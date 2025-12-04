@@ -1,0 +1,5 @@
+{
+  "name": "Sanitation Impact Modeler",
+  "description": "An interactive tool to estimate the economic cost of poor sanitation, modeled after the Malawi Sanitation Economic Impact Model. Visualize costs across health, productivity, and mortality.",
+  "requestFramePermissions": []
+}
