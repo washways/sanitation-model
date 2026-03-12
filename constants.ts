@@ -43,6 +43,7 @@ export const SUPPORTED_COUNTRIES = [
   { code: 'UG', name: 'Uganda', currency: 'UGX' },
   { code: 'YE', name: 'Yemen', currency: 'YER' },
   { code: 'ZM', name: 'Zambia', currency: 'ZMW' },
+  { code: 'ZW', name: 'Zimbabwe', currency: 'ZWG' },
 ];
 
 export const EMISSION_PRESETS = {
@@ -50,7 +51,7 @@ export const EMISSION_PRESETS = {
   SCARE: 52, // kg CO2e/person/year (Higher estimates from SCARE tool for containment + emptying)
 };
 
-// Approximate baseline values for a hypothetical Malawi scenario (Fallback)
+// Approximate fallback baseline values used before country-specific data is loaded
 export const DEFAULT_INPUTS: ModelInputs = {
   macro: {
     analysisYear: 2023,
