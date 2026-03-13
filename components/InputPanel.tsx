@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
-import { ModelInputs, MacroInputs, HealthInputs, NutritionInputs, AccessTimeInputs, OtherCostsInputs, CarbonInputs, DataSourceMap } from '../types';
+import { ModelInputs, MacroInputs, HealthInputs, NutritionInputs, AccessTimeInputs, OtherCostsInputs, CarbonInputs, DataSourceInfo, DataSourceMap } from '../types';
 import { EMISSION_PRESETS } from '../constants';
+import { getSourceToneClasses, getSourceTooltip, getSourceYearLabel } from '../utils/dataSources';
 
 interface InputPanelProps {
   inputs: ModelInputs;
@@ -22,32 +23,35 @@ const InputGroup = ({ title, children, isOpen, onToggle }: { title: string, chil
   </div>
 );
 
-const SourceBadge = ({ text }: { text: string }) => {
-    let colorClass = "bg-slate-100 text-slate-500 border-slate-200";
-    let icon = null;
+const SourceBadge = ({ source }: { source?: DataSourceInfo }) => {
+    if (!source) return null;
 
-    if (!text) return null;
+    const colorClass = getSourceToneClasses(source);
+    const tooltip = getSourceTooltip(source);
+    const yearLabel = getSourceYearLabel(source);
 
-    if (text.toLowerCase().includes("world bank") || text.toLowerCase().includes("who") || text.toLowerCase().includes("data:")) {
-        colorClass = "bg-green-50 text-green-700 border-green-200";
-        icon = (
-            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        );
-    } else if (text.toLowerCase().includes("est") || text.toLowerCase().includes("derived")) {
-        colorClass = "bg-amber-50 text-amber-700 border-amber-200";
-        icon = (
-            <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-        );
-    }
+    const icon = source.tone === 'success' ? (
+        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    ) : (
+        <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+    );
 
     return (
-        <div className={`flex items-center text-[10px] px-2 py-1 rounded border mt-1.5 w-fit ${colorClass}`}>
+        <div
+            className={`flex items-center gap-1 text-[10px] px-2 py-1 rounded border mt-1.5 w-fit ${colorClass}`}
+            title={tooltip}
+        >
             {icon}
-            <span className="truncate max-w-[180px]">{text}</span>
+            <span className="truncate max-w-[180px]">{source.label}</span>
+            {yearLabel && (
+                <span className="font-bold whitespace-nowrap">
+                    {yearLabel}
+                </span>
+            )}
         </div>
     );
 };
@@ -72,7 +76,7 @@ interface NumberFieldProps {
     onChange: (val: number) => void;
     step?: number;
     unit?: string;
-    source?: string;
+    source?: DataSourceInfo;
     noSeparator?: boolean;
 }
 
@@ -136,7 +140,7 @@ const NumberField = ({ label, value, onChange, step = 1, unit, source, noSeparat
                     </span>
                 )}
             </div>
-            {source && <SourceBadge text={source} />}
+            {source && <SourceBadge source={source} />}
         </div>
     );
 };
@@ -146,7 +150,7 @@ interface SelectFieldProps {
     value: string;
     options: {label: string; value: string}[];
     onChange: (val: string) => void;
-    source?: string;
+    source?: DataSourceInfo;
 }
 
 const SelectField = ({ label, value, options, onChange, source }: SelectFieldProps) => (
@@ -166,7 +170,7 @@ const SelectField = ({ label, value, options, onChange, source }: SelectFieldPro
                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
             </div>
         </div>
-        {source && <SourceBadge text={source} />}
+        {source && <SourceBadge source={source} />}
     </div>
 );
 

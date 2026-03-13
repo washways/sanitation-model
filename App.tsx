@@ -3,6 +3,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { DEFAULT_INPUTS, SUPPORTED_COUNTRIES } from './constants';
 import { ModelInputs, DataSourceMap } from './types';
 import { calculateModelOutputs, formatCurrency, formatNumber } from './utils/calculations';
+import { getFallbackSources } from './utils/dataSources';
+import { downloadAnalysisCsv } from './utils/export';
 import { InputPanel } from './components/InputPanel';
 import { CostChart } from './components/CostChart';
 import { MonteCarloPanel } from './components/MonteCarloPanel';
@@ -189,6 +191,7 @@ const App = () => {
   const [inputs, setInputs] = useState<ModelInputs>(DEFAULT_INPUTS);
   const [sources, setSources] = useState<DataSourceMap>({});
   const [isLoading, setIsLoading] = useState(false);
+  const [isExportingPdf, setIsExportingPdf] = useState(false);
 
   // Initial Load
   useEffect(() => {
@@ -202,7 +205,7 @@ const App = () => {
       if (country) {
           try {
               const rawData = await fetchCountryData(country.code, country.currency);
-              const estimated = estimateInputs(rawData || {}, country.code, country.currency);
+              const estimated = estimateInputs(rawData, country.code, country.currency);
               setInputs(estimated.inputs);
               setSources(estimated.sources);
           } catch (e) {
@@ -213,6 +216,37 @@ const App = () => {
   };
 
   const outputs = useMemo(() => calculateModelOutputs(inputs), [inputs]);
+  const selectedCountryMeta = useMemo(
+      () => SUPPORTED_COUNTRIES.find(country => country.code === selectedCountry),
+      [selectedCountry]
+  );
+  const selectedCountryName = selectedCountryMeta?.name || 'Selected Country';
+  const fallbackEntries = useMemo(
+      () => getFallbackSources(sources).filter(([key]) => key !== 'analysisYear'),
+      [sources]
+  );
+
+  const handleCsvExport = () => {
+      downloadAnalysisCsv(selectedCountryName, inputs, outputs, sources);
+  };
+
+  const handlePdfExport = async () => {
+      try {
+          setIsExportingPdf(true);
+          const { downloadAdvocacyPdf } = await import('./components/PDFExport');
+          await downloadAdvocacyPdf({
+              countryName: selectedCountryName,
+              inputs,
+              outputs,
+              sources
+          });
+      } catch (error) {
+          console.error('PDF export failed', error);
+          alert('PDF export failed. Please try again in the local build.');
+      } finally {
+          setIsExportingPdf(false);
+      }
+  };
 
   if (showIntro) {
       return <SplashScreen onStart={() => setShowIntro(false)} />;
@@ -247,15 +281,23 @@ const App = () => {
                     </button>
                 </div>
                 
-                {/* PDF Export Disabled in Preview Mode due to library crash */}
-                <button 
-                    disabled={true}
-                    title="PDF Export requires local build environment"
-                    className="bg-white/10 text-white/50 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-white/10 cursor-not-allowed"
-                >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                    <span className="hidden sm:inline">Export PDF (Local Only)</span>
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={handleCsvExport}
+                        className="bg-white text-brand-primary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-white/20 shadow-sm hover:bg-sky-50 transition-colors"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <span className="hidden sm:inline">Export CSV</span>
+                    </button>
+                    <button
+                        onClick={handlePdfExport}
+                        disabled={isExportingPdf}
+                        className="bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-white/20 hover:bg-white/15 transition-colors disabled:opacity-60 disabled:cursor-wait"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+                        <span className="hidden sm:inline">{isExportingPdf ? 'Building PDF...' : 'Advocacy PDF'}</span>
+                    </button>
+                </div>
             </div>
         </div>
       </header>
@@ -278,6 +320,21 @@ const App = () => {
                     </div>
                     {/* Content */}
                     <div className="overflow-visible lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 pb-6 lg:pb-6">
+                        <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
+                            fallbackEntries.length > 0
+                                ? 'bg-amber-50 border-amber-200 text-amber-900'
+                                : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+                        }`}>
+                            <div className="font-bold">
+                                Analysis aligned to {inputs.macro.analysisYear}
+                                {fallbackEntries.length > 0 ? ` with ${fallbackEntries.length} fallback year${fallbackEntries.length > 1 ? 's' : ''}` : ''}
+                            </div>
+                            <p className="mt-1 text-xs leading-relaxed">
+                                {fallbackEntries.length > 0
+                                    ? `Some indicators had to use earlier World Bank data: ${fallbackEntries.map(([key, source]) => `${key.replace(/([A-Z])/g, ' $1').trim()} (${source.actualYear || 'n/a'})`).join(', ')}. Hover the source badges below to see the exact year used for each input.`
+                                    : 'Fetched World Bank inputs matched the aligned analysis year. Hover the source badges below to inspect source details and data years.'}
+                            </p>
+                        </div>
                         <InputPanel inputs={inputs} sources={sources} onUpdate={setInputs} />
                     </div>
                 </div>

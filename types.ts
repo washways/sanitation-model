@@ -1,5 +1,46 @@
 
 export type MortalityMethod = 'humanCapital' | 'vsl';
+export type DataSourceKind = 'api' | 'live' | 'derived' | 'estimate' | 'assumption' | 'user';
+export type DataSourceTone = 'success' | 'warning' | 'danger' | 'neutral';
+
+export interface DataSourceInfo {
+  label: string;
+  kind: DataSourceKind;
+  sourceName?: string;
+  indicatorCode?: string;
+  requestedYear?: number;
+  actualYear?: number;
+  fallbackUsed?: boolean;
+  fallbackDirection?: 'earlier' | 'later';
+  tone?: DataSourceTone;
+  notes?: string;
+  link?: string;
+}
+
+export interface CountryIndicatorValue {
+  value: number | null;
+  source: DataSourceInfo;
+}
+
+export interface CountryApiData {
+  analysisYear: number;
+  alignmentStrategy: 'latest-common-year' | 'best-coverage-year';
+  fallbackFields: string[];
+  fields: {
+    population: CountryIndicatorValue;
+    gdpPerCapita: CountryIndicatorValue;
+    openDefecation: CountryIndicatorValue;
+    mortalityUnder5Rate: CountryIndicatorValue;
+    tourismReceipts: CountryIndicatorValue;
+    birthRate: CountryIndicatorValue;
+    healthExpenditure: CountryIndicatorValue;
+    diarrheaPrevalence: CountryIndicatorValue;
+    stuntingPrevalence: CountryIndicatorValue;
+    washMortality: CountryIndicatorValue;
+    exchangeRate: CountryIndicatorValue;
+    basicSanitation: CountryIndicatorValue;
+  };
+}
 
 export interface MacroInputs {
   analysisYear: number;
@@ -86,7 +127,7 @@ export interface ChartDataPoint {
   color: string;
 }
 
-export type DataSourceMap = Record<string, string>; // Key (e.g., 'population') -> Source Description
+export type DataSourceMap = Record<string, DataSourceInfo>;
 
 // Monte Carlo & Comparison Types
 export interface SimulationStats {

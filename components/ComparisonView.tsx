@@ -33,7 +33,7 @@ export const ComparisonView = () => {
       for (let i = 0; i < SUPPORTED_COUNTRIES.length; i++) {
         const country = SUPPORTED_COUNTRIES[i];
         const rawData = allWBData[country.code];
-        const { inputs } = estimateInputs(rawData || {}, country.code, country.currency);
+        const { inputs } = estimateInputs(rawData, country.code, country.currency);
         
         const stats = runSimulation(inputs, 2000);
         
