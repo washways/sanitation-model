@@ -350,14 +350,18 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
             value={inputs.carbon.emissionFactor} 
             onChange={(v) => updateCarbon('emissionFactor', v)} 
             unit="kg"
-            source={inputs.carbon.emissionFactorSource === 'IPCC' ? 'Ref: IPCC 2019 Refinement' : inputs.carbon.emissionFactorSource === 'SCARE' ? 'Ref: SCARE Tool (Univ. of Leeds)' : 'Custom Estimate'} 
+            source={{
+                label: inputs.carbon.emissionFactorSource === 'IPCC' ? 'Ref: IPCC 2019 Refinement' : inputs.carbon.emissionFactorSource === 'SCARE' ? 'Ref: SCARE Tool (Univ. of Leeds)' : 'Custom Estimate',
+                kind: inputs.carbon.emissionFactorSource === 'Custom' ? 'user' : 'assumption',
+                tone: 'neutral',
+            }}
         />
          <NumberField 
             label="Social Cost of Carbon (USD/t)" 
             value={inputs.carbon.socialCostOfCarbon} 
             onChange={(v) => updateCarbon('socialCostOfCarbon', v)} 
             unit="$"
-            source="Ref: Rennert et al. 2022 / EPA"
+            source={{ label: 'Ref: Rennert et al. 2022 / EPA', kind: 'assumption', tone: 'neutral' }}
         />
       </InputGroup>
 
