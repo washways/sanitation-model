@@ -9,7 +9,7 @@ interface CountrySelectorProps {
 
 export const CountrySelector: React.FC<CountrySelectorProps> = ({ selectedCode, onSelect, isLoading }) => {
   return (
-    <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-300 shadow-sm transition-colors hover:border-brand-primary/50">
+    <div className="flex items-center gap-2 bg-white rounded-lg p-1 border border-slate-300 transition-colors hover:border-brand-primary/50">
       <div className="relative group">
         <select
           value={selectedCode}

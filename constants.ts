@@ -99,7 +99,7 @@ export const DEFAULT_INPUTS: ModelInputs = {
 };
 
 export const COLOR_PALETTE = {
-  healthCare: '#1CABE2', // Brand Cyan
+  healthCare: '#0B6E80', // Brand Teal
   productivity: '#FFC20E', // Brand Accent (Yellow)
   mortality: '#E2231A', // UNICEF Red (approx for alerts)
   nutrition: '#84BD00', // Green

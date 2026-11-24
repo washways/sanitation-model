@@ -1,5 +1,5 @@
 
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { ModelInputs, ModelOutputs, SimulationStats } from '../types';
 import { runSimulation } from '../utils/monteCarlo';
 import { formatCurrency } from '../utils/calculations';
@@ -11,10 +11,16 @@ interface MonteCarloPanelProps {
 }
 
 export const MonteCarloPanel: React.FC<MonteCarloPanelProps> = ({ inputs, baseOutputs }) => {
-  // Run simulation on render (or when inputs change)
-  const stats: SimulationStats = useMemo(() => {
-    return runSimulation(inputs, 10000);
+  // Re-run the simulation only once typing pauses, so inputs stay responsive.
+  const [simInputs, setSimInputs] = useState(inputs);
+  useEffect(() => {
+    const t = setTimeout(() => setSimInputs(inputs), 250);
+    return () => clearTimeout(t);
   }, [inputs]);
+
+  const stats: SimulationStats = useMemo(() => {
+    return runSimulation(simInputs, 10000);
+  }, [simInputs]);
 
   // Prepare Histogram Data
   const histogramData = useMemo(() => {
@@ -49,8 +55,8 @@ export const MonteCarloPanel: React.FC<MonteCarloPanelProps> = ({ inputs, baseOu
   }, [stats]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-4 border-b border-slate-200 bg-slate-50 flex justify-between items-center">
+    <div className="bg-white rounded-xl border border-line overflow-hidden">
+      <div className="p-4 border-b border-line bg-slate-50 flex justify-between items-center">
         <h3 className="font-bold text-brand-dark flex items-center gap-2">
           <svg className="w-5 h-5 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -63,7 +69,7 @@ export const MonteCarloPanel: React.FC<MonteCarloPanelProps> = ({ inputs, baseOu
       <div className="p-6">
         
         {/* Summary Stats Card */}
-        <div className="bg-slate-50 rounded-lg border border-slate-200 p-5 mb-6">
+        <div className="bg-slate-50 rounded-lg border border-line p-5 mb-6">
            <h4 className="text-xs font-bold text-slate-500 mb-4 uppercase tracking-wider text-center">Projected Annual Cost (90% Confidence Interval)</h4>
            
            <div className="grid grid-cols-3 gap-4 items-end mb-2">
@@ -126,10 +132,10 @@ export const MonteCarloPanel: React.FC<MonteCarloPanelProps> = ({ inputs, baseOu
                             <Bar dataKey="count" radius={[2, 2, 0, 0]}>
                                 {histogramData.map((entry, index) => {
                                     const isMean = Math.abs(entry.fullValue - stats.mean) < (entry.rangeEnd - entry.rangeStart);
-                                    return <Cell key={`cell-${index}`} fill={isMean ? '#1CABE2' : '#cbd5e1'} />;
+                                    return <Cell key={`cell-${index}`} fill={isMean ? '#0B6E80' : '#cbd5e1'} />;
                                 })}
                             </Bar>
-                            <ReferenceLine x={histogramData.find(h => h.fullValue > stats.mean)?.label} stroke="#374EA2" strokeDasharray="3 3" />
+                            <ReferenceLine x={histogramData.find(h => h.fullValue > stats.mean)?.label} stroke="#263238" strokeDasharray="3 3" />
                             </BarChart>
                         </ResponsiveContainer>
                 </div>
@@ -137,7 +143,7 @@ export const MonteCarloPanel: React.FC<MonteCarloPanelProps> = ({ inputs, baseOu
 
             {/* Interpretation */}
             <div className="flex flex-col justify-center">
-                <div className="bg-blue-50/50 border-l-4 border-brand-primary p-4 rounded-r-lg">
+                <div className="bg-white border border-line p-4 rounded-lg">
                     <h4 className="text-sm font-bold text-brand-dark mb-2">Analysis Insight</h4>
                     <p className="text-sm text-slate-600 leading-relaxed">
                         The model estimates a mean economic cost of <strong className="text-brand-dark">{formatCurrency(stats.mean)}</strong>. 

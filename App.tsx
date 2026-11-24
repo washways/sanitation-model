@@ -1,21 +1,31 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { DEFAULT_INPUTS, SUPPORTED_COUNTRIES } from './constants';
 import { ModelInputs, DataSourceMap } from './types';
 import { calculateModelOutputs, formatCurrency, formatNumber } from './utils/calculations';
 import { getFallbackSources } from './utils/dataSources';
 import { downloadAnalysisCsv } from './utils/export';
 import { InputPanel } from './components/InputPanel';
-import { CostChart } from './components/CostChart';
-import { MonteCarloPanel } from './components/MonteCarloPanel';
-import { ComparisonView } from './components/ComparisonView';
+// Chart-heavy views (Recharts) are split out of the initial bundle so the splash screen
+// appears immediately; they are preloaded in the background while the splash is shown.
+const loadCostChart = () => import('./components/CostChart');
+const loadMonteCarlo = () => import('./components/MonteCarloPanel');
+const loadComparison = () => import('./components/ComparisonView');
+const CostChart = lazy(() => loadCostChart().then(m => ({ default: m.CostChart })));
+const MonteCarloPanel = lazy(() => loadMonteCarlo().then(m => ({ default: m.MonteCarloPanel })));
+const ComparisonView = lazy(() => loadComparison().then(m => ({ default: m.ComparisonView })));
+
+const PanelFallback = () => (
+    <div className="h-64 flex items-center justify-center text-sm text-slate-400">Loading…</div>
+);
 import { CountrySelector } from './components/CountrySelector';
 import { SplashScreen } from './components/SplashScreen';
+import { ChangelogDialog, APP_VERSION } from './components/ChangelogDialog';
 import { fetchCountryData } from './services/worldBank';
 import { estimateInputs } from './utils/estimators';
 
 const MobileStickyFooter = ({ outputs, currency }: { outputs: any, currency: string }) => (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 px-4 py-3 flex justify-between items-center safe-area-pb">
+    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-line shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 px-4 py-3 flex justify-between items-center safe-area-pb">
         <div>
             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Total Economic Cost</p>
             <div className="flex items-baseline gap-2">
@@ -192,10 +202,13 @@ const App = () => {
   const [sources, setSources] = useState<DataSourceMap>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
+  const [showChangelog, setShowChangelog] = useState(false);
 
   // Initial Load
   useEffect(() => {
       loadCountryData('MW');
+      loadCostChart();
+      loadMonteCarlo();
   }, []);
 
   const loadCountryData = async (code: string) => {
@@ -253,38 +266,42 @@ const App = () => {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col font-sans text-slate-900">
+    <div className="min-h-screen bg-page flex flex-col font-sans text-slate-900">
       
+      {showChangelog && <ChangelogDialog onClose={() => setShowChangelog(false)} />}
+
       {/* Header */}
-      <header className="bg-brand-primary text-white shadow-md z-20 shrink-0">
-        <div className="max-w-[1600px] mx-auto px-4 h-16 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-white text-brand-primary rounded flex items-center justify-center font-bold shadow-lg">
-                    S
-                </div>
-                <h1 className="font-bold text-lg tracking-tight hidden sm:block">Sanitation Impact Modeler</h1>
+      <header className="sticky top-0 z-20 shrink-0 bg-navy text-white">
+        <div className="max-w-[1600px] mx-auto px-4 min-h-[56px] flex flex-wrap items-center gap-x-5">
+            <div className="flex flex-col py-2">
+                <h1 className="text-[1.1rem] font-extrabold leading-tight tracking-tight">Sanitation Impact Modeler</h1>
+                <span className="text-[0.64rem] font-semibold uppercase tracking-[0.09em] text-navy-sub">washways · sanitation economics</span>
             </div>
 
-            <div className="flex items-center gap-4">
-                <div className="flex items-center bg-black/10 rounded-lg p-1 mr-2">
-                    <button 
-                        onClick={() => setActiveTab('analysis')}
-                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${activeTab === 'analysis' ? 'bg-white text-brand-primary shadow' : 'text-white/80 hover:text-white'}`}
+            <nav className="flex items-end self-stretch">
+                {([['analysis', 'Single Analysis'], ['comparison', 'Global Comparison']] as const).map(([tab, label]) => (
+                    <button
+                        key={tab}
+                        onClick={() => setActiveTab(tab)}
+                        className={`whitespace-nowrap border-b-[3px] px-3 pb-3 pt-4 text-sm font-semibold ${activeTab === tab ? 'border-navy-tab text-white' : 'border-transparent text-[#d5dde0] hover:text-white'}`}
                     >
-                        Single Analysis
+                        {label}
                     </button>
-                    <button 
-                        onClick={() => setActiveTab('comparison')}
-                        className={`px-4 py-1.5 rounded-md text-sm font-bold transition-all ${activeTab === 'comparison' ? 'bg-white text-brand-primary shadow' : 'text-white/80 hover:text-white'}`}
-                    >
-                        Global Comparison
-                    </button>
-                </div>
-                
+                ))}
+            </nav>
+
+            <div className="ml-auto flex items-center gap-2 py-2">
+                <button
+                    onClick={() => setShowChangelog(true)}
+                    className="rounded-md px-2 py-1 text-xs font-semibold text-navy-sub hover:text-white"
+                    title="What changed"
+                >
+                    v{APP_VERSION}
+                </button>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleCsvExport}
-                        className="bg-white text-brand-primary px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-white/20 shadow-sm hover:bg-sky-50 transition-colors"
+                        className="bg-brand-primary text-white px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-sky-600 transition-colors"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <span className="hidden sm:inline">Export CSV</span>
@@ -292,7 +309,7 @@ const App = () => {
                     <button
                         onClick={handlePdfExport}
                         disabled={isExportingPdf}
-                        className="bg-white/10 text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 border border-white/20 hover:bg-white/15 transition-colors disabled:opacity-60 disabled:cursor-wait"
+                        className="text-white px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 border border-[#56666d] hover:bg-white/10 transition-colors disabled:opacity-60 disabled:cursor-wait"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                         <span className="hidden sm:inline">{isExportingPdf ? 'Building PDF...' : 'Advocacy PDF'}</span>
@@ -309,8 +326,8 @@ const App = () => {
              <div className="flex-1 flex flex-col lg:flex-row relative lg:h-full">
                 
                 {/* LEFT PANEL: INPUTS (Top on mobile, Left on desktop) */}
-                <div className="w-full lg:w-1/2 flex flex-col border-r border-slate-200 bg-white shadow-xl lg:shadow-none lg:h-full h-auto order-1 z-10">
-                    <div className="p-4 bg-slate-50 border-b border-slate-200 shrink-0 flex items-center justify-between sticky top-0 lg:static z-20">
+                <div className="w-full lg:w-1/2 flex flex-col border-r border-line bg-white lg:h-full h-auto order-1 z-10">
+                    <div className="p-4 bg-slate-50 border-b border-line shrink-0 flex items-center justify-between sticky top-0 lg:static z-20">
                          <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Country Context</h2>
                          <CountrySelector 
                             selectedCode={selectedCountry} 
@@ -340,17 +357,17 @@ const App = () => {
                 </div>
 
                 {/* RIGHT PANEL: RESULTS (Bottom on mobile, Right on desktop) */}
-                <div className="w-full lg:w-1/2 bg-slate-50 flex flex-col lg:h-full h-auto order-2">
+                <div className="w-full lg:w-1/2 bg-page flex flex-col lg:h-full h-auto order-2">
                     {/* Content */}
                     <div className="overflow-visible lg:overflow-y-auto custom-scrollbar p-4 lg:p-8 pb-32">
                         {/* Summary Cards */}
                         <div className="grid grid-cols-2 gap-4">
-                            <div className="bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-primary">
+                            <div className="bg-white p-5 rounded-xl border border-line">
                                 <p className="text-xs font-bold text-slate-500 uppercase mb-1">Total Annual Cost</p>
                                 <p className="text-2xl lg:text-3xl font-black text-brand-dark">{formatCurrency(outputs.totalCostUSD)}</p>
                                 <p className="text-xs text-slate-400 mt-1">{formatCurrency(outputs.totalCostLocal, inputs.macro.currencyCode)}</p>
                             </div>
-                            <div className="bg-white p-5 rounded-xl shadow-sm border-l-4 border-brand-accent">
+                            <div className="bg-white p-5 rounded-xl border border-line">
                                 <p className="text-xs font-bold text-slate-500 uppercase mb-1">Impact on Economy</p>
                                 <p className="text-2xl lg:text-3xl font-black text-brand-dark">{formatNumber(outputs.percentGDP)}%</p>
                                 <p className="text-xs text-slate-400 mt-1">of National GDP</p>
@@ -358,7 +375,7 @@ const App = () => {
                         </div>
 
                         {/* Chart Section */}
-                        <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mt-6">
+                        <div className="bg-white p-6 rounded-xl border border-line mt-6">
                              <div className="flex justify-between items-center mb-6">
                                  <h3 className="font-bold text-brand-dark">Cost Breakdown by Category</h3>
                                  <div className="flex gap-2">
@@ -367,13 +384,13 @@ const App = () => {
                                      ))}
                                  </div>
                              </div>
-                             <CostChart outputs={outputs} />
+                             <Suspense fallback={<PanelFallback />}><CostChart outputs={outputs} /></Suspense>
                         </div>
 
                         {/* Breakdown Table */}
-                        <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mt-6">
+                        <div className="bg-white rounded-xl border border-line overflow-hidden mt-6">
                              <table className="w-full text-sm">
-                                 <thead className="bg-slate-50 border-b border-slate-200">
+                                 <thead className="bg-slate-50 border-b border-line">
                                      <tr>
                                          <th className="px-6 py-3 text-left font-bold text-slate-500">Category</th>
                                          <th className="px-6 py-3 text-right font-bold text-slate-500">Cost (USD)</th>
@@ -400,7 +417,7 @@ const App = () => {
 
                         {/* Monte Carlo Analysis */}
                         <div className="mt-6">
-                            <MonteCarloPanel inputs={inputs} baseOutputs={outputs} />
+                            <Suspense fallback={<PanelFallback />}><MonteCarloPanel inputs={inputs} baseOutputs={outputs} /></Suspense>
                         </div>
 
                         {/* Methodology Footer */}
@@ -412,7 +429,7 @@ const App = () => {
              </div>
         ) : (
             <div className="h-full overflow-hidden">
-                <ComparisonView />
+                <Suspense fallback={<PanelFallback />}><ComparisonView /></Suspense>
             </div>
         )}
 

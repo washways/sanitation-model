@@ -29,7 +29,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart }) => {
         <div className="flex-1 min-h-0 overflow-y-auto flex flex-col md:flex-row">
 
           {/* Left Visual Side */}
-          <div className="w-full md:w-5/12 bg-gradient-to-br from-brand-primary to-blue-600 p-6 md:p-10 flex flex-col justify-between text-white relative shrink-0 overflow-hidden">
+          <div className="w-full md:w-5/12 bg-brand-dark p-6 md:p-10 flex flex-col justify-between text-white relative shrink-0 overflow-hidden">
             <div className="relative z-10">
               <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">Sanitation Impact Modeler</h1>
               <div className="h-1.5 w-16 md:w-24 bg-brand-accent mb-6 md:mb-8"></div>
@@ -52,10 +52,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart }) => {
                 <span className="font-semibold text-base md:text-lg">Analyze Costs</span>
               </div>
             </div>
-
-            {/* Abstract blobs - Hidden on mobile to save space/visual noise */}
-            <div className="hidden md:block absolute -bottom-32 -right-32 w-80 h-80 bg-brand-dark rounded-full mix-blend-multiply opacity-50 blur-3xl"></div>
-            <div className="hidden md:block absolute top-0 -left-10 w-40 h-40 bg-white rounded-full mix-blend-overlay opacity-20 blur-2xl"></div>
           </div>
 
           {/* Right Content Side */}
@@ -68,32 +64,32 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart }) => {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-              <div className="bg-blue-50 p-4 md:p-5 rounded-xl border border-blue-100">
-                <h3 className="font-bold text-brand-primary mb-1 md:mb-2 flex items-center gap-2 text-sm md:text-base">
+              <div className="p-4 md:p-5 rounded-lg border border-line">
+                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
                   Health & Mortality
                 </h3>
                 <p className="text-xs md:text-sm text-slate-600">
                   Treatment costs for disease and value of premature deaths (Human Capital or VSL).
                 </p>
               </div>
-              <div className="bg-amber-50 p-4 md:p-5 rounded-xl border border-amber-100">
-                <h3 className="font-bold text-brand-accent mb-1 md:mb-2 flex items-center gap-2 text-amber-600 text-sm md:text-base">
+              <div className="p-4 md:p-5 rounded-lg border border-line">
+                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
                   Access Time
                 </h3>
                 <p className="text-xs md:text-sm text-slate-600">
                   Productive time lost searching for open defecation sites.
                 </p>
               </div>
-              <div className="bg-green-50 p-4 md:p-5 rounded-xl border border-green-100">
-                <h3 className="font-bold text-green-600 mb-1 md:mb-2 flex items-center gap-2 text-sm md:text-base">
+              <div className="p-4 md:p-5 rounded-lg border border-line">
+                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
                   Stunting
                 </h3>
                 <p className="text-xs md:text-sm text-slate-600">
                   Future wage losses due to childhood stunting and cognitive delay.
                 </p>
               </div>
-              <div className="bg-slate-100 p-4 md:p-5 rounded-xl border border-slate-200">
-                <h3 className="font-bold text-slate-700 mb-1 md:mb-2 flex items-center gap-2 text-sm md:text-base">
+              <div className="p-4 md:p-5 rounded-lg border border-line">
+                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
                   Uncertainty
                 </h3>
                 <p className="text-xs md:text-sm text-slate-600">
@@ -105,14 +101,14 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart }) => {
         </div>
 
         {/* Pinned footer - always visible regardless of screen height */}
-        <div className="shrink-0 border-t border-slate-200 bg-white px-4 py-3 md:px-8 md:py-4 flex flex-col-reverse md:flex-row items-center gap-2 md:gap-6">
+        <div className="shrink-0 border-t border-line bg-white px-4 py-3 md:px-8 md:py-4 flex flex-col-reverse md:flex-row items-center gap-2 md:gap-6">
           <p className="text-[10px] md:text-xs text-center md:text-left text-slate-400 font-medium md:flex-1">
             Modeled after World Bank WSP methodologies. Data sourced live from World Bank Open Data API.
           </p>
           <button
             onClick={onStart}
             autoFocus
-            className="w-full md:w-auto md:px-10 bg-brand-primary hover:bg-sky-500 text-white font-bold text-lg py-3 md:py-4 rounded-2xl shadow-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3"
+            className="w-full md:w-auto md:px-10 bg-brand-primary hover:bg-sky-500 text-white font-bold text-lg py-3 md:py-4 rounded-lg transition-colors flex items-center justify-center gap-3"
           >
             Launch Model
             <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>

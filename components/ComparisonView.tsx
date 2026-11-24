@@ -96,9 +96,9 @@ export const ComparisonView = () => {
   const chartHeight = Math.max(500, chartData.length * 40);
 
   return (
-    <div className="w-full h-full bg-white rounded-xl shadow-sm border border-slate-200 flex flex-col overflow-hidden font-sans">
+    <div className="w-full h-full bg-white rounded-xl border border-line flex flex-col overflow-hidden font-sans">
       {/* Header */}
-      <div className="p-6 border-b border-slate-200 flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50 shrink-0">
+      <div className="p-6 border-b border-line flex flex-col md:flex-row justify-between items-center gap-4 bg-slate-50 shrink-0">
         <div>
             <h2 className="text-xl font-bold text-brand-dark">Global LDC Comparison</h2>
             <p className="text-sm text-slate-500">Ranking economic impact across {SUPPORTED_COUNTRIES.length} countries using Monte Carlo analysis.</p>
@@ -128,7 +128,7 @@ export const ComparisonView = () => {
              )}
 
              {hasRun && !isRunning && (
-                 <div className="flex bg-white rounded-lg border border-slate-300 overflow-hidden shadow-sm">
+                 <div className="flex bg-white rounded-lg border border-slate-300 overflow-hidden">
                      <button 
                         onClick={() => setSortBy('gdp')}
                         className={`px-4 py-2 text-sm font-bold ${sortBy === 'gdp' ? 'bg-brand-primary text-white' : 'text-slate-600 hover:bg-slate-50'}`}
@@ -160,7 +160,7 @@ export const ComparisonView = () => {
         {hasRun && (
             <div className="flex flex-col gap-8 p-6">
                 {/* Chart */}
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
+                <div className="bg-white p-6 rounded-xl border border-line">
                     <h3 className="font-bold text-slate-700 mb-6 ml-2">Estimated Impact ({sortBy === 'gdp' ? '% GDP' : 'USD'}) Breakdown</h3>
                     <div style={{ height: chartHeight }} className="w-full">
                         <ResponsiveContainer width="100%" height="100%">
@@ -235,7 +235,7 @@ export const ComparisonView = () => {
                 </div>
 
                 {/* Methodology Footer for Comparison Tab */}
-                <div className="bg-slate-900 text-slate-300 p-8 rounded-xl border-l-4 border-brand-accent">
+                <div className="bg-slate-900 text-slate-300 p-8 rounded-xl">
                     <h3 className="text-white font-bold text-lg mb-6 flex items-center gap-2">
                         <svg className="w-6 h-6 text-brand-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         Methodology & Interpretation

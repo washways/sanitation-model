@@ -11,7 +11,7 @@ interface InputPanelProps {
 }
 
 const InputGroup = ({ title, children, isOpen, onToggle }: { title: string, children?: React.ReactNode, isOpen: boolean, onToggle: () => void }) => (
-  <div className="border border-slate-200 rounded-lg mb-4 overflow-hidden bg-white shadow-sm transition-all duration-200">
+  <div className="border border-slate-200 rounded-lg mb-4 overflow-hidden bg-white transition-all duration-200">
     <button 
       className={`w-full px-4 py-3 text-left font-bold flex justify-between items-center transition-colors ${isOpen ? 'bg-slate-50 text-brand-dark' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
       onClick={onToggle}
@@ -275,7 +275,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
                     />
                 )}
             </div>
-            <div className="mt-3 bg-blue-50 text-blue-800 text-xs p-3 rounded border border-blue-100">
+            <div className="mt-3 bg-slate-50 text-slate-600 text-xs p-3 rounded border border-slate-200">
                 {inputs.macro.mortalityMethod === 'humanCapital' 
                     ? <span><strong>Note:</strong> The Human Capital Approach is conservative. It values life based solely on future economic output (GDP contribution).</span>
                     : <span><strong>Note:</strong> VSL (Value of Statistical Life) values risk reduction based on "Willingness to Pay". It captures the intrinsic value of living and is typically 50-100x higher than Human Capital.</span>

@@ -38,8 +38,15 @@ export const runSimulation = (baseInputs: ModelInputs, iterations: number = 500)
   };
 
   for (let i = 0; i < iterations; i++) {
-    // deep copy to avoid mutating base
-    const simInputs: ModelInputs = JSON.parse(JSON.stringify(baseInputs)); 
+    // Copy each (flat) section to avoid mutating base. Much faster than a JSON deep clone.
+    const simInputs: ModelInputs = {
+      macro: { ...baseInputs.macro },
+      health: { ...baseInputs.health },
+      nutrition: { ...baseInputs.nutrition },
+      access: { ...baseInputs.access },
+      carbon: { ...baseInputs.carbon },
+      other: { ...baseInputs.other },
+    };
 
     // --- APPLY UNCERTAINTY TO ALL VARIABLES ---
     
