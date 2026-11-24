@@ -22,10 +22,11 @@ import { CountrySelector } from './components/CountrySelector';
 import { SplashScreen } from './components/SplashScreen';
 import { ChangelogDialog, APP_VERSION } from './components/ChangelogDialog';
 import { fetchCountryData } from './services/worldBank';
+import { useBottomOverlayInset } from './utils/useBottomOverlayInset';
 import { estimateInputs } from './utils/estimators';
 
 const MobileStickyFooter = ({ outputs, currency }: { outputs: any, currency: string }) => (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-line shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 px-4 py-3 flex justify-between items-center safe-area-pb">
+    <div className="lg:hidden fixed bottom-[var(--bottom-inset,0px)] left-0 right-0 bg-white border-t border-line shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-40 px-4 py-3 flex justify-between items-center safe-area-pb">
         <div>
             <p className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">Total Economic Cost</p>
             <div className="flex items-baseline gap-2">
@@ -203,6 +204,7 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
+  useBottomOverlayInset();
 
   // Initial Load
   useEffect(() => {
@@ -272,47 +274,50 @@ const App = () => {
 
       {/* Header */}
       <header className="sticky top-0 z-20 shrink-0 bg-navy text-white">
-        <div className="max-w-[1600px] mx-auto px-4 min-h-[56px] flex flex-wrap items-center gap-x-5">
+        <div className="max-w-[1600px] mx-auto px-4 min-h-[56px] flex flex-wrap items-center gap-x-3 md:gap-x-5">
             <div className="flex flex-col py-2">
-                <h1 className="text-[1.1rem] font-extrabold leading-tight tracking-tight">Sanitation Impact Modeler</h1>
+                <h1 className="text-base sm:text-[1.1rem] font-extrabold leading-tight tracking-tight">Sanitation Impact Modeler</h1>
                 <span className="text-[0.64rem] font-semibold uppercase tracking-[0.09em] text-navy-sub">washways · sanitation economics</span>
             </div>
 
-            <nav className="flex items-end self-stretch">
+            <nav className="order-3 w-full -mt-1 md:mt-0 md:order-none md:w-auto flex items-end self-stretch overflow-x-auto">
                 {([['analysis', 'Single Analysis'], ['comparison', 'Global Comparison']] as const).map(([tab, label]) => (
                     <button
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={`whitespace-nowrap border-b-[3px] px-3 pb-3 pt-4 text-sm font-semibold ${activeTab === tab ? 'border-navy-tab text-white' : 'border-transparent text-[#d5dde0] hover:text-white'}`}
+                        className={`whitespace-nowrap border-b-[3px] px-3 pb-2 pt-1 md:pb-3 md:pt-4 text-sm font-semibold ${activeTab === tab ? 'border-navy-tab text-white' : 'border-transparent text-[#d5dde0] hover:text-white'}`}
                     >
                         {label}
                     </button>
                 ))}
             </nav>
 
-            <div className="ml-auto flex items-center gap-2 py-2">
+            <div className="order-2 md:order-none ml-auto flex items-center gap-1.5 md:gap-2 py-2">
                 <button
                     onClick={() => setShowChangelog(true)}
-                    className="rounded-md px-2 py-1 text-xs font-semibold text-navy-sub hover:text-white"
+                    className="rounded-md px-1 md:px-2 py-1 text-xs font-semibold text-navy-sub hover:text-white"
                     title="What changed"
+                    aria-label={`Version ${APP_VERSION}: what changed`}
                 >
                     v{APP_VERSION}
                 </button>
                 <div className="flex items-center gap-2">
                     <button
                         onClick={handleCsvExport}
-                        className="bg-brand-primary text-white px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-sky-600 transition-colors"
+                        title="Export CSV"
+                        className="bg-brand-primary text-white px-2 lg:px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 hover:bg-sky-600 transition-colors"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span className="hidden sm:inline">Export CSV</span>
+                        <span className="hidden lg:inline">Export CSV</span>
                     </button>
                     <button
                         onClick={handlePdfExport}
                         disabled={isExportingPdf}
-                        className="text-white px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 border border-[#56666d] hover:bg-white/10 transition-colors disabled:opacity-60 disabled:cursor-wait"
+                        title="Advocacy PDF"
+                        className="text-white px-2 lg:px-3 py-1.5 rounded-md text-sm font-semibold flex items-center gap-2 border border-[#56666d] hover:bg-white/10 transition-colors disabled:opacity-60 disabled:cursor-wait"
                     >
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
-                        <span className="hidden sm:inline">{isExportingPdf ? 'Building PDF...' : 'Advocacy PDF'}</span>
+                        <span className="hidden lg:inline">{isExportingPdf ? 'Building PDF...' : 'Advocacy PDF'}</span>
                     </button>
                 </div>
             </div>
@@ -328,7 +333,7 @@ const App = () => {
                 {/* LEFT PANEL: INPUTS (Top on mobile, Left on desktop) */}
                 <div className="w-full lg:w-1/2 flex flex-col border-r border-line bg-white lg:h-full h-auto order-1 z-10">
                     <div className="p-4 bg-slate-50 border-b border-line shrink-0 flex items-center justify-between sticky top-0 lg:static z-20">
-                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider">Country Context</h2>
+                         <h2 className="text-sm font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">Country</h2>
                          <CountrySelector 
                             selectedCode={selectedCountry} 
                             onSelect={loadCountryData} 
@@ -336,7 +341,7 @@ const App = () => {
                          />
                     </div>
                     {/* Content */}
-                    <div className="overflow-visible lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 pb-6 lg:pb-6">
+                    <div className="overflow-visible lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 pb-6 lg:pb-[calc(1.5rem+var(--bottom-inset,0px))]">
                         <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
                             fallbackEntries.length > 0
                                 ? 'bg-amber-50 border-amber-200 text-amber-900'

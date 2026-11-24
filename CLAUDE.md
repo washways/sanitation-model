@@ -31,4 +31,6 @@ Repo: github.com/washways/sanitation-model. Work directly on `main`; keep local 
 
 ## Code notes
 - `components/SplashScreen.tsx`: card capped at `100dvh`, body scrolls, Launch button lives in a pinned footer so it is always visible. Enter/Escape also dismiss. Don't move the button back into the scrolling content.
+- The shared WASHways analytics script injects a fixed consent banner (no id/class) at the bottom of the page. `utils/useBottomOverlayInset.ts` measures it and sets `--bottom-inset` on `<html>`; the splash, the mobile cost bar and the inputs panel pad by it. Use `var(--bottom-inset,0px)` for anything new pinned to the bottom.
+- To check layouts at phone/tablet sizes when Chrome can't be resized, load the app in same-origin iframes of fixed width (media queries follow the iframe width).
 - Data source badges (`SourceBadge` in `components/InputPanel.tsx`) take a `DataSourceInfo` object (`types.ts`), never a plain string.

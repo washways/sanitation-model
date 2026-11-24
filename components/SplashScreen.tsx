@@ -4,9 +4,20 @@ interface SplashScreenProps {
   onStart: () => void;
 }
 
+const FEATURES: [string, string][] = [
+  ['Health & mortality', 'Treatment costs and the value of premature deaths (Human Capital or VSL).'],
+  ['Access time', 'Productive time lost searching for open defecation sites.'],
+  ['Stunting', 'Future wage losses from childhood stunting and cognitive delay.'],
+  ['Uncertainty', 'Monte Carlo simulation gives a confidence range, not just one number.'],
+];
+
+const STEPS = ['Select a country', 'Adjust the inputs', 'Read the costs'];
+
 /**
  * Layout guarantees the "Launch Model" button is always on screen:
- * - The overlay is exactly one viewport tall (100dvh, so mobile browser bars are accounted for).
+ * - The overlay is exactly one viewport tall (100dvh, so mobile browser bars are accounted for)
+ *   and pads its bottom by --bottom-inset, the height of the WASHways consent banner while it
+ *   is showing (see utils/useBottomOverlayInset.ts).
  * - The card is capped at the overlay height (max-h-full).
  * - Only the card body scrolls (flex-1 min-h-0 overflow-y-auto); the footer holding the
  *   button is a non-shrinking sibling, so it can never be pushed off screen.
@@ -22,96 +33,60 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({ onStart }) => {
   }, [onStart]);
 
   return (
-    <div className="fixed inset-0 h-[100dvh] bg-brand-dark z-50 flex items-center justify-center p-0 md:p-4">
-      <div className="w-full h-full md:h-auto md:max-h-full md:max-w-5xl bg-white md:rounded-3xl md:shadow-2xl md:border md:border-slate-700 overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 h-[100dvh] bg-page flex items-center justify-center p-0 pb-[var(--bottom-inset,0px)] sm:p-4 sm:pb-[max(var(--bottom-inset,0px),1rem)]">
+      <div className="w-full h-full sm:h-auto sm:max-h-full sm:max-w-4xl bg-white sm:rounded-xl sm:border sm:border-line overflow-hidden flex flex-col">
 
         {/* Scrollable body */}
         <div className="flex-1 min-h-0 overflow-y-auto flex flex-col md:flex-row">
 
-          {/* Left Visual Side */}
-          <div className="w-full md:w-5/12 bg-brand-dark p-6 md:p-10 flex flex-col justify-between text-white relative shrink-0 overflow-hidden">
-            <div className="relative z-10">
-              <h1 className="text-3xl md:text-5xl font-black tracking-tight mb-4">Sanitation Impact Modeler</h1>
-              <div className="h-1.5 w-16 md:w-24 bg-brand-accent mb-6 md:mb-8"></div>
-              <p className="text-blue-50 text-lg md:text-xl font-medium leading-relaxed opacity-90">
-                Quantifying the hidden economic burden of poor sanitation on health, productivity, and human potential.
-              </p>
-            </div>
-
-            <div className="relative z-10 mt-8 md:mt-12 space-y-4 md:space-y-6 hidden sm:block">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-base md:text-lg border border-white/30">1</div>
-                <span className="font-semibold text-base md:text-lg">Select Country</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-base md:text-lg border border-white/30">2</div>
-                <span className="font-semibold text-base md:text-lg">Adjust Inputs</span>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-white/20 flex items-center justify-center font-bold text-base md:text-lg border border-white/30">3</div>
-                <span className="font-semibold text-base md:text-lg">Analyze Costs</span>
-              </div>
-            </div>
+          {/* Left: title */}
+          <div className="md:w-5/12 shrink-0 bg-navy text-white px-5 py-6 md:p-8 flex flex-col">
+            <p className="text-[0.64rem] font-semibold uppercase tracking-[0.09em] text-navy-sub">washways · sanitation economics</p>
+            <h1 className="mt-2 text-2xl md:text-3xl font-extrabold leading-tight tracking-tight">Sanitation Impact Modeler</h1>
+            <p className="mt-3 text-sm md:text-base text-[#d5dde0] leading-relaxed">
+              Puts a money value on the hidden cost of poor sanitation: health, productivity and human potential.
+            </p>
+            <ol className="mt-6 md:mt-auto md:pt-8 space-y-2 text-sm hidden sm:block">
+              {STEPS.map((step, i) => (
+                <li key={step} className="flex items-center gap-3">
+                  <span className="w-6 h-6 shrink-0 rounded-full border border-[#56666d] flex items-center justify-center text-xs font-bold">{i + 1}</span>
+                  <span className="font-semibold">{step}</span>
+                </li>
+              ))}
+            </ol>
           </div>
 
-          {/* Right Content Side */}
-          <div className="w-full md:w-7/12 p-6 md:p-12 bg-white text-slate-800 flex flex-col justify-center">
-            <h2 className="text-2xl md:text-3xl font-bold text-brand-dark mb-4 md:mb-6">About This Tool</h2>
-            <p className="text-slate-600 mb-6 md:mb-8 text-base md:text-lg leading-relaxed">
-              Poor sanitation is not just a health crisis; it is an economic one. This tool uses a
-              <strong> bottom-up "Cost of Illness" & "Human Capital" approach</strong> to estimate the financial losses
-              incurred by a country due to inadequate sanitation facilities and hygiene practices.
+          {/* Right: about */}
+          <div className="md:w-7/12 px-5 py-6 md:p-8 text-slate-800">
+            <h2 className="text-lg md:text-xl font-bold text-slate-900">About this tool</h2>
+            <p className="mt-2 text-sm md:text-[15px] text-slate-600 leading-relaxed">
+              Poor sanitation is an economic problem as well as a health one. This tool uses a bottom-up
+              <strong className="text-slate-800"> cost-of-illness and human-capital approach</strong> to estimate what a country
+              loses each year to inadequate sanitation and hygiene.
             </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 md:gap-4">
-              <div className="p-4 md:p-5 rounded-lg border border-line">
-                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
-                  Health & Mortality
-                </h3>
-                <p className="text-xs md:text-sm text-slate-600">
-                  Treatment costs for disease and value of premature deaths (Human Capital or VSL).
-                </p>
-              </div>
-              <div className="p-4 md:p-5 rounded-lg border border-line">
-                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
-                  Access Time
-                </h3>
-                <p className="text-xs md:text-sm text-slate-600">
-                  Productive time lost searching for open defecation sites.
-                </p>
-              </div>
-              <div className="p-4 md:p-5 rounded-lg border border-line">
-                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
-                  Stunting
-                </h3>
-                <p className="text-xs md:text-sm text-slate-600">
-                  Future wage losses due to childhood stunting and cognitive delay.
-                </p>
-              </div>
-              <div className="p-4 md:p-5 rounded-lg border border-line">
-                <h3 className="font-bold text-slate-800 mb-1 md:mb-2 text-sm md:text-base">
-                  Uncertainty
-                </h3>
-                <p className="text-xs md:text-sm text-slate-600">
-                  Monte Carlo simulations provide robust confidence intervals.
-                </p>
-              </div>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {FEATURES.map(([title, body]) => (
+                <div key={title} className="p-3 rounded-lg border border-line">
+                  <h3 className="text-sm font-bold text-slate-900">{title}</h3>
+                  <p className="mt-0.5 text-xs text-slate-600 leading-snug">{body}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Pinned footer - always visible regardless of screen height */}
-        <div className="shrink-0 border-t border-line bg-white px-4 py-3 md:px-8 md:py-4 flex flex-col-reverse md:flex-row items-center gap-2 md:gap-6">
-          <p className="text-[10px] md:text-xs text-center md:text-left text-slate-400 font-medium md:flex-1">
-            Modeled after World Bank WSP methodologies. Data sourced live from World Bank Open Data API.
+        <div className="shrink-0 border-t border-line bg-white px-4 py-3 md:px-6 flex flex-col-reverse sm:flex-row items-center gap-2 sm:gap-4">
+          <p className="text-[11px] text-center sm:text-left text-slate-500 sm:flex-1">
+            Modelled on World Bank WSP methods. Data from the World Bank Open Data API.
           </p>
           <button
             onClick={onStart}
             autoFocus
-            className="w-full md:w-auto md:px-10 bg-brand-primary hover:bg-sky-500 text-white font-bold text-lg py-3 md:py-4 rounded-lg transition-colors flex items-center justify-center gap-3"
+            className="w-full sm:w-auto sm:px-6 bg-brand-primary hover:bg-sky-600 text-white font-semibold text-base py-2.5 rounded-md transition-colors flex items-center justify-center gap-2"
           >
-            Launch Model
-            <svg className="w-5 h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+            Launch model
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
           </button>
         </div>
       </div>

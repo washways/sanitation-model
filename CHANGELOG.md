@@ -4,6 +4,11 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.1.1 — 2026-11-24
+- The splash screen and the mobile cost bar now move up out of the way of the cookie notice, so the Launch button is never hidden behind it.
+- More compact splash screen that fits on a laptop screen without scrolling, on a light background so the card stands out.
+- Tidier top bar on phones and tablets: buttons show icons only on smaller screens, so the bar takes less space.
+
 ## v1.1.0 — 2026-11-24
 - New look in line with the other WASHways tools: dark top bar, teal buttons, flat cards and the Hanken Grotesk font.
 - Removed the coloured highlight stripes and tints from cards.
