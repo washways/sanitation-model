@@ -120,9 +120,9 @@ const MethodologySection = () => (
 
                 <div>
                     <strong className="text-white block mb-1">Access Time</strong>
-                    <p className="text-xs">Opportunity cost of walking to open defecation sites.</p>
+                    <p className="text-xs">Opportunity cost of walking to open defecation sites: about 10 extra minutes a day for people aged 5 and over (Hickling &amp; Hutton 2014; Radin et al. 2020).</p>
                     <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded">
-                         Pop<sub>OD</sub> × 365 × Hours × (30% Wage)
+                         Pop<sub>OD, 5+</sub> × 365 × Hours × (30% Wage)
                     </p>
                 </div>
             </div>

@@ -87,7 +87,8 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   const nutritionCostUSD = attributableStunted * stuntingCostPerChild;
 
   // --- 5. Access Time Costs ---
-  const odPopulation = health.population * access.openDefecationPrevalence;
+  // Children under 5 are not counted: their time has no wage value (Radin et al. 2020 values under-5s at zero).
+  const odPopulation = health.population * (1 - health.under5Share) * access.openDefecationPrevalence;
   const valueOfAccessTime = macro.hourlyWage * 0.3; 
   const accessTimeCostUSD = odPopulation * 365 * access.dailyTimeForOD * valueOfAccessTime;
 

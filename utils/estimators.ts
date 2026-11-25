@@ -25,6 +25,9 @@ const UNDER5_SHARE_OF_DIARRHOEA_DEATHS = 273 / 1035; // about 0.26
 export const SANITATION_STUNTING_PAF = Math.round((7.2 / 44.1) * 100) / 100; // 0.16
 // Haacker, Hallett & Atun (2020) Health Policy Plan: at least 5% for low- and lower-middle-income countries.
 export const DEFAULT_DISCOUNT_RATE = 0.05;
+// Extra time per person per day for open defecation vs a home latrine: about 10 minutes
+// (Hickling & Hutton 2014, 2.5 days/year; Radin et al. 2020, 4–12 min per visit).
+export const OD_HOURS_PER_DAY = 10 / 60;
 
 const getField = (rawData: CountryApiData | null | undefined, key: RawFieldKey) => rawData?.fields[key];
 
@@ -301,7 +304,7 @@ export const estimateInputs = (
     },
     access: {
       openDefecationPrevalence: odPrevalence,
-      dailyTimeForOD: 0.5,
+      dailyTimeForOD: OD_HOURS_PER_DAY,
     },
     carbon: {
       percentWithPoorSanitation: Number.parseFloat(percentPoorSanitation.toFixed(2)),
@@ -311,7 +314,7 @@ export const estimateInputs = (
       includeInTotal: false,
     },
     other: {
-      choleraResponseCost: gdpPerCapita * 2000,
+      choleraResponseCost: Math.round(gdpPerCapita * population * 0.0001),
       funeralCostPerDeath: gdpPerCapita * 0.2,
       tourismLossPercentage: 0.05,
       tourismReceipts,
@@ -352,11 +355,11 @@ export const estimateInputs = (
     'Literature estimate',
     'Adults who were stunted earn less: Hoddinott et al. (2013) find 1 SD more height-for-age goes with 21% higher household spending; Galasso & Wagstaff (2019) put the population-wide income penalty at about 7%. 10% is a conservative middle value.'
   );
-  sources.dailyTimeForOD = assumptionSource('Model assumption', 'Extra time for open defecation set to 0.5 hours per person per day, valued at 30% of the wage proxy, following the WSP Economic Impacts of Sanitation studies. No recent primary source; replace with local survey data if available.');
+  sources.dailyTimeForOD = assumptionSource('Hickling & Hutton 2014; Radin et al. 2020', 'About 10 minutes (0.17 hours) of extra time per person per day for open defecation compared with a latrine at home. WSP sector experts put it at 2.5 days a year (about 10 minutes a day); field studies found about 7 minutes a day per adult in rural India and about 4 minutes more per trip in Ethiopia (Radin et al., Journal of Benefit-Cost Analysis 2020). Applied to people aged 5 and over, valued at 30% of the wage proxy. Was 0.5 hours, which had no source. Replace with local survey data if available.');
   sources.tourismLossPercentage = assumptionSource('Model assumption', 'Tourism loss attributable to poor sanitation set to 5%. Not based on a published estimate; treat as illustrative.');
   sources.choleraResponseCost = estimateSource(
     'Placeholder, no source',
-    'Placeholder: 2,000 × GDP per person every year. This is not based on data. Replace it with the national cholera response plan budget, or set it to 0.'
+    'Placeholder: 0.01% of GDP every year (about the same as the old 2,000 × GDP per person for Malawi, but it now scales with country size; the old rule made it 21% of GDP for Tuvalu). This is not based on data. Replace it with the national cholera response plan budget, or set it to 0.'
   );
   sources.funeralCostPerDeath = derivedFrom(
     sources.gdpPerCapita,

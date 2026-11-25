@@ -55,8 +55,9 @@ The World Bank diarrhoea prevalence series (SH.STA.DIAR.ZS / SH.STA.DIRH.ZS) has
 ## Access time
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Time per person in open defecation | 0.5 hours/day | WSP Economic Impacts of Sanitation studies; no recent primary source. Drives a large share of the total where open defecation is high (e.g. Niger 67%). | Weak |
-| Value of that time | 30% of the wage proxy | Common convention in WASH cost-benefit studies (Hutton). | Reasonable |
+| **Extra time per person in open defecation** | **10 minutes/day** (was 30, i.e. 0.5 hours) | Compared with a latrine at home. WSP sector experts: 2.5 days a year, about 10 minutes a day (Hickling & Hutton 2014). Radin et al. (2020) use 8 minutes saved per latrine visit (range 4–12), citing about 7 minutes a day per adult in rural India (Dickinson et al. 2015) and 6 minutes vs 2 minutes per trip in Ethiopia. The old 30 minutes had no source and was three times these figures. | Reasonable |
+| Who is counted | People aged 5 and over in open defecation | Radin et al. (2020) give under-5s' time no value. Before v1.4.0 everyone was counted. | Reasonable |
+| Value of that time | 30% of the wage proxy | Common convention in WASH cost-benefit studies (Hutton). Radin et al. (2020) use 50% for adults and 25% for school-age children. | Reasonable |
 | Wage proxy | GDP per person ÷ 2,080 hours × 0.8 | Proxy. | Reasonable |
 
 ## Carbon (shown separately, not in the total since v1.3.1)
@@ -74,7 +75,7 @@ Excluded from the total by default (can be switched on under Inputs → Carbon),
 ## Other
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Cholera response | 2,000 × GDP per person every year | No source. Placeholder; replace with the national cholera response plan budget or set to 0. | Weak |
+| Cholera response | 0.01% of GDP every year (was 2,000 × GDP per person) | No source. Placeholder; replace with the national cholera response plan budget or set to 0. The old rule did not scale with population, so it was 21% of GDP for Tuvalu and the largest item for Kiribati. | Weak |
 | Tourism loss | 5% of tourism receipts | No published estimate found. | Weak |
 
 ## Effect of the v1.3.0 review (World Bank data, 2023)
@@ -85,6 +86,8 @@ Excluded from the total by default (can be switched on under Inputs → Carbon),
 | Niger | US$341m (2.01%) | US$466m (2.75%; real open-defecation rate of 67% instead of 5%) |
 
 With carbon taken out of the total (v1.3.1): Malawi US$88m (0.65%), Bangladesh US$957m (0.22%), Niger US$389m (2.30%).
+
+With 10 minutes of open-defecation time for people aged 5+ and the cholera placeholder scaled to GDP (v1.4.0): Malawi US$83m (0.62%), Bangladesh US$995m (0.23%), Niger US$215m (1.27%).
 
 ## Sources
 - WHO (2023). *Burden of disease attributable to unsafe drinking-water, sanitation and hygiene: 2019 update.* Geneva: WHO.
@@ -97,4 +100,6 @@ With carbon taken out of the total (v1.3.1): Malawi US$88m (0.65%), Bangladesh U
 - Galasso E., Wagstaff A. (2019). The aggregate income losses from childhood stunting and the returns to a nutrition intervention aimed at reducing stunting. *Economics & Human Biology* (World Bank WPS8536).
 - Cheng S. et al. (2022). Non-negligible greenhouse gas emissions from non-sewered sanitation systems: a meta-analysis. *Environmental Research* 212:113468.
 - Rennert K. et al. (2022). Comprehensive evidence implies a higher social cost of CO2. *Nature*.
+- Radin M., Jeuland M., Wang H., Whittington D. (2020). Benefit–cost analysis of community-led total sanitation: incorporating results from recent evaluations. *Journal of Benefit-Cost Analysis* 11(3):380–417.
+- Hickling S., Hutton G. (2014). *Economic assessment of sanitation interventions.* Water and Sanitation Program, World Bank (as cited by Radin et al. 2020).
 - Fischer Walker C.L. et al. (2013). Global burden of childhood pneumonia and diarrhoea. *Lancet*.

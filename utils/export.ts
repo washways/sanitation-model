@@ -31,7 +31,7 @@ const INPUT_FIELDS: ExportField[] = [
   { section: 'Nutrition', key: 'attributionStunting', label: 'Share of Stunting Caused by Unsafe Sanitation', value: 0, unit: '%' },
   { section: 'Nutrition', key: 'wageLossPercent', label: 'Future Wage Penalty', value: 0, unit: '%' },
   { section: 'Access', key: 'openDefecationPrevalence', label: 'Open Defecation Prevalence', value: 0, unit: '%' },
-  { section: 'Access', key: 'dailyTimeForOD', label: 'Time Spent on OD', value: 0, unit: 'hours/day' },
+  { section: 'Access', key: 'dailyTimeForOD', label: 'Extra Time per Person for OD (aged 5+)', value: 0, unit: 'hours/day' },
   { section: 'Carbon', key: 'percentWithPoorSanitation', label: 'Population with Poor Sanitation', value: 0, unit: '%' },
   { section: 'Carbon', key: 'emissionFactorSource', label: 'Emission Factor Source', value: '' },
   { section: 'Carbon', key: 'emissionFactor', label: 'Emission Factor', value: 0, unit: 'kg CO2e/person/year' },

@@ -320,7 +320,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
 
       <InputGroup title="4. Access Time (Open Defecation)" isOpen={openSection === 'access'} onToggle={() => toggle('access')}>
         <NumberField label="OD Prevalence" value={inputs.access.openDefecationPrevalence * 100} onChange={(v) => updateAccess('openDefecationPrevalence', v/100)} unit="%" source={sources['openDefecationPrevalence']} />
-        <NumberField label="Time Spent (Hours/Day)" value={inputs.access.dailyTimeForOD} onChange={(v) => updateAccess('dailyTimeForOD', v)} step={0.1} unit="hrs" source={sources['dailyTimeForOD']} />
+        <NumberField label="Extra Time per Person (Minutes/Day)" value={Math.round(inputs.access.dailyTimeForOD * 60 * 10) / 10} onChange={(v) => updateAccess('dailyTimeForOD', v / 60)} step={1} unit="min" source={sources['dailyTimeForOD']} />
       </InputGroup>
       
       <InputGroup title="5. Carbon (GHG) Emissions" isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>

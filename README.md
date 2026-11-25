@@ -130,6 +130,8 @@ This module is high-impact and needs strong transparency: small changes in assum
 
 Conservative practice is to value time at a fraction of wage (e.g., 30%) unless stronger evidence exists.
 
+The default is about 10 extra minutes per person per day for people aged 5 and over (Hickling & Hutton 2014; Radin et al. 2020). See ASSUMPTIONS.md.
+
 ### 6) 🌍 Climate impact (GHG)
 **Logic:** Unmanaged excreta and certain sanitation pathways emit methane (CH₄) and other GHGs.
 

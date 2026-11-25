@@ -4,6 +4,12 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.4.0 — 2026-11-25
+- **All 44 UN Least Developed Countries are now included.** Added Comoros, Kiribati, Solomon Islands and Tuvalu. Zimbabwe, which is not an LDC, stays in the list. Bangladesh, Lao PDR and Nepal were due to leave the LDC list on 24 November 2026 and are kept.
+- **Time lost to open defecation lowered from 30 to 10 minutes per person per day.** The 30 minutes had no source. World Bank sanitation experts put it at 2.5 days a year (about 10 minutes a day), and field studies in India and Ethiopia found 4 to 8 minutes per trip (Radin et al. 2020). Children under 5 are no longer counted, since their time has no wage value. The input is now in minutes.
+- Fixed: the cholera response placeholder didn't scale with country size, so it came to 21% of GDP for Tuvalu. It is now 0.01% of GDP, about the same as before for Malawi. It is still a placeholder with no source.
+- Results change most where open defecation is common: Niger goes from US$389m (2.3% of GDP) to US$215m (1.3%). Malawi goes from US$88m to US$83m (0.62%).
+
 ## v1.3.1 — 2026-11-25
 - **Carbon is no longer counted in the total cost.** It had become the largest item for Malawi, which was misleading. Three reasons it doesn't belong in the total: basic pit latrines emit as much methane as unimproved ones (and open defecation emits little), so moving to basic sanitation doesn't remove these emissions; the social cost of carbon is damage to the whole world, not a cost to the country's economy; and it is priced at a global US$100 per tonne while health losses are valued at local incomes.
 - The carbon figure is still shown below the cost table and in the PDF, labelled "not in total". It can be added back with "Include carbon in the total" under Inputs → Carbon.

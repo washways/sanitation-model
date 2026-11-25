@@ -1,7 +1,8 @@
 
 import { ModelInputs } from './types';
 
-// Focused list of Least Developed Countries (LDCs) and high-priority developing nations for sanitation interventions
+// All 44 UN Least Developed Countries (list after São Tomé and Príncipe graduated in Dec 2024; Bangladesh,
+// Lao PDR and Nepal were scheduled to graduate on 24 Nov 2026 and are kept), plus Zimbabwe (not an LDC).
 export const SUPPORTED_COUNTRIES = [
   { code: 'AF', name: 'Afghanistan', currency: 'AFN' },
   { code: 'AO', name: 'Angola', currency: 'AOA' },
@@ -12,6 +13,7 @@ export const SUPPORTED_COUNTRIES = [
   { code: 'KH', name: 'Cambodia', currency: 'KHR' },
   { code: 'CF', name: 'Central African Republic', currency: 'XAF' },
   { code: 'TD', name: 'Chad', currency: 'XAF' },
+  { code: 'KM', name: 'Comoros', currency: 'KMF' },
   { code: 'CD', name: 'Dem. Rep. Congo', currency: 'CDF' },
   { code: 'DJ', name: 'Djibouti', currency: 'DJF' },
   { code: 'ER', name: 'Eritrea', currency: 'ERN' },
@@ -20,6 +22,7 @@ export const SUPPORTED_COUNTRIES = [
   { code: 'GN', name: 'Guinea', currency: 'GNF' },
   { code: 'GW', name: 'Guinea-Bissau', currency: 'XOF' },
   { code: 'HT', name: 'Haiti', currency: 'HTG' },
+  { code: 'KI', name: 'Kiribati', currency: 'AUD' },
   { code: 'LA', name: 'Laos', currency: 'LAK' },
   { code: 'LS', name: 'Lesotho', currency: 'LSL' },
   { code: 'LR', name: 'Liberia', currency: 'LRD' },
@@ -34,12 +37,14 @@ export const SUPPORTED_COUNTRIES = [
   { code: 'RW', name: 'Rwanda', currency: 'RWF' },
   { code: 'SN', name: 'Senegal', currency: 'XOF' },
   { code: 'SL', name: 'Sierra Leone', currency: 'SLE' },
+  { code: 'SB', name: 'Solomon Islands', currency: 'SBD' },
   { code: 'SO', name: 'Somalia', currency: 'SOS' },
   { code: 'SS', name: 'South Sudan', currency: 'SSP' },
   { code: 'SD', name: 'Sudan', currency: 'SDG' },
   { code: 'TZ', name: 'Tanzania', currency: 'TZS' },
   { code: 'TL', name: 'Timor-Leste', currency: 'USD' },
   { code: 'TG', name: 'Togo', currency: 'XOF' },
+  { code: 'TV', name: 'Tuvalu', currency: 'AUD' },
   { code: 'UG', name: 'Uganda', currency: 'UGX' },
   { code: 'YE', name: 'Yemen', currency: 'YER' },
   { code: 'ZM', name: 'Zambia', currency: 'ZMW' },
@@ -83,7 +88,7 @@ export const DEFAULT_INPUTS: ModelInputs = {
   },
   access: {
     openDefecationPrevalence: 0.06, 
-    dailyTimeForOD: 0.5, 
+    dailyTimeForOD: 10 / 60, // about 10 minutes (Hickling & Hutton 2014; Radin et al. 2020)
   },
   carbon: {
     percentWithPoorSanitation: 0.60, // Default estimate (Unimproved + OD)
