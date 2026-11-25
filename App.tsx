@@ -23,6 +23,7 @@ import { SplashScreen } from './components/SplashScreen';
 import { ChangelogDialog, APP_VERSION } from './components/ChangelogDialog';
 import { fetchCountryData } from './services/worldBank';
 import { useBottomOverlayInset } from './utils/useBottomOverlayInset';
+import { countryCodeFromPath, countryPath } from './utils/countryRoute';
 import { estimateInputs } from './utils/estimators';
 
 const MobileStickyFooter = ({ outputs, currency }: { outputs: any, currency: string }) => (
@@ -198,10 +199,13 @@ const MethodologySection = () => (
     </div>
 );
 
+// A link such as /sanitation-model/kiribati opens that country directly and skips the splash.
+const linkedCountry = countryCodeFromPath(window.location.pathname, import.meta.env.BASE_URL);
+
 const App = () => {
-  const [showIntro, setShowIntro] = useState(true);
+  const [showIntro, setShowIntro] = useState(!linkedCountry);
   const [activeTab, setActiveTab] = useState<'analysis' | 'comparison'>('analysis');
-  const [selectedCountry, setSelectedCountry] = useState('MW'); // Default Malawi
+  const [selectedCountry, setSelectedCountry] = useState(linkedCountry || 'MW'); // Default Malawi
   const [inputs, setInputs] = useState<ModelInputs>(DEFAULT_INPUTS);
   const [sources, setSources] = useState<DataSourceMap>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -213,15 +217,23 @@ const App = () => {
 
   // Initial Load
   useEffect(() => {
-      loadCountryData('MW');
+      loadCountryData(linkedCountry || 'MW', !linkedCountry);
       loadCostChart();
       loadMonteCarlo();
   }, []);
 
-  const loadCountryData = async (code: string) => {
+  const loadCountryData = async (code: string, keepUrl = false) => {
       setIsLoading(true);
       setSelectedCountry(code);
       const country = SUPPORTED_COUNTRIES.find(c => c.code === code);
+      if (country && !keepUrl) {
+          // Keep the address bar on a shareable link for the chosen country.
+          const path = countryPath(code, import.meta.env.BASE_URL);
+          if (window.location.pathname !== path) {
+              window.history.replaceState(null, '', path + window.location.search + window.location.hash);
+          }
+          document.title = `${country.name}: cost of poor sanitation | Sanitation Impact Modeler`;
+      }
       if (country) {
           try {
               const rawData = await fetchCountryData(country.code, country.currency);

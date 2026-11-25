@@ -49,6 +49,11 @@ Repo: github.com/washways/sanitation-model. Work directly on `main`; keep local 
 - Fixed footer must be absolutely positioned `<Text fixed>`; a fixed `<View>` footer and `render` page-number props did not draw.
 - Check output by rendering with Vite SSR from a script (load the modules with `server.ssrLoadModule`, then `renderToFile`) and reading the PDF back.
 
+## Country links (v1.5.0)
+- `/sanitation-model/<slug>` opens a country and skips the splash; slugs come from the country name (`utils/countryRoute.ts`, e.g. `dem-rep-congo`). The two-letter code also works via `404.html`.
+- GitHub Pages has no routing, so the `country-pages` plugin in `vite.config.ts` writes `dist/<slug>/index.html` per country (own title, canonical, og:url) plus `404.html`. Renaming a country changes its link.
+- Selecting a country calls `history.replaceState` to the country path; the root URL is left alone on first load.
+
 ## Code notes
 - `components/SplashScreen.tsx`: card capped at `100dvh`, body scrolls, Launch button lives in a pinned footer so it is always visible. Enter/Escape also dismiss. Don't move the button back into the scrolling content.
 - The shared WASHways analytics script injects a fixed consent banner (no id/class) at the bottom of the page. `utils/useBottomOverlayInset.ts` measures it and sets `--bottom-inset` on `<html>`; the splash, the mobile cost bar and the inputs panel pad by it. Use `var(--bottom-inset,0px)` for anything new pinned to the bottom.

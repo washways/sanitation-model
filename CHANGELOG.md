@@ -4,6 +4,10 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.5.0 — 2026-11-25
+- **Each country has its own link**, for example washways.org/sanitation-model/kiribati. Opening it goes straight to that country, without the welcome screen. The address bar updates when you pick a country, so you can copy and send it. Link previews (email, WhatsApp, social media) show the country name.
+- Names with spaces use hyphens, e.g. /solomon-islands, /dem-rep-congo, /burkina-faso.
+
 ## v1.4.0 — 2026-11-25
 - **All 44 UN Least Developed Countries are now included.** Added Comoros, Kiribati, Solomon Islands and Tuvalu. Zimbabwe, which is not an LDC, stays in the list. Bangladesh, Lao PDR and Nepal were due to leave the LDC list on 24 November 2026 and are kept.
 - **Time lost to open defecation lowered from 30 to 10 minutes per person per day.** The 30 minutes had no source. World Bank sanitation experts put it at 2.5 days a year (about 10 minutes a day), and field studies in India and Ethiopia found 4 to 8 minutes per trip (Radin et al. 2020). Children under 5 are no longer counted, since their time has no wage value. The input is now in minutes.
