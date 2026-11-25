@@ -191,7 +191,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
   const updateAccess = (key: keyof AccessTimeInputs, val: number) => {
     onUpdate({ ...inputs, access: { ...inputs.access, [key]: val } });
   };
-  const updateCarbon = (key: keyof CarbonInputs, val: number | string) => {
+  const updateCarbon = (key: keyof CarbonInputs, val: number | string | boolean) => {
     // If source changes, update factor using presets
     if (key === 'emissionFactorSource') {
         let newFactor = inputs.carbon.emissionFactor;
@@ -324,8 +324,17 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
       </InputGroup>
       
       <InputGroup title="5. Carbon (GHG) Emissions" isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>
-         <div className="md:col-span-2 bg-slate-50 p-2 rounded text-xs text-slate-500 mb-2">
-            Estimates climate damage using emission factors from IPCC or SCARE.
+         <div className="md:col-span-2 bg-slate-50 p-3 rounded border border-line text-xs text-slate-600 leading-relaxed">
+            Methane from pit latrines and septic tanks, valued at the social cost of carbon. <strong>Not included in the total by default</strong>, for three reasons:
+            <ul className="list-disc pl-4 mt-1 space-y-0.5">
+              <li>Basic pit latrines emit as much methane as unimproved ones (open defecation emits little), so better basic sanitation does not remove these emissions; only treatment does.</li>
+              <li>The social cost of carbon is damage to the whole world, not a cost to this country's economy.</li>
+              <li>It is valued at a global price (US$100/t) while health losses are valued at local incomes, so it looks large next to them in low-income countries.</li>
+            </ul>
+            <label className="flex items-center gap-2 mt-2 font-semibold text-slate-700 cursor-pointer">
+              <input type="checkbox" checked={!!inputs.carbon.includeInTotal} onChange={(e) => updateCarbon('includeInTotal', e.target.checked)} className="accent-brand-primary" />
+              Include carbon in the total
+            </label>
          </div>
          <NumberField 
             label="Pop. with Poor Sanitation" 

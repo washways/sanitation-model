@@ -202,7 +202,6 @@ export const ComparisonView = () => {
                                                         <div className="flex justify-between"><span>Mortality:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.mortality) + '%' : formatCurrency(d.mortality)}</span></div>
                                                         <div className="flex justify-between"><span>Stunting:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.nutrition) + '%' : formatCurrency(d.nutrition)}</span></div>
                                                         <div className="flex justify-between"><span>Access Time:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.accessTime) + '%' : formatCurrency(d.accessTime)}</span></div>
-                                                        <div className="flex justify-between"><span>Carbon:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.carbon) + '%' : formatCurrency(d.carbon)}</span></div>
                                                         <div className="flex justify-between"><span>Tourism:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.tourism) + '%' : formatCurrency(d.tourism)}</span></div>
                                                     </div>
                                                     <div className="border-t border-slate-600 pt-1 mt-1">
@@ -223,7 +222,6 @@ export const ComparisonView = () => {
                                 <Bar dataKey="productivity" name="Productivity" stackId="a" fill={COLOR_PALETTE.productivity} />
                                 <Bar dataKey="nutrition" name="Stunting" stackId="a" fill={COLOR_PALETTE.nutrition} />
                                 <Bar dataKey="accessTime" name="Access Time" stackId="a" fill={COLOR_PALETTE.accessTime} />
-                                <Bar dataKey="carbon" name="Carbon (GHG)" stackId="a" fill={COLOR_PALETTE.carbon} />
                                 <Bar dataKey="choleraAndFunerals" name="Cholera" stackId="a" fill={COLOR_PALETTE.choleraAndFunerals} />
                                 <Bar dataKey="tourism" name="Tourism" stackId="a" fill={COLOR_PALETTE.tourism} />
                                 <Bar dataKey="mortality" name="Mortality" stackId="a" fill={COLOR_PALETTE.mortality}>
@@ -248,7 +246,7 @@ export const ComparisonView = () => {
                             </p>
                             <p>
                                 <strong className="text-white uppercase tracking-wider text-xs block mb-1">Uncertainty Analysis</strong>
-                                A Monte Carlo simulation (N=2,000 runs per country) is performed, varying inputs by ±5% (Demographics) to ±50% (Tourism/Cholera) to generate the error bars shown above.
+                                A Monte Carlo simulation (N=2,000 runs per country) is performed, varying inputs by ±5% (Demographics) to ±50% (Tourism/Cholera) to generate the error bars shown above. Carbon (greenhouse gas) costs are not included in the comparison.
                             </p>
                         </div>
                         <div>

@@ -35,8 +35,10 @@ export const CostChart: React.FC<CostChartProps> = ({ outputs }) => {
     { name: 'Tourism', value: outputs.costsUSD.tourism, color: COLOR_PALETTE.tourism },
   ];
 
-  // Sort data descending for the bar chart
-  const data = rawData.sort((a, b) => b.value - a.value);
+  // Carbon is only charted when it is part of the total.
+  const data = rawData
+    .filter((d) => d.name !== 'Carbon (GHG)' || outputs.carbonIncluded)
+    .sort((a, b) => b.value - a.value);
 
   return (
     <div className="w-full h-[400px]">

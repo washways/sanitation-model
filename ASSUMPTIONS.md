@@ -59,10 +59,15 @@ The World Bank diarrhoea prevalence series (SH.STA.DIAR.ZS / SH.STA.DIRH.ZS) has
 | Value of that time | 30% of the wage proxy | Common convention in WASH cost-benefit studies (Hutton). | Reasonable |
 | Wage proxy | GDP per person ÷ 2,080 hours × 0.8 | Proxy. | Reasonable |
 
-## Carbon
+## Carbon (shown separately, not in the total since v1.3.1)
+Excluded from the total by default (can be switched on under Inputs → Carbon), because:
+1. Basic pit latrines emit as much methane as unimproved ones, and open defecation emits little, so moving people to basic sanitation does not remove these emissions. Only treatment, safe emptying or container-based systems do. It is not a cost of *poor* sanitation.
+2. The social cost of carbon is damage to the whole world; the country bears a tiny share of it. Mixing it into a national economic burden is inconsistent.
+3. It is valued at a global price (US$100/t) while health losses are valued at local incomes, so it dominates in low-income countries. For Malawi it was the largest single item (US$38m of US$125m).
+
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Population counted | Everyone without basic sanitation | Conceptual caveat: basic pit latrines also emit methane, so upgrading does not remove these emissions. Consider reporting carbon separately. | Weak |
+| Population counted | Everyone without basic sanitation | See point 1 above. | Weak |
 | Emission factor | 35 kg CO2e/person/year (IPCC); SCARE 52 kg | Cheng et al. (Environmental Research 2022): non-sewered sanitation emits 377 Mt CO2e a year (range 22–1,003). Very uncertain. | Reasonable |
 | Social cost of carbon | US$100/t | Conservative; recent central estimates are about US$185–190/t (Rennert et al., Nature 2022; US EPA 2023). | Reasonable |
 
@@ -78,6 +83,8 @@ The World Bank diarrhoea prevalence series (SH.STA.DIAR.ZS / SH.STA.DIRH.ZS) has
 | Malawi | US$211m (1.58% of GDP) | US$125m (0.94%) |
 | Bangladesh | US$2,637m (0.60%) | US$1,161m (0.27%) |
 | Niger | US$341m (2.01%) | US$466m (2.75%; real open-defecation rate of 67% instead of 5%) |
+
+With carbon taken out of the total (v1.3.1): Malawi US$88m (0.65%), Bangladesh US$957m (0.22%), Niger US$389m (2.30%).
 
 ## Sources
 - WHO (2023). *Burden of disease attributable to unsafe drinking-water, sanitation and hygiene: 2019 update.* Geneva: WHO.

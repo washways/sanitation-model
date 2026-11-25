@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { DEFAULT_INPUTS, SUPPORTED_COUNTRIES } from './constants';
 import { ModelInputs, DataSourceMap, YearExplanation } from './types';
 import { YearNotice } from './components/YearNotice';
-import { calculateModelOutputs, formatCurrency, formatNumber } from './utils/calculations';
+import { calculateModelOutputs, costEntries, formatCurrency, formatNumber } from './utils/calculations';
 import { downloadAnalysisCsv } from './utils/export';
 import { InputPanel } from './components/InputPanel';
 // Chart-heavy views (Recharts) are split out of the initial bundle so the splash screen
@@ -136,6 +136,9 @@ const MethodologySection = () => (
                 
                 <p className="text-xs mb-4">
                     Quantifies the economic damage of Greenhouse Gas (GHG) emissions—primarily Methane (CH<sub>4</sub>)—from decomposing waste in pit latrines and open defecation.
+                </p>
+                <p className="text-xs mb-4 text-slate-400">
+                    <strong className="text-white">Shown separately, not in the total by default.</strong> Basic pit latrines emit as much methane as unimproved ones, so the emissions aren't caused by <em>poor</em> sanitation. The social cost of carbon is worldwide damage, not a cost to the national economy. It can be added to the total under Inputs → Carbon.
                 </p>
 
                 <div className="bg-slate-800 p-3 rounded border border-slate-700 mb-4">
@@ -372,7 +375,7 @@ const App = () => {
                              <div className="flex justify-between items-center mb-6">
                                  <h3 className="font-bold text-brand-dark">Cost Breakdown by Category</h3>
                                  <div className="flex gap-2">
-                                     {['Health', 'Productivity', 'Carbon'].map(l => (
+                                     {['Health', 'Productivity', ...(outputs.carbonIncluded ? ['Carbon'] : [])].map(l => (
                                          <span key={l} className="text-[10px] px-2 py-1 bg-slate-100 text-slate-500 rounded-full">{l}</span>
                                      ))}
                                  </div>
@@ -391,7 +394,7 @@ const App = () => {
                                      </tr>
                                  </thead>
                                  <tbody className="divide-y divide-slate-100">
-                                     {Object.entries(outputs.costsUSD).map(([key, value]) => (
+                                     {costEntries(outputs).map(([key, value]) => (
                                          <tr key={key} className="hover:bg-slate-50 transition-colors">
                                              <td className="px-6 py-3 font-medium text-slate-700 capitalize">
                                                  {key.replace(/([A-Z])/g, ' $1').trim().replace('Nutrition', 'Stunting').replace('Carbon', 'Carbon (GHG)')}
@@ -404,6 +407,13 @@ const App = () => {
                                              </td>
                                          </tr>
                                      ))}
+                                     {!outputs.carbonIncluded && (
+                                         <tr className="text-slate-500">
+                                             <td className="px-6 py-3 text-xs">Carbon (GHG), <span className="italic">not in total</span>: worldwide climate damage (see Inputs → Carbon)</td>
+                                             <td className="px-6 py-3 text-right font-mono text-xs">{formatCurrency(outputs.carbonCostUSD)}</td>
+                                             <td className="px-6 py-3 text-right text-xs">–</td>
+                                         </tr>
+                                     )}
                                  </tbody>
                              </table>
                         </div>

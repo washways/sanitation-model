@@ -90,6 +90,7 @@ export const DEFAULT_INPUTS: ModelInputs = {
     emissionFactor: EMISSION_PRESETS.IPCC, // Default to IPCC
     emissionFactorSource: 'IPCC',
     socialCostOfCarbon: 100, // USD per ton
+    includeInTotal: false,
   },
   other: {
     choleraResponseCost: 2000000, 

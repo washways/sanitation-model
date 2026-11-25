@@ -97,6 +97,7 @@ export interface CarbonInputs {
   emissionFactor: number; // kg CO2e per person per year
   emissionFactorSource: 'IPCC' | 'SCARE' | 'Custom'; // Source of the factor
   socialCostOfCarbon: number; // USD per ton CO2e
+  includeInTotal: boolean; // Off by default: global climate damage, not a national cost of poor sanitation
 }
 
 export interface OtherCostsInputs {
@@ -128,7 +129,10 @@ export interface CostBreakdown {
 }
 
 export interface ModelOutputs {
+  // costsUSD.carbon is 0 unless the carbon cost is included in the total; carbonCostUSD always holds it.
   costsUSD: CostBreakdown;
+  carbonCostUSD: number;
+  carbonIncluded: boolean;
   costsLocal: CostBreakdown;
   totalCostUSD: number;
   totalCostLocal: number;

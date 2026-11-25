@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
 import { DataSourceMap, DataSourceInfo, ModelInputs, ModelOutputs, YearExplanation } from '../types';
-import { formatNumber } from '../utils/calculations';
+import { costEntries, formatNumber } from '../utils/calculations';
 import { COST_LABELS } from '../utils/export';
 import { runSimulation } from '../utils/monteCarlo';
 import { COLOR_PALETTE } from '../constants';
@@ -117,7 +117,7 @@ const Footer = ({ version }: { version: string }) => (
 
 export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName, inputs, outputs, sources, yearExplanation, dataYear, version }) => {
   const sim = runSimulation(inputs, 3000);
-  const breakdown = (Object.entries(outputs.costsUSD) as [string, number][])
+  const breakdown = costEntries(outputs)
     .map(([key, value]) => ({ key, label: COST_LABELS[key] ?? key, value, share: outputs.totalCostUSD > 0 ? value / outputs.totalCostUSD : 0 }))
     .sort((a, b) => b.value - a.value);
   const maxShare = Math.max(...breakdown.map((b) => b.share), 0.0001);
@@ -192,6 +192,11 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
                 <Text style={[s.cellText, { width: 40, textAlign: 'right', color: C.muted }]}>{formatNumber(b.share * 100)}%</Text>
               </View>
             ))}
+            {!outputs.carbonIncluded && (
+              <Text style={[s.small, { marginTop: 5 }]}>
+                Not included: greenhouse gas emissions from sanitation, about {money(outputs.carbonCostUSD)} a year at US${inputs.carbon.socialCostOfCarbon} per tonne. This is worldwide climate damage, and basic pit latrines emit as much methane as unimproved ones, so it is not a cost of poor sanitation to this economy.
+              </Text>
+            )}
           </View>
 
           <View style={s.section} wrap={false}>

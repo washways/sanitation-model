@@ -4,6 +4,12 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.3.1 — 2026-11-25
+- **Carbon is no longer counted in the total cost.** It had become the largest item for Malawi, which was misleading. Three reasons it doesn't belong in the total: basic pit latrines emit as much methane as unimproved ones (and open defecation emits little), so moving to basic sanitation doesn't remove these emissions; the social cost of carbon is damage to the whole world, not a cost to the country's economy; and it is priced at a global US$100 per tonne while health losses are valued at local incomes.
+- The carbon figure is still shown below the cost table and in the PDF, labelled "not in total". It can be added back with "Include carbon in the total" under Inputs → Carbon.
+- The country comparison no longer includes carbon.
+- Malawi's total goes from US$125m (0.9% of GDP) to US$88m (0.65%); its carbon figure, US$38m, is shown separately.
+
 ## v1.3.0 — 2026-11-25
 - **Review of every model assumption against current evidence.** The full list, with sources and how solid each one is, is in ASSUMPTIONS.md in the repository.
 - **Fixed: diarrhoea was counted as 100% caused by poor sanitation.** When WHO's WASH death data were available, every diarrhoea case and death was treated as caused by sanitation. Now 38% of diarrhoea is attributed to unsafe sanitation alone (WHO 2023: 564,000 of about 1.5 million diarrhoea deaths in 2019). The old 88% fallback was a 2004 figure for water, sanitation and hygiene combined.

@@ -1,5 +1,5 @@
 import { ModelInputs, ModelOutputs, DataSourceMap, YearExplanation } from '../types';
-import { formatCurrency, formatNumber } from './calculations';
+import { costEntries, formatCurrency, formatNumber } from './calculations';
 
 interface ExportField {
   section: string;
@@ -51,7 +51,8 @@ const OUTPUT_FIELDS: ExportField[] = [
   { section: 'Outputs', key: 'mortality', label: 'Mortality Cost', value: 0, unit: 'USD/year' },
   { section: 'Outputs', key: 'nutrition', label: 'Stunting Cost', value: 0, unit: 'USD/year' },
   { section: 'Outputs', key: 'accessTime', label: 'Access Time Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'carbon', label: 'Carbon Cost', value: 0, unit: 'USD/year' },
+  { section: 'Outputs', key: 'carbon', label: 'Carbon Cost (in total only if included)', value: 0, unit: 'USD/year' },
+  { section: 'Outputs', key: 'carbonIncluded', label: 'Carbon Included in Total', value: '' },
   { section: 'Outputs', key: 'choleraAndFunerals', label: 'Cholera and Funeral Cost', value: 0, unit: 'USD/year' },
   { section: 'Outputs', key: 'tourism', label: 'Tourism Cost', value: 0, unit: 'USD/year' },
 ];
@@ -117,6 +118,8 @@ const getOutputValue = (outputs: ModelOutputs, key: string) => {
     case 'totalCostUSD': return outputs.totalCostUSD;
     case 'totalCostLocal': return outputs.totalCostLocal;
     case 'percentGDP': return outputs.percentGDP;
+    case 'carbon': return outputs.carbonCostUSD;
+    case 'carbonIncluded': return outputs.carbonIncluded ? 'Yes' : 'No';
     default: return outputs.costsUSD[key as keyof typeof outputs.costsUSD] ?? '';
   }
 };
@@ -206,7 +209,7 @@ export const COST_LABELS: Record<string, string> = {
 };
 
 export const getAdvocacySummary = (outputs: ModelOutputs) => {
-  const breakdown = Object.entries(outputs.costsUSD)
+  const breakdown = costEntries(outputs)
     .map(([key, value]) => ({
       key,
       label: COST_LABELS[key] ?? key,

@@ -308,6 +308,7 @@ export const estimateInputs = (
       emissionFactorSource: 'IPCC',
       emissionFactor: EMISSION_PRESETS.IPCC,
       socialCostOfCarbon: 100,
+      includeInTotal: false,
     },
     other: {
       choleraResponseCost: gdpPerCapita * 2000,

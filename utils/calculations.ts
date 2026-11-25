@@ -101,7 +101,11 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   
   // Economic cost = Emissions * Social Cost of Carbon (NPV of future damage)
   // Note: We do not discount again because SCC typically represents the Present Value of damage per ton emitted *today*.
-  const carbonCostUSD = totalEmissionsTons * carbon.socialCostOfCarbon;
+  const carbonCostAll = totalEmissionsTons * carbon.socialCostOfCarbon;
+  // Excluded from the national total by default: the social cost of carbon is worldwide damage, and
+  // basic pit latrines emit as much methane as unimproved ones, so it is not a cost of *poor* sanitation.
+  const carbonIncluded = !!carbon.includeInTotal;
+  const carbonCostUSD = carbonIncluded ? carbonCostAll : 0;
 
   // --- 7. Cholera & Funerals ---
   const funeralCostsUSD = attributableDeaths * other.funeralCostPerDeath;
@@ -151,6 +155,8 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
 
   return {
     costsUSD,
+    carbonCostUSD: carbonCostAll,
+    carbonIncluded,
     costsLocal,
     totalCostUSD,
     totalCostLocal,
@@ -159,7 +165,12 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   };
 };
 
-export const formatCurrency = (val: number, currency: string = 'USD') => {
+/** Cost categories that make up the total (carbon only when it is included). */
+export const costEntries = (outputs: ModelOutputs): [keyof CostBreakdown, number][] =>
+  (Object.entries(outputs.costsUSD) as [keyof CostBreakdown, number][])
+    .filter(([key]) => key !== 'carbon' || outputs.carbonIncluded);
+
+export const formatCurrency =(val: number, currency: string = 'USD') => {
   // If > 10, round to integer (fractionDigits: 0)
   const fractionDigits = Math.abs(val) >= 10 ? 0 : 2;
   
