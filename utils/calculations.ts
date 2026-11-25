@@ -43,9 +43,10 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   const { macro, health, nutrition, access, carbon, other } = inputs;
 
   // --- 1. Health Care Costs ---
-  const totalDiarrheaCases = 
-    (health.diarrheaIncidenceUnder5 * (health.population * 0.15)) + 
-    (health.diarrheaIncidenceOver5 * (health.population * 0.85));
+  const populationUnder5 = health.population * health.under5Share;
+  const totalDiarrheaCases =
+    (health.diarrheaIncidenceUnder5 * populationUnder5) +
+    (health.diarrheaIncidenceOver5 * (health.population - populationUnder5));
 
   const attributableCases = totalDiarrheaCases * health.attributionToSanitation;
   const treatedCases = attributableCases * health.treatmentSeekingRate;
@@ -75,9 +76,7 @@ export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   }
 
   // --- 4. Stunting Costs (Nutrition) ---
-  // Approximate annual cohort of children turning 2 (peak stunting risk)
-  // 15% of population is U5. Divide by 5 to get one year cohort.
-  const populationUnder5 = health.population * 0.15; 
+  // One yearly cohort of children (the under-5 population divided by 5).
   const annualCohort = populationUnder5 / 5;
   
   const newStuntedCases = annualCohort * nutrition.stuntingPrevalence;

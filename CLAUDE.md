@@ -33,6 +33,13 @@ Repo: github.com/washways/sanitation-model. Work directly on `main`; keep local 
 - `services/worldBank.ts` `CORE_KEYS`: the analysis year is the latest year where all six core annual indicators have data. Sparse survey/modelled series must NOT set the year (they dragged Malawi back to 2019). `explainYear()` builds the `YearExplanation` shown by `components/YearNotice.tsx`, the PDF and the CSV.
 - The World Bank API sometimes returns an HTML error page under load; those series come back empty and the notice says so.
 
+## Model assumptions (reviewed 2026-11-25, v1.3.0)
+- `ASSUMPTIONS.md` lists every default with its source and a strength rating. Keep it in step with `utils/estimators.ts` and the source-badge notes when changing a default.
+- Diarrhoea deaths inputs are ALL diarrhoea deaths; `attributionToSanitation` (default 0.38, WHO 2023 sanitation-only) is applied to both cases and deaths. Never set it to 1.0 because WASH data exist: SDG 3.9.2 is water+sanitation+hygiene and four diseases.
+- Stunting attribution 0.16 (Danaei 2016), discount rate 5% (Haacker 2020).
+- World Bank codes go stale: SH.STA.ODEF.ZS was retired (use SH.STA.ODFC.ZS); diarrhoea prevalence (SH.STA.DIAR/DIRH) is archived. When adding an indicator, curl `api.worldbank.org/v2/country/MW/indicator/<code>?format=json` first. Treat 0 as a valid value, not as missing.
+- `scratch/`-style check: load `services/worldBank.ts`, `utils/estimators.ts` and `utils/calculations.ts` through Vite `ssrLoadModule` to print per-country cost breakdowns.
+
 ## PDF export (`components/PDFExport.tsx`, @react-pdf/renderer)
 - Set `lineHeight` on every text style; inherited lineHeight makes large text overlap.
 - Use `Helvetica-Bold` as the bold font (fontWeight alone doesn't switch the face).

@@ -71,7 +71,7 @@ const MethodologySection = () => (
                     <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded mb-2">
                         Cost = Cases × %Seeking × (AvgCost<sub>OP</sub> + AvgCost<sub>IP</sub>)
                     </p>
-                    <p className="text-xs">Based on disease incidence (WB/WHO) attributable to sanitation (default 88%). Unit costs derived from national health expenditure data.</p>
+                    <p className="text-xs">Diarrhoea cases and deaths × the share caused by unsafe sanitation alone: 38% by default (WHO 2023: 564,000 of about 1.5 million diarrhoea deaths in 2019). Water, sanitation and hygiene together cause 69%. Unit costs derived from national health expenditure data.</p>
                 </div>
 
                 <div>
@@ -105,7 +105,7 @@ const MethodologySection = () => (
                         Loss = Cohort × Stunt% × Attr% × WagePenalty% × NPV
                     </p>
                     <p className="text-xs">
-                        Ref: <em>Grantham-McGregor et al.</em> Estimates income loss (typ. 10-20%) due to cognitive delays in stunted children. Modeled as an NPV of future working life (40 yrs).
+                        Share of stunting caused by unsafe sanitation: 16% by default (<em>Danaei et al. 2016</em>). Treat it as an upper bound, since household WASH trials found no effect on growth. Future wage penalty 10% (<em>Hoddinott et al. 2013</em>; <em>Galasso &amp; Wagstaff 2019</em>), as an NPV over a 40-year working life.
                     </p>
                 </div>
 

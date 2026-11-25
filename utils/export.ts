@@ -18,16 +18,17 @@ const INPUT_FIELDS: ExportField[] = [
   { section: 'Macro', key: 'mortalityMethod', label: 'Mortality Method', value: '' },
   { section: 'Macro', key: 'vslMultiplier', label: 'VSL Multiplier', value: 0, unit: 'x GDPpc' },
   { section: 'Health', key: 'population', label: 'Population', value: 0, unit: 'people' },
-  { section: 'Health', key: 'attributionToSanitation', label: 'Attributable to Sanitation', value: 0, unit: '%' },
+  { section: 'Health', key: 'under5Share', label: 'Population Under 5', value: 0, unit: '%' },
+  { section: 'Health', key: 'attributionToSanitation', label: 'Share of Diarrhoea Caused by Unsafe Sanitation', value: 0, unit: '%' },
   { section: 'Health', key: 'diarrheaIncidenceUnder5', label: 'Under-5 Diarrhea Incidence', value: 0, unit: 'cases/person/year' },
-  { section: 'Health', key: 'diarrheaDeathsUnder5', label: 'Under-5 Diarrhea Deaths', value: 0, unit: 'deaths/year' },
+  { section: 'Health', key: 'diarrheaDeathsUnder5', label: 'Under-5 Diarrhea Deaths (all causes)', value: 0, unit: 'deaths/year' },
   { section: 'Health', key: 'diarrheaIncidenceOver5', label: 'Over-5 Diarrhea Incidence', value: 0, unit: 'cases/person/year' },
-  { section: 'Health', key: 'diarrheaDeathsOver5', label: 'Over-5 Diarrhea Deaths', value: 0, unit: 'deaths/year' },
+  { section: 'Health', key: 'diarrheaDeathsOver5', label: 'Over-5 Diarrhea Deaths (all causes)', value: 0, unit: 'deaths/year' },
   { section: 'Health', key: 'treatmentSeekingRate', label: 'Treatment Seeking Rate', value: 0, unit: '%' },
   { section: 'Health', key: 'costOutpatient', label: 'Outpatient Cost', value: 0, unit: 'USD/case' },
   { section: 'Health', key: 'costInpatient', label: 'Inpatient Cost', value: 0, unit: 'USD/case' },
   { section: 'Nutrition', key: 'stuntingPrevalence', label: 'Stunting Prevalence', value: 0, unit: '%' },
-  { section: 'Nutrition', key: 'attributionStunting', label: 'Attributable Stunting', value: 0, unit: '%' },
+  { section: 'Nutrition', key: 'attributionStunting', label: 'Share of Stunting Caused by Unsafe Sanitation', value: 0, unit: '%' },
   { section: 'Nutrition', key: 'wageLossPercent', label: 'Future Wage Penalty', value: 0, unit: '%' },
   { section: 'Access', key: 'openDefecationPrevalence', label: 'Open Defecation Prevalence', value: 0, unit: '%' },
   { section: 'Access', key: 'dailyTimeForOD', label: 'Time Spent on OD', value: 0, unit: 'hours/day' },
@@ -85,6 +86,7 @@ const getInputValue = (inputs: ModelInputs, key: string) => {
     case 'mortalityMethod': return inputs.macro.mortalityMethod;
     case 'vslMultiplier': return inputs.macro.vslMultiplier;
     case 'population': return inputs.health.population;
+    case 'under5Share': return inputs.health.under5Share * 100;
     case 'attributionToSanitation': return inputs.health.attributionToSanitation * 100;
     case 'diarrheaIncidenceUnder5': return inputs.health.diarrheaIncidenceUnder5;
     case 'diarrheaDeathsUnder5': return inputs.health.diarrheaDeathsUnder5;

@@ -69,7 +69,8 @@ export const runSimulation = (baseInputs: ModelInputs, iterations: number = 500)
     simInputs.health.diarrheaDeathsUnder5 = vary(baseInputs.health.diarrheaDeathsUnder5, 0.20);
     simInputs.health.diarrheaDeathsOver5 = vary(baseInputs.health.diarrheaDeathsOver5, 0.20);
     
-    simInputs.health.attributionToSanitation = clamp(vary(baseInputs.health.attributionToSanitation, 0.10), 0.1, 1.0);
+    // Sanitation share of diarrhoea varies by country coverage; ±25% spans roughly 0.28-0.48 around the WHO global 0.38.
+    simInputs.health.attributionToSanitation = clamp(vary(baseInputs.health.attributionToSanitation, 0.25), 0.05, 1.0);
 
     // 3. HEALTH COSTS
     simInputs.health.treatmentSeekingRate = clamp(vary(baseInputs.health.treatmentSeekingRate, 0.15), 0.0, 1.0);
@@ -78,7 +79,8 @@ export const runSimulation = (baseInputs: ModelInputs, iterations: number = 500)
 
     // 4. NUTRITION
     simInputs.nutrition.stuntingPrevalence = clamp(vary(baseInputs.nutrition.stuntingPrevalence, 0.10), 0.0, 1.0);
-    simInputs.nutrition.attributionStunting = clamp(vary(baseInputs.nutrition.attributionStunting, 0.30), 0.0, 1.0);
+    // Wide: trials found no growth effect from household WASH, so the true causal share may be well below 16%.
+    simInputs.nutrition.attributionStunting = clamp(vary(baseInputs.nutrition.attributionStunting, 0.50), 0.0, 1.0);
     simInputs.nutrition.wageLossPercent = clamp(vary(baseInputs.nutrition.wageLossPercent, 0.20), 0.0, 1.0);
 
     // 5. ACCESS TIME

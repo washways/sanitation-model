@@ -58,26 +58,27 @@ export const DEFAULT_INPUTS: ModelInputs = {
     currencyCode: 'MWK',
     exchangeRate: 1700, 
     gdpPerCapita: 600, 
-    discountRate: 0.10, 
+    discountRate: 0.05,
     hourlyWage: 0.50, 
     workingDaysPerYear: 260,
     mortalityMethod: 'humanCapital',
     vslMultiplier: 70, 
   },
   health: {
-    population: 20000000, 
-    diarrheaIncidenceUnder5: 3.5, 
+    population: 20000000,
+    under5Share: 0.15,
+    diarrheaIncidenceUnder5: 3.5,
     diarrheaIncidenceOver5: 0.5,
-    diarrheaDeathsUnder5: 4500, 
-    diarrheaDeathsOver5: 1500,
-    attributionToSanitation: 0.88, 
+    diarrheaDeathsUnder5: 1800, // all diarrhoea deaths
+    diarrheaDeathsOver5: 5000,
+    attributionToSanitation: 0.38, // WHO 2023: unsafe sanitation alone
     treatmentSeekingRate: 0.60, 
     costOutpatient: 5.0, 
     costInpatient: 40.0, 
   },
   nutrition: {
     stuntingPrevalence: 0.30, // Updated to 30% to align with broader LDC averages
-    attributionStunting: 0.50, // Approx 50% of stunting often linked to WASH/Environment
+    attributionStunting: 0.16, // Danaei et al. 2016: unimproved sanitation
     wageLossPercent: 0.10, // 10% future wage penalty
   },
   access: {

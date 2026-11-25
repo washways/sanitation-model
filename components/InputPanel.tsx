@@ -286,8 +286,9 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
 
       <InputGroup title="2. Health (Diarrhea)" isOpen={openSection === 'health'} onToggle={() => toggle('health')}>
         <NumberField label="Total Population" value={inputs.health.population} onChange={(v) => updateHealth('population', v)} source={sources['population']} />
-        <NumberField 
-            label="Attributable to Sanitation" 
+        <NumberField label="Population Under 5" value={inputs.health.under5Share * 100} onChange={(v) => updateHealth('under5Share', v / 100)} step={0.1} unit="%" source={sources['under5Share']} />
+        <NumberField
+            label="Share Caused by Unsafe Sanitation"
             value={inputs.health.attributionToSanitation * 100} 
             onChange={(v) => updateHealth('attributionToSanitation', v / 100)} 
             step={1} 
@@ -298,13 +299,13 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
         <div className="md:col-span-2 grid grid-cols-2 gap-4 border p-3 rounded bg-slate-50/50">
             <h4 className="col-span-2 text-xs font-bold text-slate-400 uppercase">Under 5 Years</h4>
             <NumberField label="Incidence (Cases/Year)" value={inputs.health.diarrheaIncidenceUnder5} onChange={(v) => updateHealth('diarrheaIncidenceUnder5', v)} step={0.1} source={sources['diarrheaIncidenceUnder5']} />
-            <NumberField label="Total Annual Deaths" value={inputs.health.diarrheaDeathsUnder5} onChange={(v) => updateHealth('diarrheaDeathsUnder5', v)} source={sources['diarrheaDeathsUnder5']} />
+            <NumberField label="All Diarrhoea Deaths / Year" value={inputs.health.diarrheaDeathsUnder5} onChange={(v) => updateHealth('diarrheaDeathsUnder5', v)} source={sources['diarrheaDeathsUnder5']} />
         </div>
         
         <div className="md:col-span-2 grid grid-cols-2 gap-4 border p-3 rounded bg-slate-50/50">
              <h4 className="col-span-2 text-xs font-bold text-slate-400 uppercase">Over 5 Years</h4>
             <NumberField label="Incidence (Cases/Year)" value={inputs.health.diarrheaIncidenceOver5} onChange={(v) => updateHealth('diarrheaIncidenceOver5', v)} step={0.1} source={sources['diarrheaIncidenceOver5']} />
-            <NumberField label="Total Annual Deaths" value={inputs.health.diarrheaDeathsOver5} onChange={(v) => updateHealth('diarrheaDeathsOver5', v)} source={sources['diarrheaDeathsOver5']} />
+            <NumberField label="All Diarrhoea Deaths / Year" value={inputs.health.diarrheaDeathsOver5} onChange={(v) => updateHealth('diarrheaDeathsOver5', v)} source={sources['diarrheaDeathsOver5']} />
         </div>
 
         <NumberField label="Treatment Seeking Rate" value={inputs.health.treatmentSeekingRate * 100} onChange={(v) => updateHealth('treatmentSeekingRate', v/100)} unit="%" source={sources['treatmentSeekingRate']} />
@@ -313,7 +314,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
 
       <InputGroup title="3. Stunting (Child Development)" isOpen={openSection === 'stunting'} onToggle={() => toggle('stunting')}>
         <NumberField label="Stunting Prevalence (U5)" value={inputs.nutrition.stuntingPrevalence * 100} onChange={(v) => updateNutrition('stuntingPrevalence', v/100)} unit="%" source={sources['stuntingPrevalence']} />
-        <NumberField label="Attributable to Sanitation" value={inputs.nutrition.attributionStunting * 100} onChange={(v) => updateNutrition('attributionStunting', v/100)} unit="%" source={sources['attributionStunting']} />
+        <NumberField label="Share Caused by Unsafe Sanitation" value={inputs.nutrition.attributionStunting * 100} onChange={(v) => updateNutrition('attributionStunting', v/100)} unit="%" source={sources['attributionStunting']} />
         <NumberField label="Future Wage Penalty" value={inputs.nutrition.wageLossPercent * 100} onChange={(v) => updateNutrition('wageLossPercent', v/100)} unit="%" source={sources['wageLossPercent']} />
       </InputGroup>
 

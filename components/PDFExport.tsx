@@ -99,7 +99,7 @@ const sourceText = (src?: DataSourceInfo) => {
     case 'live': return `Live rate${year}`;
     case 'derived': return `Derived${year}`;
     case 'estimate': return 'Model estimate';
-    case 'assumption': return 'Standard assumption';
+    case 'assumption': return src.label;
     case 'user': return 'User input';
     default: return src.label;
   }
@@ -129,7 +129,9 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
     ['GDP per person', money(inputs.macro.gdpPerCapita), sources.gdpPerCapita],
     ['Exchange rate', `${formatNumber(inputs.macro.exchangeRate)} ${inputs.macro.currencyCode} per US$`, sources.exchangeRate],
     ['Hourly wage', `US$${inputs.macro.hourlyWage.toFixed(2)}`, sources.hourlyWage],
+    ['Diarrhoea caused by unsafe sanitation', pct(inputs.health.attributionToSanitation), sources.attributionToSanitation],
     ['Stunting (under-5)', pct(inputs.nutrition.stuntingPrevalence), sources.stuntingPrevalence],
+    ['Stunting caused by unsafe sanitation', pct(inputs.nutrition.attributionStunting), sources.attributionStunting],
     ['Open defecation', pct(inputs.access.openDefecationPrevalence), sources.openDefecationPrevalence],
     ['Poor sanitation (carbon)', pct(inputs.carbon.percentWithPoorSanitation), sources.percentWithPoorSanitation],
     ['Deaths valued by', inputs.macro.mortalityMethod === 'vsl' ? `Value of statistical life (${inputs.macro.vslMultiplier}× GDP per person)` : `Human capital (lost output, ${pct(inputs.macro.discountRate)} discount rate)`, undefined],

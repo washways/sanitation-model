@@ -49,7 +49,6 @@ export interface CountryApiData {
     tourismReceipts: CountryIndicatorValue;
     birthRate: CountryIndicatorValue;
     healthExpenditure: CountryIndicatorValue;
-    diarrheaPrevalence: CountryIndicatorValue;
     stuntingPrevalence: CountryIndicatorValue;
     washMortality: CountryIndicatorValue;
     exchangeRate: CountryIndicatorValue;
@@ -71,11 +70,12 @@ export interface MacroInputs {
 
 export interface HealthInputs {
   population: number;
+  under5Share: number; // 0.0 - 1.0 share of population aged under 5
   diarrheaIncidenceUnder5: number; // Cases per person per year
   diarrheaIncidenceOver5: number;
-  diarrheaDeathsUnder5: number;
+  diarrheaDeathsUnder5: number; // ALL diarrhoea deaths (not yet attributed)
   diarrheaDeathsOver5: number;
-  attributionToSanitation: number; // 0.0 - 1.0 (Attributable fraction)
+  attributionToSanitation: number; // 0.0 - 1.0 share of diarrhoea cases and deaths caused by unsafe sanitation
   treatmentSeekingRate: number; // 0.0 - 1.0
   costOutpatient: number; // USD
   costInpatient: number; // USD

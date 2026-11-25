@@ -23,10 +23,11 @@ const INDICATORS = {
     link: 'https://data.worldbank.org/indicator/NY.GDP.PCAP.CD',
   },
   OPEN_DEFECATION: {
-    code: 'SH.STA.ODEF.ZS',
+    // SH.STA.ODEF.ZS no longer exists in the API; ODFC is the current JMP series.
+    code: 'SH.STA.ODFC.ZS',
     label: 'People practicing open defecation (% of population)',
     shortLabel: 'Open defecation',
-    link: 'https://data.worldbank.org/indicator/SH.STA.ODEF.ZS',
+    link: 'https://data.worldbank.org/indicator/SH.STA.ODFC.ZS',
   },
   MORTALITY_U5: {
     code: 'SH.DYN.MORT',
@@ -51,12 +52,6 @@ const INDICATORS = {
     label: 'Current health expenditure per capita (current US$)',
     shortLabel: 'Health spending per person',
     link: 'https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
-  },
-  DIARRHEA_PREVALENCE: {
-    code: 'SH.STA.DIAR.ZS',
-    label: 'Prevalence of diarrhea (% of children under 5)',
-    shortLabel: 'Diarrhoea prevalence (under-5)',
-    link: 'https://data.worldbank.org/indicator/SH.STA.DIAR.ZS',
   },
   STUNTING: {
     code: 'SH.STA.STNT.ZS',
@@ -335,7 +330,6 @@ export const fetchCountryData = async (isoCode: string, currencyCode: string = '
     fetchIndicatorSeries(isoCode, 'tourismReceipts', INDICATORS.TOURISM_RECEIPTS),
     fetchIndicatorSeries(isoCode, 'birthRate', INDICATORS.BIRTH_RATE),
     fetchIndicatorSeries(isoCode, 'healthExpenditure', INDICATORS.HEALTH_EXPENDITURE),
-    fetchIndicatorSeries(isoCode, 'diarrheaPrevalence', INDICATORS.DIARRHEA_PREVALENCE),
     fetchIndicatorSeries(isoCode, 'stuntingPrevalence', INDICATORS.STUNTING),
     fetchIndicatorSeries(isoCode, 'washMortality', INDICATORS.WASH_MORTALITY),
     fetchIndicatorSeries(isoCode, 'basicSanitation', INDICATORS.BASIC_SANITATION),

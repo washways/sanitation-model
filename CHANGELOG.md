@@ -4,6 +4,16 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.3.0 — 2026-11-25
+- **Review of every model assumption against current evidence.** The full list, with sources and how solid each one is, is in ASSUMPTIONS.md in the repository.
+- **Fixed: diarrhoea was counted as 100% caused by poor sanitation.** When WHO's WASH death data were available, every diarrhoea case and death was treated as caused by sanitation. Now 38% of diarrhoea is attributed to unsafe sanitation alone (WHO 2023: 564,000 of about 1.5 million diarrhoea deaths in 2019). The old 88% fallback was a 2004 figure for water, sanitation and hygiene combined.
+- **Fixed: open defecation always showed 5%.** The World Bank indicator code had been retired, so every country fell back to 5%. The app now loads the real figure (for example 2.5% in Malawi, 0% in Bangladesh, 67% in Niger).
+- Share of stunting caused by unsafe sanitation lowered from 50% to 16% (Danaei et al. 2016). This is likely an upper bound, since large trials found household WASH did not improve child growth.
+- Discount rate lowered from 10% to 5%, the rate recommended for low- and lower-middle-income countries (Haacker et al. 2020).
+- The under-5 share of the population is now worked out from each country's birth rate instead of a fixed 15%.
+- Source notes now cite their evidence. The cholera response cost is marked as a placeholder with no source.
+- Results change: Malawi goes from US$211m (1.6% of GDP) to US$125m (0.9%); Niger rises because its real open-defecation rate is used.
+
 ## v1.2.0 — 2026-11-25
 - **New rule for the data year.** It is now the latest year with World Bank data for six core annual indicators: population, GDP per capita, health spending per person, under-5 mortality, birth rate and basic sanitation coverage. Before, any single indicator could hold the whole analysis back. Malawi was stuck at 2019 because deaths from unsafe WASH only have a 2019 figure; it now uses 2023. Results change for most countries.
 - Survey-based and irregular inputs (stunting, diarrhoea, open defecation, deaths from unsafe WASH, tourism) use their most recent value up to the data year and are listed as "older or missing".
