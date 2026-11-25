@@ -1,231 +1,260 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
-import { DataSourceMap, ModelInputs, ModelOutputs } from '../types';
-import { formatCurrency, formatNumber } from '../utils/calculations';
-import { getFallbackSources } from '../utils/dataSources';
-import { getAdvocacySummary } from '../utils/export';
+import { DataSourceMap, DataSourceInfo, ModelInputs, ModelOutputs, YearExplanation } from '../types';
+import { formatNumber } from '../utils/calculations';
+import { COST_LABELS } from '../utils/export';
+import { runSimulation } from '../utils/monteCarlo';
+import { COLOR_PALETTE } from '../constants';
 
 interface SanitationReportProps {
   countryName: string;
   inputs: ModelInputs;
   outputs: ModelOutputs;
   sources: DataSourceMap;
+  yearExplanation: YearExplanation | null;
+  dataYear: number;
+  version: string;
 }
 
-const styles = StyleSheet.create({
-  page: {
-    padding: 28,
-    fontSize: 10,
-    fontFamily: 'Helvetica',
-    color: '#0f172a',
-    backgroundColor: '#f8fafc',
-  },
-  header: {
-    backgroundColor: '#0f4c81',
-    color: '#ffffff',
-    borderRadius: 14,
-    padding: 18,
-    marginBottom: 14,
-  },
-  eyebrow: {
-    fontSize: 9,
-    textTransform: 'uppercase',
-    letterSpacing: 1.2,
-    marginBottom: 6,
-    opacity: 0.85,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 700,
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 11,
-    lineHeight: 1.35,
-    opacity: 0.95,
-  },
-  grid: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 10,
-    marginBottom: 12,
-  },
-  card: {
-    flexGrow: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 14,
-    border: '1 solid #dbeafe',
-  },
-  cardLabel: {
-    fontSize: 8,
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-    color: '#475569',
-    marginBottom: 6,
-  },
-  cardValue: {
-    fontSize: 18,
-    fontWeight: 700,
-    color: '#0f172a',
-  },
-  cardSubvalue: {
-    fontSize: 10,
-    color: '#475569',
-    marginTop: 4,
-  },
-  sectionRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    gap: 12,
-  },
-  section: {
-    flexGrow: 1,
-    backgroundColor: '#ffffff',
-    borderRadius: 12,
-    padding: 14,
-    border: '1 solid #e2e8f0',
-  },
-  sectionTitle: {
-    fontSize: 11,
-    fontWeight: 700,
-    marginBottom: 10,
-    color: '#0f4c81',
-    textTransform: 'uppercase',
-  },
-  driverRow: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingVertical: 5,
-    borderBottom: '1 solid #e2e8f0',
-  },
-  driverLabel: {
-    fontSize: 10,
-    color: '#1e293b',
-    width: '44%',
-  },
-  driverValue: {
-    fontSize: 10,
-    fontWeight: 700,
-    color: '#0f172a',
-    width: '32%',
-    textAlign: 'right',
-  },
-  driverShare: {
-    fontSize: 10,
-    color: '#475569',
-    width: '18%',
-    textAlign: 'right',
-  },
-  bullet: {
-    marginBottom: 8,
-    lineHeight: 1.4,
-    color: '#334155',
-  },
-  callout: {
-    marginTop: 12,
-    backgroundColor: '#ecfeff',
-    borderRadius: 12,
-    padding: 12,
-    border: '1 solid #bae6fd',
-  },
-  calloutTitle: {
-    fontSize: 11,
-    fontWeight: 700,
-    color: '#0f4c81',
-    marginBottom: 6,
-  },
-  footer: {
-    marginTop: 14,
-    paddingTop: 10,
-    borderTop: '1 solid #cbd5e1',
-    fontSize: 8,
-    color: '#64748b',
-    lineHeight: 1.35,
-  },
+// WASHways palette (matches tailwind.config.js).
+const C = {
+  navy: '#263238',
+  navySub: '#9FB0B6',
+  tab: '#26A6C1',
+  teal: '#0B6E80',
+  tealTint: '#E8F2F4',
+  page: '#EEF1F2',
+  line: '#DDE2E4',
+  text: '#17181a',
+  body: '#334155',
+  muted: '#64748b',
+  amber: '#92400e',
+};
+
+// Built-in PDF fonts: Helvetica / Helvetica-Bold (fontWeight alone does not switch the face).
+const BOLD = 'Helvetica-Bold';
+
+const s = StyleSheet.create({
+  // NB: set lineHeight per text style. react-pdf resolves an inherited lineHeight against the
+  // parent's font size, so large text inheriting it from the page overlaps the next line.
+  page: { paddingTop: 0, paddingBottom: 44, paddingHorizontal: 0, fontFamily: 'Helvetica', fontSize: 9.5, color: C.body },
+  header: { backgroundColor: C.navy, paddingVertical: 18, paddingHorizontal: 40, marginBottom: 16 },
+  eyebrow: { fontSize: 7.5, lineHeight: 1.2, fontFamily: BOLD, color: C.navySub, letterSpacing: 1, textTransform: 'uppercase' },
+  title: { fontSize: 20, lineHeight: 1.2, fontFamily: BOLD, color: '#ffffff', marginTop: 6 },
+  meta: { fontSize: 8.5, lineHeight: 1.3, color: '#d5dde0', marginTop: 4 },
+  accent: { height: 3, width: 48, backgroundColor: C.tab, marginTop: 10 },
+  body: { paddingHorizontal: 40 },
+
+  statsRow: { flexDirection: 'row', marginBottom: 14 },
+  stat: { flex: 1, borderWidth: 1, borderColor: C.line, borderRadius: 6, padding: 12 },
+  statGap: { width: 10 },
+  statLabel: { fontSize: 7.5, lineHeight: 1.2, fontFamily: BOLD, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.6 },
+  statValue: { fontSize: 17, lineHeight: 1.2, fontFamily: BOLD, color: C.text, marginTop: 5 },
+  statSub: { fontSize: 8.5, lineHeight: 1.3, color: C.muted, marginTop: 3 },
+
+  lead: { fontSize: 10.5, color: C.text, lineHeight: 1.5, marginBottom: 14 },
+
+  h2: { fontSize: 11.5, lineHeight: 1.2, fontFamily: BOLD, color: C.text, marginBottom: 6, marginTop: 2 },
+  section: { marginBottom: 14 },
+  para: { fontSize: 9.5, lineHeight: 1.45, marginBottom: 5 },
+  small: { fontSize: 8.5, lineHeight: 1.4, color: C.muted },
+
+  tableHead: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: C.line, paddingBottom: 4, marginBottom: 1 },
+  th: { fontSize: 7.5, lineHeight: 1.2, fontFamily: BOLD, color: C.muted, textTransform: 'uppercase', letterSpacing: 0.5 },
+  row: { flexDirection: 'row', alignItems: 'center', paddingVertical: 3.5, borderBottomWidth: 0.5, borderBottomColor: C.line },
+  cellText: { fontSize: 9, lineHeight: 1.3, color: C.text },
+
+  barTrack: { height: 6, backgroundColor: C.page, borderRadius: 3, flex: 1, marginHorizontal: 8 },
+  bar: { height: 6, borderRadius: 3 },
+
+  note: { backgroundColor: C.tealTint, borderRadius: 6, padding: 10, marginTop: 6 },
+  noteText: { fontSize: 8.5, lineHeight: 1.4, color: C.body },
+
+  footerRule: { position: 'absolute', bottom: 30, left: 40, right: 40, height: 0.5, backgroundColor: C.line },
+  footerText: { position: 'absolute', bottom: 18, fontSize: 7.5, lineHeight: 1.2, color: C.muted },
 });
 
-export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName, inputs, outputs, sources }) => {
-  const summary = getAdvocacySummary(outputs);
-  const fallbackSources = getFallbackSources(sources)
-    .filter(([key]) => key !== 'analysisYear')
-    .slice(0, 4);
+/** Lower-case a label for use mid-sentence, but leave acronyms ("GDP per capita") alone. */
+const inSentence = (label: string) => (/^[A-Z][a-z]/.test(label) ? label[0].toLowerCase() + label.slice(1) : label);
+const listJoin = (items: string[]) => (items.length < 2 ? items.join('') : `${items.slice(0, -1).join(', ')} and ${items[items.length - 1]}`);
+
+/** "US$180.1 million", "MWK 314.1 billion" — readable and never too wide for a cell. */
+const money = (value: number, currency = 'USD') => {
+  const prefix = currency === 'USD' ? 'US$' : `${currency} `;
+  const abs = Math.abs(value);
+  const units: [number, string][] = [[1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million']];
+  for (const [size, word] of units) {
+    if (abs >= size) return `${prefix}${(value / size).toLocaleString('en-US', { maximumFractionDigits: 1 })} ${word}`;
+  }
+  return `${prefix}${Math.round(value).toLocaleString('en-US')}`;
+};
+
+const pct = (fraction: number) => `${formatNumber(fraction * 100)}%`;
+
+const sourceText = (src?: DataSourceInfo) => {
+  if (!src) return 'Model input';
+  const year = src.actualYear ? ` ${src.actualYear}` : '';
+  switch (src.kind) {
+    case 'api': return `World Bank${year}`;
+    case 'live': return `Live rate${year}`;
+    case 'derived': return `Derived${year}`;
+    case 'estimate': return 'Model estimate';
+    case 'assumption': return 'Standard assumption';
+    case 'user': return 'User input';
+    default: return src.label;
+  }
+};
+
+const Footer = ({ version }: { version: string }) => (
+  <>
+    <View style={s.footerRule} fixed />
+    {/* Static text only: react-pdf's render-prop page numbers did not draw in testing. */}
+    <Text style={[s.footerText, { left: 40, right: 40 }]} fixed>
+      Sanitation Impact Modeler v{version} · washways.org/sanitation-model · Indicative estimate, not an official statistic
+    </Text>
+  </>
+);
+
+export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName, inputs, outputs, sources, yearExplanation, dataYear, version }) => {
+  const sim = runSimulation(inputs, 3000);
+  const breakdown = (Object.entries(outputs.costsUSD) as [string, number][])
+    .map(([key, value]) => ({ key, label: COST_LABELS[key] ?? key, value, share: outputs.totalCostUSD > 0 ? value / outputs.totalCostUSD : 0 }))
+    .sort((a, b) => b.value - a.value);
+  const maxShare = Math.max(...breakdown.map((b) => b.share), 0.0001);
+  const top = breakdown.slice(0, 3).map((b) => b.label.toLowerCase());
+  const generated = new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  const keyInputs: [string, string, DataSourceInfo | undefined][] = [
+    ['Population', Math.round(inputs.health.population).toLocaleString('en-US'), sources.population],
+    ['GDP per person', money(inputs.macro.gdpPerCapita), sources.gdpPerCapita],
+    ['Exchange rate', `${formatNumber(inputs.macro.exchangeRate)} ${inputs.macro.currencyCode} per US$`, sources.exchangeRate],
+    ['Hourly wage', `US$${inputs.macro.hourlyWage.toFixed(2)}`, sources.hourlyWage],
+    ['Stunting (under-5)', pct(inputs.nutrition.stuntingPrevalence), sources.stuntingPrevalence],
+    ['Open defecation', pct(inputs.access.openDefecationPrevalence), sources.openDefecationPrevalence],
+    ['Poor sanitation (carbon)', pct(inputs.carbon.percentWithPoorSanitation), sources.percentWithPoorSanitation],
+    ['Deaths valued by', inputs.macro.mortalityMethod === 'vsl' ? `Value of statistical life (${inputs.macro.vslMultiplier}× GDP per person)` : `Human capital (lost output, ${pct(inputs.macro.discountRate)} discount rate)`, undefined],
+  ];
 
   return (
-    <Document title={`${countryName} Sanitation Advocacy Brief`}>
-      <Page size="A4" style={styles.page}>
-        <View style={styles.header}>
-          <Text style={styles.eyebrow}>Sanitation Economic Burden Brief</Text>
-          <Text style={styles.title}>{countryName}</Text>
-          <Text style={styles.subtitle}>
-            Poor sanitation is estimated to cost {countryName} {summary.headline}, equivalent to {summary.percentGdp}.
-            Results are aligned to {inputs.macro.analysisYear} source data where available.
-          </Text>
+    <Document title={`Cost of poor sanitation: ${countryName}`} author="WASHways" subject="Sanitation economic burden brief">
+      <Page size="A4" style={s.page} wrap>
+        <Footer version={version} />
+        <View style={s.header}>
+          <Text style={s.eyebrow}>WASHways · Sanitation economics brief</Text>
+          <Text style={s.title}>The cost of poor sanitation: {countryName}</Text>
+          <Text style={s.meta}>Estimate for data year {dataYear} · Generated {generated}</Text>
+          <View style={s.accent} />
         </View>
 
-        <View style={styles.grid}>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Annual Economic Loss</Text>
-            <Text style={styles.cardValue}>{formatCurrency(outputs.totalCostUSD)}</Text>
-            <Text style={styles.cardSubvalue}>Across health, productivity, mortality, time, climate, and tourism channels.</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Local Currency</Text>
-            <Text style={styles.cardValue}>{formatCurrency(outputs.totalCostLocal, inputs.macro.currencyCode)}</Text>
-            <Text style={styles.cardSubvalue}>Converted using the current USD exchange rate available at runtime.</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardLabel}>Share of National GDP</Text>
-            <Text style={styles.cardValue}>{formatNumber(outputs.percentGDP)}%</Text>
-            <Text style={styles.cardSubvalue}>A recurring annual drag on growth, fiscal space, and household welfare.</Text>
-          </View>
-        </View>
-
-        <View style={styles.sectionRow}>
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Largest Cost Drivers</Text>
-            {summary.topDrivers.map((driver) => (
-              <View key={driver.key} style={styles.driverRow}>
-                <Text style={styles.driverLabel}>{driver.label}</Text>
-                <Text style={styles.driverValue}>{formatCurrency(driver.value)}</Text>
-                <Text style={styles.driverShare}>{formatNumber(driver.share)}%</Text>
-              </View>
-            ))}
-            <View style={styles.callout}>
-              <Text style={styles.calloutTitle}>Advocacy Message</Text>
-              <Text style={styles.bullet}>
-                Sanitation is not only a service-delivery issue. It is a material economic burden that suppresses productivity,
-                raises avoidable health costs, and weakens resilience.
-              </Text>
-              <Text style={styles.bullet}>
-                The model points to the largest annual losses first, helping frame sanitation investment as a fiscal and growth decision.
-              </Text>
+        <View style={s.body}>
+          <View style={s.statsRow} wrap={false}>
+            <View style={s.stat}>
+              <Text style={s.statLabel}>Annual economic loss</Text>
+              <Text style={s.statValue}>{money(outputs.totalCostUSD)}</Text>
+              <Text style={s.statSub}>{money(outputs.totalCostLocal, inputs.macro.currencyCode)}</Text>
+            </View>
+            <View style={s.statGap} />
+            <View style={s.stat}>
+              <Text style={s.statLabel}>Share of GDP</Text>
+              <Text style={s.statValue}>{formatNumber(outputs.percentGDP)}%</Text>
+              <Text style={s.statSub}>lost every year</Text>
+            </View>
+            <View style={s.statGap} />
+            <View style={s.stat}>
+              <Text style={s.statLabel}>Likely range (90%)</Text>
+              <Text style={[s.statValue, { fontSize: 13, marginTop: 7 }]}>{money(sim.p5)} – {money(sim.p95)}</Text>
+              <Text style={s.statSub}>from {sim.iterations.toLocaleString('en-US')} simulations</Text>
             </View>
           </View>
 
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Data Integrity</Text>
-            <Text style={styles.bullet}>
-              Calculations are aligned to {inputs.macro.analysisYear} to reduce mixed-year distortion across indicators.
+          <Text style={s.lead}>
+            Poor sanitation is estimated to cost {countryName} about {money(outputs.totalCostUSD)} a year, equal to {formatNumber(outputs.percentGDP)}% of GDP.
+            The largest losses come from {listJoin(top)}.
+          </Text>
+
+          <View style={s.section} wrap={false}>
+            <Text style={s.h2}>Where the losses come from</Text>
+            <View style={s.tableHead}>
+              <Text style={[s.th, { width: '38%' }]}>Cost category</Text>
+              <Text style={[s.th, { flex: 1 }]}> </Text>
+              <Text style={[s.th, { width: 80, textAlign: 'right' }]}>US$ per year</Text>
+              <Text style={[s.th, { width: 40, textAlign: 'right' }]}>Share</Text>
+            </View>
+            {breakdown.map((b) => (
+              <View key={b.key} style={s.row} wrap={false}>
+                <Text style={[s.cellText, { width: '38%' }]}>{b.label}</Text>
+                <View style={s.barTrack}>
+                  <View style={[s.bar, { width: `${(b.share / maxShare) * 100}%`, backgroundColor: (COLOR_PALETTE as Record<string, string>)[b.key] ?? C.teal }]} />
+                </View>
+                <Text style={[s.cellText, { width: 80, textAlign: 'right' }]}>{money(b.value)}</Text>
+                <Text style={[s.cellText, { width: 40, textAlign: 'right', color: C.muted }]}>{formatNumber(b.share * 100)}%</Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={s.section} wrap={false}>
+            <Text style={s.h2}>Why it matters</Text>
+            <Text style={s.para}>
+              Sanitation is an economic issue as well as a service-delivery one. These losses recur every year: avoidable health spending,
+              working time lost to illness and to finding places to defecate, early deaths, and lower lifetime earnings for children who are stunted.
             </Text>
-            <Text style={styles.bullet}>
-              GDP per capita, population, open defecation, stunting, tourism, mortality, and health expenditure inputs were pulled from World Bank time series and pinned to the aligned year when available.
+            <Text style={s.para}>
+              Comparing these annual losses with the cost of extending and maintaining sanitation services helps frame investment as a growth and fiscal decision.
             </Text>
-            <Text style={styles.bullet}>
-              {fallbackSources.length > 0
-                ? `Fallback years were required for ${fallbackSources.length} indicator(s): ${fallbackSources.map(([, source]) => `${source.label}${source.actualYear ? ` (${source.actualYear})` : ''}`).join(', ')}.`
-                : 'No earlier-year World Bank fallbacks were required for the displayed input set.'}
+          </View>
+
+          <View style={s.section} wrap={false}>
+            <Text style={s.h2}>Which year the data are from</Text>
+            <Text style={s.para}>
+              The estimate uses {dataYear} data.{' '}
+              {yearExplanation
+                ? `${yearExplanation.rule}${yearExplanation.limiting.length ? ` For ${countryName}, ${listJoin(yearExplanation.limiting.map(inSentence))} ${yearExplanation.limiting.length > 1 ? 'have' : 'has'} no data after ${dataYear}.` : ''}`
+                : 'Live World Bank data were not available, so default values were used.'}
             </Text>
-            <Text style={styles.bullet}>
-              Analysts can export the companion CSV to review every parameter, its source, and the exact year used in the model.
+            {yearExplanation && yearExplanation.core.some((c) => c.latestYear === null) && (
+              <Text style={[s.para, { color: C.amber }]}>
+                Some core World Bank series could not be loaded when this brief was generated ({yearExplanation.core.filter((c) => c.latestYear === null).map((c) => inSentence(c.label)).join(', ')}), so model estimates were used for them.
+              </Text>
+            )}
+            {yearExplanation && yearExplanation.olderOrMissing.length > 0 && (
+              <View style={s.note}>
+                <Text style={s.noteText}>
+                  <Text style={{ fontFamily: BOLD }}>Older or missing inputs: </Text>
+                  {yearExplanation.olderOrMissing.map((o) => `${o.label} (${o.usedYear ?? 'no data, estimated'})`).join(', ')}.
+                </Text>
+              </View>
+            )}
+          </View>
+
+          <View style={s.section} wrap={false}>
+            <Text style={s.h2}>Key inputs</Text>
+            <View style={s.tableHead}>
+              <Text style={[s.th, { width: '30%' }]}>Input</Text>
+              <Text style={[s.th, { flex: 1 }]}>Value</Text>
+              <Text style={[s.th, { width: 110, textAlign: 'right' }]}>Source</Text>
+            </View>
+            {keyInputs.map(([label, value, src]) => (
+              <View key={label} style={s.row} wrap={false}>
+                <Text style={[s.cellText, { width: '30%' }]}>{label}</Text>
+                <Text style={[s.cellText, { flex: 1, paddingRight: 8 }]}>{value}</Text>
+                <Text style={[s.cellText, { width: 110, textAlign: 'right', color: src?.fallbackUsed ? C.amber : C.muted }]}>
+                  {src ? sourceText(src) : 'User choice'}
+                </Text>
+              </View>
+            ))}
+          </View>
+
+          <View style={s.section} wrap={false}>
+            <Text style={s.h2}>Method and caveats</Text>
+            <Text style={s.para}>
+              Bottom-up cost-of-illness and human-capital approach, modelled on the World Bank Water and Sanitation Program economic studies.
+              Inputs come from World Bank Open Data where available; the rest are model estimates or standard assumptions, which users can change in the tool.
+            </Text>
+            <Text style={s.small}>
+              This is an indicative estimate for advocacy and planning, not an official statistic. The companion CSV export lists every input with its source, data year and notes.
             </Text>
           </View>
         </View>
-
-        <Text style={styles.footer}>
-          Generated by the Sanitation Impact Modeler on {new Date().toLocaleDateString('en-US')}. This brief is designed for advocacy use and should be interpreted alongside the detailed CSV export, which includes all parameters, source notes, and data-year metadata.
-        </Text>
       </Page>
     </Document>
   );

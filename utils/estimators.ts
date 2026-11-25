@@ -292,9 +292,9 @@ export const estimateInputs = (
         actualYear: analysisYear,
         fallbackUsed: rawData.fallbackFields.length > 0,
         tone: rawData.fallbackFields.length > 0 ? 'warning' : 'success',
-        notes: rawData.alignmentStrategy === 'latest-common-year'
-          ? `Calculations are aligned to ${analysisYear}, the latest year shared across the fetched World Bank indicators.`
-          : `Calculations are aligned to ${analysisYear}, the year with the strongest indicator coverage across the fetched World Bank series.`,
+        notes: `${rawData.yearExplanation.rule}${rawData.yearExplanation.limiting.length
+          ? ` For this country, ${rawData.yearExplanation.limiting.join(', ')} ${rawData.yearExplanation.limiting.length > 1 ? 'have' : 'has'} no data after ${analysisYear}.`
+          : ''}`,
       }
     : estimateSource('Default analysis year', 'No external data was available, so the model fell back to the default analysis year.');
 

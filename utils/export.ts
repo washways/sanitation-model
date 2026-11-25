@@ -1,4 +1,4 @@
-import { ModelInputs, ModelOutputs, DataSourceMap } from '../types';
+import { ModelInputs, ModelOutputs, DataSourceMap, YearExplanation } from '../types';
 import { formatCurrency, formatNumber } from './calculations';
 
 interface ExportField {
@@ -123,14 +123,24 @@ export const downloadAnalysisCsv = (
   countryName: string,
   inputs: ModelInputs,
   outputs: ModelOutputs,
-  sources: DataSourceMap
+  sources: DataSourceMap,
+  yearExplanation?: YearExplanation | null
 ) => {
   const exportDate = new Date().toISOString();
-  const rows = [
+  const rows: (string | number)[][] = [
     ['Country', countryName],
     ['Exported At', exportDate],
     ['Aligned Analysis Year', inputs.macro.analysisYear],
     ['Currency Code', inputs.macro.currencyCode],
+  ];
+  if (yearExplanation) {
+    rows.push(['How the year is chosen', yearExplanation.rule]);
+    rows.push(['Core indicators (latest data year)', yearExplanation.core.map((c) => `${c.label} ${c.latestYear ?? 'none'}`).join('; ')]);
+    if (yearExplanation.olderOrMissing.length) {
+      rows.push(['Older or missing inputs (year used)', yearExplanation.olderOrMissing.map((c) => `${c.label} ${c.usedYear ?? 'no data, estimated'}`).join('; ')]);
+    }
+  }
+  rows.push(
     [],
     [
       'Section',
@@ -144,7 +154,7 @@ export const downloadAnalysisCsv = (
       'Fallback Used',
       'Notes',
     ],
-  ];
+  );
 
   INPUT_FIELDS.forEach((field) => {
     const source = sources[field.key as keyof DataSourceMap];
@@ -182,11 +192,22 @@ export const downloadAnalysisCsv = (
   triggerDownload(content, filename, 'text/csv;charset=utf-8;');
 };
 
+export const COST_LABELS: Record<string, string> = {
+  healthCare: 'Health care',
+  productivity: 'Lost productivity (illness)',
+  mortality: 'Premature deaths',
+  nutrition: 'Stunting (future earnings)',
+  accessTime: 'Time lost to open defecation',
+  carbon: 'Greenhouse gas emissions',
+  choleraAndFunerals: 'Cholera response and funerals',
+  tourism: 'Tourism losses',
+};
+
 export const getAdvocacySummary = (outputs: ModelOutputs) => {
   const breakdown = Object.entries(outputs.costsUSD)
     .map(([key, value]) => ({
       key,
-      label: key.replace(/([A-Z])/g, ' $1').trim().replace('nutrition', 'Stunting').replace('cholera And Funerals', 'Cholera and Funerals'),
+      label: COST_LABELS[key] ?? key,
       value,
       share: outputs.totalCostUSD > 0 ? (value / outputs.totalCostUSD) * 100 : 0,
     }))

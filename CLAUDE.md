@@ -29,6 +29,16 @@ Repo: github.com/washways/sanitation-model. Work directly on `main`; keep local 
 - Recharts views (`CostChart`, `MonteCarloPanel`, `ComparisonView`) are `React.lazy` in `App.tsx` and preloaded while the splash shows. PDF export is a dynamic import.
 - Monte Carlo (`utils/monteCarlo.ts`) copies inputs per section (no JSON clone) and `MonteCarloPanel` debounces input changes by 250 ms. Keep both.
 
+## Data year (decided by the user 2026-11-25)
+- `services/worldBank.ts` `CORE_KEYS`: the analysis year is the latest year where all six core annual indicators have data. Sparse survey/modelled series must NOT set the year (they dragged Malawi back to 2019). `explainYear()` builds the `YearExplanation` shown by `components/YearNotice.tsx`, the PDF and the CSV.
+- The World Bank API sometimes returns an HTML error page under load; those series come back empty and the notice says so.
+
+## PDF export (`components/PDFExport.tsx`, @react-pdf/renderer)
+- Set `lineHeight` on every text style; inherited lineHeight makes large text overlap.
+- Use `Helvetica-Bold` as the bold font (fontWeight alone doesn't switch the face).
+- Fixed footer must be absolutely positioned `<Text fixed>`; a fixed `<View>` footer and `render` page-number props did not draw.
+- Check output by rendering with Vite SSR from a script (load the modules with `server.ssrLoadModule`, then `renderToFile`) and reading the PDF back.
+
 ## Code notes
 - `components/SplashScreen.tsx`: card capped at `100dvh`, body scrolls, Launch button lives in a pinned footer so it is always visible. Enter/Escape also dismiss. Don't move the button back into the scrolling content.
 - The shared WASHways analytics script injects a fixed consent banner (no id/class) at the bottom of the page. `utils/useBottomOverlayInset.ts` measures it and sets `--bottom-inset` on `<html>`; the splash, the mobile cost bar and the inputs panel pad by it. Use `var(--bottom-inset,0px)` for anything new pinned to the bottom.

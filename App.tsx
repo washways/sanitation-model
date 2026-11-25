@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
 import { DEFAULT_INPUTS, SUPPORTED_COUNTRIES } from './constants';
-import { ModelInputs, DataSourceMap } from './types';
+import { ModelInputs, DataSourceMap, YearExplanation } from './types';
+import { YearNotice } from './components/YearNotice';
 import { calculateModelOutputs, formatCurrency, formatNumber } from './utils/calculations';
-import { getFallbackSources } from './utils/dataSources';
 import { downloadAnalysisCsv } from './utils/export';
 import { InputPanel } from './components/InputPanel';
 // Chart-heavy views (Recharts) are split out of the initial bundle so the splash screen
@@ -204,6 +204,8 @@ const App = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
+  const [yearExplanation, setYearExplanation] = useState<YearExplanation | null>(null);
+  const [dataYear, setDataYear] = useState<number | null>(null);
   useBottomOverlayInset();
 
   // Initial Load
@@ -223,6 +225,8 @@ const App = () => {
               const estimated = estimateInputs(rawData, country.code, country.currency);
               setInputs(estimated.inputs);
               setSources(estimated.sources);
+              setYearExplanation(rawData.yearExplanation);
+              setDataYear(rawData.analysisYear);
           } catch (e) {
               console.error("Failed to load country data", e);
           }
@@ -236,13 +240,8 @@ const App = () => {
       [selectedCountry]
   );
   const selectedCountryName = selectedCountryMeta?.name || 'Selected Country';
-  const fallbackEntries = useMemo(
-      () => getFallbackSources(sources).filter(([key]) => key !== 'analysisYear'),
-      [sources]
-  );
-
   const handleCsvExport = () => {
-      downloadAnalysisCsv(selectedCountryName, inputs, outputs, sources);
+      downloadAnalysisCsv(selectedCountryName, inputs, outputs, sources, yearExplanation);
   };
 
   const handlePdfExport = async () => {
@@ -253,7 +252,10 @@ const App = () => {
               countryName: selectedCountryName,
               inputs,
               outputs,
-              sources
+              sources,
+              yearExplanation,
+              dataYear: dataYear ?? inputs.macro.analysisYear,
+              version: APP_VERSION,
           });
       } catch (error) {
           console.error('PDF export failed', error);
@@ -342,21 +344,7 @@ const App = () => {
                     </div>
                     {/* Content */}
                     <div className="overflow-visible lg:overflow-y-auto custom-scrollbar p-4 lg:p-6 pb-6 lg:pb-[calc(1.5rem+var(--bottom-inset,0px))]">
-                        <div className={`mb-4 rounded-xl border px-4 py-3 text-sm ${
-                            fallbackEntries.length > 0
-                                ? 'bg-amber-50 border-amber-200 text-amber-900'
-                                : 'bg-emerald-50 border-emerald-200 text-emerald-900'
-                        }`}>
-                            <div className="font-bold">
-                                Analysis aligned to {inputs.macro.analysisYear}
-                                {fallbackEntries.length > 0 ? ` with ${fallbackEntries.length} fallback year${fallbackEntries.length > 1 ? 's' : ''}` : ''}
-                            </div>
-                            <p className="mt-1 text-xs leading-relaxed">
-                                {fallbackEntries.length > 0
-                                    ? `Some indicators had to use earlier World Bank data: ${fallbackEntries.map(([key, source]) => `${key.replace(/([A-Z])/g, ' $1').trim()} (${source.actualYear || 'n/a'})`).join(', ')}. Hover the source badges below to see the exact year used for each input.`
-                                    : 'Fetched World Bank inputs matched the aligned analysis year. Hover the source badges below to inspect source details and data years.'}
-                            </p>
-                        </div>
+                        <YearNotice year={dataYear ?? inputs.macro.analysisYear} explanation={yearExplanation} />
                         <InputPanel inputs={inputs} sources={sources} onUpdate={setInputs} />
                     </div>
                 </div>

@@ -22,10 +22,25 @@ export interface CountryIndicatorValue {
   source: DataSourceInfo;
 }
 
+export interface IndicatorYearInfo {
+  label: string; // short, plain-language name
+  latestYear: number | null; // latest year with data (2015 onwards); null = no data
+  usedYear?: number | null; // year actually used for the analysis
+}
+
+/** Why the analysis year is what it is — shown in the app, PDF and CSV. */
+export interface YearExplanation {
+  rule: string; // one-sentence description of the rule
+  core: IndicatorYearInfo[]; // indicators that set the year
+  limiting: string[]; // core indicators whose data stops at the analysis year
+  olderOrMissing: IndicatorYearInfo[]; // non-core inputs that use an older year or have no data
+}
+
 export interface CountryApiData {
   analysisYear: number;
   alignmentStrategy: 'latest-common-year' | 'best-coverage-year';
   fallbackFields: string[];
+  yearExplanation: YearExplanation;
   fields: {
     population: CountryIndicatorValue;
     gdpPerCapita: CountryIndicatorValue;

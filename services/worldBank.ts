@@ -1,9 +1,10 @@
 import { SUPPORTED_COUNTRIES } from '../constants';
-import { CountryApiData, CountryIndicatorValue, DataSourceInfo } from '../types';
+import { CountryApiData, CountryIndicatorValue, DataSourceInfo, YearExplanation } from '../types';
 
 interface IndicatorDefinition {
   code: string;
   label: string;
+  shortLabel: string;
   link: string;
 }
 
@@ -12,56 +13,67 @@ const INDICATORS = {
   POPULATION: {
     code: 'SP.POP.TOTL',
     label: 'Population, total',
+    shortLabel: 'Population',
     link: 'https://data.worldbank.org/indicator/SP.POP.TOTL',
   },
   GDP_PER_CAPITA: {
     code: 'NY.GDP.PCAP.CD',
     label: 'GDP per capita (current US$)',
+    shortLabel: 'GDP per capita',
     link: 'https://data.worldbank.org/indicator/NY.GDP.PCAP.CD',
   },
   OPEN_DEFECATION: {
     code: 'SH.STA.ODEF.ZS',
     label: 'People practicing open defecation (% of population)',
+    shortLabel: 'Open defecation',
     link: 'https://data.worldbank.org/indicator/SH.STA.ODEF.ZS',
   },
   MORTALITY_U5: {
     code: 'SH.DYN.MORT',
     label: 'Mortality rate, under-5 (per 1,000 live births)',
+    shortLabel: 'Under-5 mortality',
     link: 'https://data.worldbank.org/indicator/SH.DYN.MORT',
   },
   TOURISM_RECEIPTS: {
     code: 'ST.INT.RCPT.CD',
     label: 'International tourism, receipts (current US$)',
+    shortLabel: 'Tourism receipts',
     link: 'https://data.worldbank.org/indicator/ST.INT.RCPT.CD',
   },
   BIRTH_RATE: {
     code: 'SP.DYN.CBRT.IN',
     label: 'Birth rate, crude (per 1,000 people)',
+    shortLabel: 'Birth rate',
     link: 'https://data.worldbank.org/indicator/SP.DYN.CBRT.IN',
   },
   HEALTH_EXPENDITURE: {
     code: 'SH.XPD.CHEX.PC.CD',
     label: 'Current health expenditure per capita (current US$)',
+    shortLabel: 'Health spending per person',
     link: 'https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD',
   },
   DIARRHEA_PREVALENCE: {
     code: 'SH.STA.DIAR.ZS',
     label: 'Prevalence of diarrhea (% of children under 5)',
+    shortLabel: 'Diarrhoea prevalence (under-5)',
     link: 'https://data.worldbank.org/indicator/SH.STA.DIAR.ZS',
   },
   STUNTING: {
     code: 'SH.STA.STNT.ZS',
     label: 'Prevalence of stunting, height for age (% of children under 5)',
+    shortLabel: 'Stunting (under-5)',
     link: 'https://data.worldbank.org/indicator/SH.STA.STNT.ZS',
   },
   WASH_MORTALITY: {
     code: 'SH.STA.WASH.P5',
     label: 'Mortality rate attributed to unsafe WASH (per 100,000 population)',
+    shortLabel: 'Deaths from unsafe WASH',
     link: 'https://data.worldbank.org/indicator/SH.STA.WASH.P5',
   },
   BASIC_SANITATION: {
     code: 'SH.STA.BASS.ZS',
     label: 'People using at least basic sanitation services (% of population)',
+    shortLabel: 'Basic sanitation coverage',
     link: 'https://data.worldbank.org/indicator/SH.STA.BASS.ZS',
   },
 } as const satisfies Record<string, IndicatorDefinition>;
@@ -144,7 +156,44 @@ const buildMissingExchangeRateSource = (): DataSourceInfo => ({
 
 const getAvailableYears = (series: IndicatorSeriesPoint[]) => new Set(series.map((point) => point.year));
 
-const selectAlignedYear = (seriesResults: IndicatorSeriesResult[]) => {
+/**
+ * Indicators that set the analysis year. These are annual national series that the World Bank
+ * updates every year. Survey-based or modelled series (stunting, diarrhoea, open defecation,
+ * WASH-attributed deaths) and tourism are published irregularly, so letting them choose the year
+ * would drag the whole analysis back (e.g. Malawi's WASH-mortality series only has 2019).
+ * Those inputs use their most recent value up to the analysis year and are flagged as older.
+ */
+const CORE_KEYS: ReadonlyArray<keyof CountryApiData['fields']> = [
+  'population',
+  'gdpPerCapita',
+  'healthExpenditure',
+  'mortalityUnder5Rate',
+  'birthRate',
+  'basicSanitation',
+];
+
+export const YEAR_RULE =
+  'The analysis year is the most recent year for which all core annual indicators (population, GDP per capita, health spending per person, under-5 mortality, birth rate and basic sanitation coverage) have World Bank data. Survey-based and irregular inputs use their most recent value up to that year.';
+
+const latestYear = (series: IndicatorSeriesPoint[]) => (series.length ? Math.max(...series.map((p) => p.year)) : null);
+
+const explainYear = (seriesResults: IndicatorSeriesResult[], analysisYear: number): YearExplanation => {
+  const isCore = (r: IndicatorSeriesResult) => CORE_KEYS.includes(r.key);
+  const core = seriesResults.filter(isCore).map((r) => ({ label: r.definition.shortLabel, latestYear: latestYear(r.series) }));
+  const limiting = core.filter((c) => c.latestYear === analysisYear).map((c) => c.label);
+  const olderOrMissing = seriesResults
+    .filter((r) => !isCore(r))
+    .map((r) => {
+      const used = r.series.filter((p) => p.year <= analysisYear).sort((a, b) => b.year - a.year)[0]
+        ?? r.series.slice().sort((a, b) => a.year - b.year)[0];
+      return { label: r.definition.shortLabel, latestYear: latestYear(r.series), usedYear: used?.year ?? null };
+    })
+    .filter((r) => r.usedYear !== analysisYear);
+  return { rule: YEAR_RULE, core, limiting, olderOrMissing };
+};
+
+const selectAlignedYear = (allResults: IndicatorSeriesResult[]) => {
+  const seriesResults = allResults.filter((result) => CORE_KEYS.includes(result.key));
   const populated = seriesResults.filter((result) => result.series.length > 0);
   const allYears = Array.from(new Set(populated.flatMap((result) => result.series.map((point) => point.year))))
     .sort((a, b) => b - a);
@@ -309,6 +358,7 @@ export const fetchCountryData = async (isoCode: string, currencyCode: string = '
     analysisYear,
     alignmentStrategy,
     fallbackFields,
+    yearExplanation: explainYear(indicatorResults, analysisYear),
     fields: {
       ...fields,
       exchangeRate,
