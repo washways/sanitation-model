@@ -200,9 +200,8 @@ export const ComparisonView = () => {
                                                         <div className="flex justify-between"><span>Health:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.healthCare) + '%' : formatCurrency(d.healthCare)}</span></div>
                                                         <div className="flex justify-between"><span>Productivity:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.productivity) + '%' : formatCurrency(d.productivity)}</span></div>
                                                         <div className="flex justify-between"><span>Mortality:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.mortality) + '%' : formatCurrency(d.mortality)}</span></div>
-                                                        <div className="flex justify-between"><span>Stunting:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.nutrition) + '%' : formatCurrency(d.nutrition)}</span></div>
                                                         <div className="flex justify-between"><span>Access Time:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.accessTime) + '%' : formatCurrency(d.accessTime)}</span></div>
-                                                        <div className="flex justify-between"><span>Tourism:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.tourism) + '%' : formatCurrency(d.tourism)}</span></div>
+                                                        <div className="flex justify-between"><span>Cholera &amp; funerals:</span> <span className="font-mono text-slate-300">{sortBy === 'gdp' ? formatNumber(d.choleraAndFunerals) + '%' : formatCurrency(d.choleraAndFunerals)}</span></div>
                                                     </div>
                                                     <div className="border-t border-slate-600 pt-1 mt-1">
                                                         <p className="text-brand-primary font-bold text-sm flex justify-between">
@@ -219,11 +218,9 @@ export const ComparisonView = () => {
                                 <Legend verticalAlign="top" height={36} iconSize={10} />
                                 
                                 <Bar dataKey="healthCare" name="Health Care" stackId="a" fill={COLOR_PALETTE.healthCare} />
-                                <Bar dataKey="productivity" name="Productivity" stackId="a" fill={COLOR_PALETTE.productivity} />
-                                <Bar dataKey="nutrition" name="Stunting" stackId="a" fill={COLOR_PALETTE.nutrition} />
+                                <Bar dataKey="productivity" name="Days Lost to Illness" stackId="a" fill={COLOR_PALETTE.productivity} />
                                 <Bar dataKey="accessTime" name="Access Time" stackId="a" fill={COLOR_PALETTE.accessTime} />
-                                <Bar dataKey="choleraAndFunerals" name="Cholera" stackId="a" fill={COLOR_PALETTE.choleraAndFunerals} />
-                                <Bar dataKey="tourism" name="Tourism" stackId="a" fill={COLOR_PALETTE.tourism} />
+                                <Bar dataKey="choleraAndFunerals" name="Cholera & Funerals" stackId="a" fill={COLOR_PALETTE.choleraAndFunerals} />
                                 <Bar dataKey="mortality" name="Mortality" stackId="a" fill={COLOR_PALETTE.mortality}>
                                     <ErrorBar dataKey="error" width={4} strokeWidth={2} stroke="black" />
                                 </Bar>
@@ -242,11 +239,11 @@ export const ComparisonView = () => {
                         <div>
                             <p className="mb-4">
                                 <strong className="text-white uppercase tracking-wider text-xs block mb-1">Batch Simulation</strong>
-                                For each country, the model pulls the latest available data from the <strong className="text-white">World Bank API</strong> and <strong className="text-white">Open Exchange Rates</strong>. Where specific disease data is missing, regional estimates based on GDP and WHO tables are used.
+                                For each country, the model uses the latest <strong className="text-white">World Bank</strong> data, WHO's country estimates of the diarrhoea burden from inadequate sanitation, WHO cholera reports and WHO-CHOICE unit costs. Where a country has no WHO estimate, global figures are used.
                             </p>
                             <p>
                                 <strong className="text-white uppercase tracking-wider text-xs block mb-1">Uncertainty Analysis</strong>
-                                A Monte Carlo simulation (N=2,000 runs per country) is performed, varying inputs by ±5% (Demographics) to ±50% (Tourism/Cholera) to generate the error bars shown above. Carbon (greenhouse gas) costs are not included in the comparison.
+                                A Monte Carlo simulation per country draws each uncertain input from its range (WHO and WHO-CHOICE 95% intervals where available) to give the error bars. Stunting, tourism and carbon are not included in the comparison, as in the single-country headline total.
                             </p>
                         </div>
                         <div>

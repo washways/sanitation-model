@@ -1,0 +1,2274 @@
+{
+ "generated": "2026-11-26",
+ "notes": "Built by scripts/build-evidence.mjs. Rates are per person per year (2019 WHO counts divided by 2019 World Bank population).",
+ "countries": {
+  "AF": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000060859,
+     "low": 0.000042242,
+     "high": 0.000082311
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000056914,
+     "low": 0.000039378,
+     "high": 0.000078329
+    },
+    "dalysPerPerson": {
+     "value": 0.006210462,
+     "low": 0.004376168,
+     "high": 0.008359188
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.00531608,
+     "low": 0.003714849,
+     "high": 0.007251314
+    },
+    "attributableFraction": {
+     "value": 0.415,
+     "low": 0.301,
+     "high": 0.537
+    },
+    "deaths2019": 2304,
+    "deathsUnder5_2019": 2155
+   },
+   "cholera": {
+    "averageCases": 11937,
+    "yearsReported": 10,
+    "firstYear": 2005,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3131,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.38,
+     "low": 0.08,
+     "high": 1.11
+    },
+    "bedDayUSD2010": {
+     "value": 1.31,
+     "low": 0.53,
+     "high": 2.67
+    }
+   }
+  },
+  "AO": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000186811,
+     "low": 0.000126868,
+     "high": 0.000260691
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.0000992,
+     "low": 0.000061983,
+     "high": 0.000148211
+    },
+    "dalysPerPerson": {
+     "value": 0.013472214,
+     "low": 0.009222807,
+     "high": 0.018828335
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.009063485,
+     "low": 0.006096011,
+     "high": 0.012786874
+    },
+    "attributableFraction": {
+     "value": 0.397,
+     "low": 0.285,
+     "high": 0.524
+    },
+    "deaths2019": 6048,
+    "deathsUnder5_2019": 3212
+   },
+   "cholera": {
+    "averageCases": 10966,
+    "yearsReported": 10,
+    "firstYear": 2006,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.5534,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 4.68,
+     "low": 0.94,
+     "high": 13.65
+    },
+    "bedDayUSD2010": {
+     "value": 33.76,
+     "low": 12.2,
+     "high": 74.59
+    }
+   }
+  },
+  "BD": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000086708,
+     "low": 0.000058324,
+     "high": 0.00012656
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000010038,
+     "low": 0.000007138,
+     "high": 0.000013673
+    },
+    "dalysPerPerson": {
+     "value": 0.003653208,
+     "low": 0.002712686,
+     "high": 0.004765522
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.000941097,
+     "low": 0.000643401,
+     "high": 0.001329594
+    },
+    "attributableFraction": {
+     "value": 0.396,
+     "low": 0.302,
+     "high": 0.503
+    },
+    "deaths2019": 14299,
+    "deathsUnder5_2019": 1655
+   },
+   "cholera": {
+    "averageCases": 1133,
+    "yearsReported": 10,
+    "firstYear": 1991,
+    "lastYear": 2000
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.318,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.92,
+     "low": 0.19,
+     "high": 2.7
+    },
+    "bedDayUSD2010": {
+     "value": 4.44,
+     "low": 1.73,
+     "high": 9.67
+    }
+   }
+  },
+  "BJ": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000244066,
+     "low": 0.000168348,
+     "high": 0.000327304
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.0001191,
+     "low": 0.000078602,
+     "high": 0.000169059
+    },
+    "dalysPerPerson": {
+     "value": 0.017039918,
+     "low": 0.010849606,
+     "high": 0.027128719
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.01075419,
+     "low": 0.006140665,
+     "high": 0.019556058
+    },
+    "attributableFraction": {
+     "value": 0.455,
+     "low": 0.325,
+     "high": 0.588
+    },
+    "deaths2019": 3106,
+    "deathsUnder5_2019": 1516
+   },
+   "cholera": {
+    "averageCases": 638,
+    "yearsReported": 10,
+    "firstYear": 2005,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4383,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.18,
+     "low": 0.25,
+     "high": 3.37
+    },
+    "bedDayUSD2010": {
+     "value": 5.52,
+     "low": 2.13,
+     "high": 12.19
+    }
+   }
+  },
+  "BF": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000252629,
+     "low": 0.0001743,
+     "high": 0.000351595
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000109743,
+     "low": 0.000067907,
+     "high": 0.000167529
+    },
+    "dalysPerPerson": {
+     "value": 0.017574496,
+     "low": 0.010044912,
+     "high": 0.032068999
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.009992725,
+     "low": 0.003728384,
+     "high": 0.023102372
+    },
+    "attributableFraction": {
+     "value": 0.445,
+     "low": 0.326,
+     "high": 0.58
+    },
+    "deaths2019": 5296,
+    "deathsUnder5_2019": 2300
+   },
+   "cholera": {
+    "averageCases": 344,
+    "yearsReported": 10,
+    "firstYear": 1998,
+    "lastYear": 2012
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4312,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.01,
+     "low": 0.22,
+     "high": 3.05
+    },
+    "bedDayUSD2010": {
+     "value": 4.48,
+     "low": 1.76,
+     "high": 10.15
+    }
+   }
+  },
+  "BI": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000205542,
+     "low": 0.000141724,
+     "high": 0.000277497
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000067295,
+     "low": 0.000046774,
+     "high": 0.000091457
+    },
+    "dalysPerPerson": {
+     "value": 0.013659703,
+     "low": 0.00895166,
+     "high": 0.020249781
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.006311841,
+     "low": 0.004069613,
+     "high": 0.0092569
+    },
+    "attributableFraction": {
+     "value": 0.417,
+     "low": 0.296,
+     "high": 0.544
+    },
+    "deaths2019": 2519,
+    "deathsUnder5_2019": 825
+   },
+   "cholera": {
+    "averageCases": 559,
+    "yearsReported": 10,
+    "firstYear": 2007,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3532,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.39,
+     "low": 0.08,
+     "high": 1.14
+    },
+    "bedDayUSD2010": {
+     "value": 1.29,
+     "low": 0.52,
+     "high": 2.98
+    }
+   }
+  },
+  "KH": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000048467,
+     "low": 0.000035395,
+     "high": 0.000064066
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000014597,
+     "low": 0.000009982,
+     "high": 0.000020485
+    },
+    "dalysPerPerson": {
+     "value": 0.002865881,
+     "low": 0.002088555,
+     "high": 0.003838252
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.001425999,
+     "low": 0.000942475,
+     "high": 0.002081102
+    },
+    "attributableFraction": {
+     "value": 0.372,
+     "low": 0.285,
+     "high": 0.471
+    },
+    "deaths2019": 799,
+    "deathsUnder5_2019": 241
+   },
+   "cholera": {
+    "averageCases": 1401,
+    "yearsReported": 10,
+    "firstYear": 1993,
+    "lastYear": 2010
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3186,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.18,
+     "low": 0.23,
+     "high": 3.71
+    },
+    "bedDayUSD2010": {
+     "value": 6.21,
+     "low": 2.52,
+     "high": 14.06
+    }
+   }
+  },
+  "CF": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000429847,
+     "low": 0.000292605,
+     "high": 0.000584658
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000126808,
+     "low": 0.000078462,
+     "high": 0.000191351
+    },
+    "dalysPerPerson": {
+     "value": 0.022504413,
+     "low": 0.015142553,
+     "high": 0.03157337
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.011585104,
+     "low": 0.007239813,
+     "high": 0.017651174
+    },
+    "attributableFraction": {
+     "value": 0.454,
+     "low": 0.324,
+     "high": 0.586
+    },
+    "deaths2019": 2125,
+    "deathsUnder5_2019": 627
+   },
+   "cholera": {
+    "averageCases": 132,
+    "yearsReported": 7,
+    "firstYear": 1997,
+    "lastYear": 2012
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.5092,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.79,
+     "low": 0.17,
+     "high": 2.53
+    },
+    "bedDayUSD2010": {
+     "value": 3.03,
+     "low": 1.3,
+     "high": 7.21
+    }
+   }
+  },
+  "TD": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000405981,
+     "low": 0.000283229,
+     "high": 0.000549655
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000228144,
+     "low": 0.000154822,
+     "high": 0.000314448
+    },
+    "dalysPerPerson": {
+     "value": 0.029494845,
+     "low": 0.019004702,
+     "high": 0.043502996
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.020594885,
+     "low": 0.012186747,
+     "high": 0.032853494
+    },
+    "attributableFraction": {
+     "value": 0.456,
+     "low": 0.326,
+     "high": 0.594
+    },
+    "deaths2019": 6774,
+    "deathsUnder5_2019": 3807
+   },
+   "cholera": {
+    "averageCases": 3653,
+    "yearsReported": 10,
+    "firstYear": 1999,
+    "lastYear": 2011
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4922,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.27,
+     "low": 0.26,
+     "high": 3.67
+    },
+    "bedDayUSD2010": {
+     "value": 5.86,
+     "low": 2.42,
+     "high": 12.75
+    }
+   }
+  },
+  "KM": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000194471,
+     "low": 0.000123673,
+     "high": 0.000276655
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000083622,
+     "low": 0.000047349,
+     "high": 0.000133871
+    },
+    "dalysPerPerson": {
+     "value": 0.013272918,
+     "low": 0.008299411,
+     "high": 0.019709175
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.007671935,
+     "low": 0.004196721,
+     "high": 0.012647767
+    },
+    "attributableFraction": {
+     "value": 0.421,
+     "low": 0.284,
+     "high": 0.565
+    },
+    "deaths2019": 153,
+    "deathsUnder5_2019": 66
+   },
+   "cholera": {
+    "averageCases": 789,
+    "yearsReported": 10,
+    "firstYear": 1999,
+    "lastYear": 2008
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.5845,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.28,
+     "low": 0.27,
+     "high": 3.92
+    },
+    "bedDayUSD2010": {
+     "value": 5.53,
+     "low": 2.17,
+     "high": 12.45
+    }
+   }
+  },
+  "CD": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000199758,
+     "low": 0.00013777,
+     "high": 0.000272584
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000109225,
+     "low": 0.00007293,
+     "high": 0.000154354
+    },
+    "dalysPerPerson": {
+     "value": 0.014422185,
+     "low": 0.008028957,
+     "high": 0.026190151
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.010045996,
+     "low": 0.004404252,
+     "high": 0.021202111
+    },
+    "attributableFraction": {
+     "value": 0.45,
+     "low": 0.324,
+     "high": 0.588
+    },
+    "deaths2019": 18567,
+    "deathsUnder5_2019": 10152
+   },
+   "cholera": {
+    "averageCases": 24699,
+    "yearsReported": 10,
+    "firstYear": 2007,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.5385,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.44,
+     "low": 0.09,
+     "high": 1.43
+    },
+    "bedDayUSD2010": {
+     "value": 1.3,
+     "low": 0.48,
+     "high": 3.09
+    }
+   }
+  },
+  "DJ": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000126614,
+     "low": 0.000088956,
+     "high": 0.000172219
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000025041,
+     "low": 0.000015801,
+     "high": 0.00003745
+    },
+    "dalysPerPerson": {
+     "value": 0.006825068,
+     "low": 0.004874662,
+     "high": 0.009121829
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.002351628,
+     "low": 0.001535608,
+     "high": 0.003435726
+    },
+    "attributableFraction": {
+     "value": 0.378,
+     "low": 0.282,
+     "high": 0.485
+    },
+    "deaths2019": 138,
+    "deathsUnder5_2019": 27
+   },
+   "cholera": {
+    "averageCases": 1897,
+    "yearsReported": 10,
+    "firstYear": 1978,
+    "lastYear": 2011
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4382,
+    "priceLevelEstimated": true,
+    "outpatientVisitUSD2010": {
+     "value": 1.75,
+     "low": 0.35,
+     "high": 5.28
+    },
+    "bedDayUSD2010": {
+     "value": 9.52,
+     "low": 3.73,
+     "high": 20.86
+    }
+   }
+  },
+  "ER": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000315391,
+     "low": 0.00020271,
+     "high": 0.000454842
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000048112,
+     "low": 0.000030864,
+     "high": 0.000068954
+    },
+    "dalysPerPerson": {
+     "value": 0.014548618,
+     "low": 0.009731123,
+     "high": 0.019949196
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004573345,
+     "low": 0.002810384,
+     "high": 0.00681753
+    },
+    "attributableFraction": {
+     "value": 0.446,
+     "low": 0.306,
+     "high": 0.591
+    },
+    "deaths2019": 1022,
+    "deathsUnder5_2019": 156
+   },
+   "cholera": {
+    "averageCases": 30,
+    "yearsReported": 4,
+    "firstYear": 2005,
+    "lastYear": 2008
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3375,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.35,
+     "low": 0.07,
+     "high": 1.06
+    },
+    "bedDayUSD2010": {
+     "value": 1.15,
+     "low": 0.46,
+     "high": 2.53
+    }
+   }
+  },
+  "ET": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000178063,
+     "low": 0.000123976,
+     "high": 0.000238796
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000045794,
+     "low": 0.000031198,
+     "high": 0.000062786
+    },
+    "dalysPerPerson": {
+     "value": 0.009792088,
+     "low": 0.006619767,
+     "high": 0.013781387
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004267069,
+     "low": 0.002518657,
+     "high": 0.007247846
+    },
+    "attributableFraction": {
+     "value": 0.465,
+     "low": 0.332,
+     "high": 0.602
+    },
+    "deaths2019": 20608,
+    "deathsUnder5_2019": 5300
+   },
+   "cholera": {
+    "averageCases": 11830,
+    "yearsReported": 10,
+    "firstYear": 1970,
+    "lastYear": 2010
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.2971,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.56,
+     "low": 0.11,
+     "high": 1.74
+    },
+    "bedDayUSD2010": {
+     "value": 2.28,
+     "low": 0.86,
+     "high": 5.07
+    }
+   }
+  },
+  "GM": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000105573,
+     "low": 0.000074021,
+     "high": 0.00014425
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000046141,
+     "low": 0.000028297,
+     "high": 0.000071506
+    },
+    "dalysPerPerson": {
+     "value": 0.007499134,
+     "low": 0.005225804,
+     "high": 0.010361317
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004329686,
+     "low": 0.002737705,
+     "high": 0.006590361
+    },
+    "attributableFraction": {
+     "value": 0.415,
+     "low": 0.31,
+     "high": 0.529
+    },
+    "deaths2019": 259,
+    "deathsUnder5_2019": 113
+   },
+   "cholera": {
+    "averageCases": 32,
+    "yearsReported": 8,
+    "firstYear": 1985,
+    "lastYear": 2008
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3534,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.2,
+     "low": 0.27,
+     "high": 3.62
+    },
+    "bedDayUSD2010": {
+     "value": 6.16,
+     "low": 2.48,
+     "high": 13
+    }
+   }
+  },
+  "GN": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000227199,
+     "low": 0.000159374,
+     "high": 0.00030635
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000089875,
+     "low": 0.000059328,
+     "high": 0.000128466
+    },
+    "dalysPerPerson": {
+     "value": 0.014739905,
+     "low": 0.008907108,
+     "high": 0.024267661
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.008156173,
+     "low": 0.003686132,
+     "high": 0.016570998
+    },
+    "attributableFraction": {
+     "value": 0.436,
+     "low": 0.314,
+     "high": 0.572
+    },
+    "deaths2019": 2961,
+    "deathsUnder5_2019": 1171
+   },
+   "cholera": {
+    "averageCases": 2535,
+    "yearsReported": 10,
+    "firstYear": 2004,
+    "lastYear": 2014
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4065,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.77,
+     "low": 0.16,
+     "high": 2.36
+    },
+    "bedDayUSD2010": {
+     "value": 3.17,
+     "low": 1.36,
+     "high": 6.89
+    }
+   }
+  },
+  "GW": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000209636,
+     "low": 0.000146516,
+     "high": 0.00028273
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000085599,
+     "low": 0.000057915,
+     "high": 0.000120151
+    },
+    "dalysPerPerson": {
+     "value": 0.013318523,
+     "low": 0.009357436,
+     "high": 0.017974309
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.007807694,
+     "low": 0.005335624,
+     "high": 0.010806961
+    },
+    "attributableFraction": {
+     "value": 0.452,
+     "low": 0.325,
+     "high": 0.59
+    },
+    "deaths2019": 412,
+    "deathsUnder5_2019": 168
+   },
+   "cholera": {
+    "averageCases": 4412,
+    "yearsReported": 10,
+    "firstYear": 2003,
+    "lastYear": 2014
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4382,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.95,
+     "low": 0.19,
+     "high": 2.84
+    },
+    "bedDayUSD2010": {
+     "value": 4.1,
+     "low": 1.66,
+     "high": 9.34
+    }
+   }
+  },
+  "HT": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000098631,
+     "low": 0.000068608,
+     "high": 0.00013353
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000054907,
+     "low": 0.000036731,
+     "high": 0.000077715
+    },
+    "dalysPerPerson": {
+     "value": 0.007158412,
+     "low": 0.004910634,
+     "high": 0.00985774
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.005152913,
+     "low": 0.003385079,
+     "high": 0.007418041
+    },
+    "attributableFraction": {
+     "value": 0.431,
+     "low": 0.311,
+     "high": 0.558
+    },
+    "deaths2019": 1095,
+    "deathsUnder5_2019": 610
+   },
+   "cholera": {
+    "averageCases": 113685,
+    "yearsReported": 7,
+    "firstYear": 2010,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4547,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.95,
+     "low": 0.19,
+     "high": 2.91
+    },
+    "bedDayUSD2010": {
+     "value": 4.04,
+     "low": 1.7,
+     "high": 8.92
+    }
+   }
+  },
+  "KI": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000176946,
+     "low": 0.000121243,
+     "high": 0.00024581
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000034922,
+     "low": 0.000022255,
+     "high": 0.000051332
+    },
+    "dalysPerPerson": {
+     "value": 0.00805251,
+     "low": 0.005510158,
+     "high": 0.01117149
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003280184,
+     "low": 0.001963617,
+     "high": 0.005174068
+    },
+    "attributableFraction": {
+     "value": 0.403,
+     "low": 0.289,
+     "high": 0.528
+    },
+    "deaths2019": 22,
+    "deathsUnder5_2019": 4
+   },
+   "cholera": {
+    "averageCases": 901,
+    "yearsReported": 2,
+    "firstYear": 1977,
+    "lastYear": 1978
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.8826,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 3.49,
+     "low": 0.79,
+     "high": 10.27
+    },
+    "bedDayUSD2010": {
+     "value": 18.9,
+     "low": 7.66,
+     "high": 42.99
+    }
+   }
+  },
+  "LA": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000081971,
+     "low": 0.00005593,
+     "high": 0.00011046
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000037871,
+     "low": 0.000025293,
+     "high": 0.000052509
+    },
+    "dalysPerPerson": {
+     "value": 0.005334153,
+     "low": 0.003632858,
+     "high": 0.007336276
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003480403,
+     "low": 0.002248641,
+     "high": 0.0050507
+    },
+    "attributableFraction": {
+     "value": 0.382,
+     "low": 0.27,
+     "high": 0.502
+    },
+    "deaths2019": 593,
+    "deathsUnder5_2019": 274
+   },
+   "cholera": {
+    "averageCases": 2039,
+    "yearsReported": 9,
+    "firstYear": 1953,
+    "lastYear": 2010
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.2985,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.25,
+     "low": 0.26,
+     "high": 3.87
+    },
+    "bedDayUSD2010": {
+     "value": 6.92,
+     "low": 2.93,
+     "high": 15.31
+    }
+   }
+  },
+  "LS": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000432662,
+     "low": 0.000302827,
+     "high": 0.000583971
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.00008063,
+     "low": 0.000055851,
+     "high": 0.000110472
+    },
+    "dalysPerPerson": {
+     "value": 0.021058494,
+     "low": 0.014587553,
+     "high": 0.029006646
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.00735458,
+     "low": 0.004346198,
+     "high": 0.011895799
+    },
+    "attributableFraction": {
+     "value": 0.406,
+     "low": 0.295,
+     "high": 0.522
+    },
+    "deaths2019": 956,
+    "deathsUnder5_2019": 178
+   },
+   "cholera": {
+    "averageCases": 0,
+    "yearsReported": 2,
+    "firstYear": 2005,
+    "lastYear": 2006
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.5199,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.63,
+     "low": 0.33,
+     "high": 4.56
+    },
+    "bedDayUSD2010": {
+     "value": 8.08,
+     "low": 3.32,
+     "high": 18.94
+    }
+   }
+  },
+  "LR": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000141463,
+     "low": 0.000096658,
+     "high": 0.000195215
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000054455,
+     "low": 0.000034943,
+     "high": 0.000079363
+    },
+    "dalysPerPerson": {
+     "value": 0.008972933,
+     "low": 0.005477593,
+     "high": 0.014955867
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.00508164,
+     "low": 0.002302969,
+     "high": 0.010527311
+    },
+    "attributableFraction": {
+     "value": 0.448,
+     "low": 0.32,
+     "high": 0.585
+    },
+    "deaths2019": 714,
+    "deathsUnder5_2019": 275
+   },
+   "cholera": {
+    "averageCases": 1717,
+    "yearsReported": 10,
+    "firstYear": 2005,
+    "lastYear": 2014
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4382,
+    "priceLevelEstimated": true,
+    "outpatientVisitUSD2010": {
+     "value": 0.5,
+     "low": 0.1,
+     "high": 1.47
+    },
+    "bedDayUSD2010": {
+     "value": 1.67,
+     "low": 0.69,
+     "high": 3.94
+    }
+   }
+  },
+  "MG": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000179945,
+     "low": 0.000122199,
+     "high": 0.000244558
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000037805,
+     "low": 0.000025337,
+     "high": 0.00005206
+    },
+    "dalysPerPerson": {
+     "value": 0.011066066,
+     "low": 0.007452509,
+     "high": 0.015401727
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003620659,
+     "low": 0.002362621,
+     "high": 0.00514052
+    },
+    "attributableFraction": {
+     "value": 0.458,
+     "low": 0.323,
+     "high": 0.593
+    },
+    "deaths2019": 5078,
+    "deathsUnder5_2019": 1067
+   },
+   "cholera": {
+    "averageCases": 5170,
+    "yearsReported": 9,
+    "firstYear": 1971,
+    "lastYear": 2006
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3074,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.55,
+     "low": 0.11,
+     "high": 1.57
+    },
+    "bedDayUSD2010": {
+     "value": 2.21,
+     "low": 0.89,
+     "high": 4.81
+    }
+   }
+  },
+  "MW": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.00013395,
+     "low": 0.000095387,
+     "high": 0.000179868
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000032254,
+     "low": 0.000021504,
+     "high": 0.00004577
+    },
+    "dalysPerPerson": {
+     "value": 0.007880557,
+     "low": 0.005531955,
+     "high": 0.010779705
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.00315899,
+     "low": 0.002004943,
+     "high": 0.004697028
+    },
+    "attributableFraction": {
+     "value": 0.441,
+     "low": 0.322,
+     "high": 0.568
+    },
+    "deaths2019": 2548,
+    "deathsUnder5_2019": 614
+   },
+   "cholera": {
+    "averageCases": 1626,
+    "yearsReported": 10,
+    "firstYear": 2005,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4687,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.78,
+     "low": 0.16,
+     "high": 2.46
+    },
+    "bedDayUSD2010": {
+     "value": 3.06,
+     "low": 1.21,
+     "high": 6.62
+    }
+   }
+  },
+  "ML": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000265563,
+     "low": 0.000182402,
+     "high": 0.000372842
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000122411,
+     "low": 0.000072419,
+     "high": 0.000191916
+    },
+    "dalysPerPerson": {
+     "value": 0.018325441,
+     "low": 0.011802298,
+     "high": 0.027762828
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.011078032,
+     "low": 0.005955304,
+     "high": 0.019688359
+    },
+    "attributableFraction": {
+     "value": 0.417,
+     "low": 0.313,
+     "high": 0.53
+    },
+    "deaths2019": 5595,
+    "deathsUnder5_2019": 2579
+   },
+   "cholera": {
+    "averageCases": 818,
+    "yearsReported": 10,
+    "firstYear": 2001,
+    "lastYear": 2013
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3963,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.89,
+     "low": 0.18,
+     "high": 2.64
+    },
+    "bedDayUSD2010": {
+     "value": 3.91,
+     "low": 1.6,
+     "high": 8.52
+    }
+   }
+  },
+  "MR": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000151863,
+     "low": 0.000101867,
+     "high": 0.000214475
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000087536,
+     "low": 0.000053909,
+     "high": 0.000133175
+    },
+    "dalysPerPerson": {
+     "value": 0.011338238,
+     "low": 0.006743321,
+     "high": 0.019365551
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.008058783,
+     "low": 0.004126418,
+     "high": 0.016037869
+    },
+    "attributableFraction": {
+     "value": 0.41,
+     "low": 0.294,
+     "high": 0.534
+    },
+    "deaths2019": 678,
+    "deathsUnder5_2019": 391
+   },
+   "cholera": {
+    "averageCases": 1059,
+    "yearsReported": 10,
+    "firstYear": 1988,
+    "lastYear": 2011
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.507,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.93,
+     "low": 0.38,
+     "high": 5.94
+    },
+    "bedDayUSD2010": {
+     "value": 10.31,
+     "low": 4.41,
+     "high": 21.95
+    }
+   }
+  },
+  "MZ": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000184816,
+     "low": 0.000128626,
+     "high": 0.000252397
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000068471,
+     "low": 0.000045353,
+     "high": 0.000097875
+    },
+    "dalysPerPerson": {
+     "value": 0.012352974,
+     "low": 0.008098148,
+     "high": 0.018280064
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.006277017,
+     "low": 0.003252151,
+     "high": 0.011190507
+    },
+    "attributableFraction": {
+     "value": 0.427,
+     "low": 0.312,
+     "high": 0.555
+    },
+    "deaths2019": 5523,
+    "deathsUnder5_2019": 2046
+   },
+   "cholera": {
+    "averageCases": 5272,
+    "yearsReported": 10,
+    "firstYear": 2007,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4961,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.86,
+     "low": 0.16,
+     "high": 2.41
+    },
+    "bedDayUSD2010": {
+     "value": 3.39,
+     "low": 1.36,
+     "high": 7.58
+    }
+   }
+  },
+  "MM": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000052114,
+     "low": 0.000038032,
+     "high": 0.000068479
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000018523,
+     "low": 0.00001283,
+     "high": 0.000025814
+    },
+    "dalysPerPerson": {
+     "value": 0.003052479,
+     "low": 0.002208103,
+     "high": 0.004056647
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.001744615,
+     "low": 0.00116189,
+     "high": 0.002521873
+    },
+    "attributableFraction": {
+     "value": 0.379,
+     "low": 0.288,
+     "high": 0.477
+    },
+    "deaths2019": 2743,
+    "deathsUnder5_2019": 975
+   },
+   "cholera": {
+    "averageCases": 503,
+    "yearsReported": 10,
+    "firstYear": 1993,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4382,
+    "priceLevelEstimated": true,
+    "outpatientVisitUSD2010": {
+     "value": 0.97,
+     "low": 0.21,
+     "high": 2.83
+    },
+    "bedDayUSD2010": {
+     "value": 4.21,
+     "low": 1.61,
+     "high": 9.57
+    }
+   }
+  },
+  "NP": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000079198,
+     "low": 0.000057157,
+     "high": 0.000106909
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000012857,
+     "low": 0.000009422,
+     "high": 0.000016831
+    },
+    "dalysPerPerson": {
+     "value": 0.004000515,
+     "low": 0.002986427,
+     "high": 0.005203624
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.001210542,
+     "low": 0.000874902,
+     "high": 0.001613495
+    },
+    "attributableFraction": {
+     "value": 0.371,
+     "low": 0.287,
+     "high": 0.461
+    },
+    "deaths2019": 2250,
+    "deathsUnder5_2019": 365
+   },
+   "cholera": {
+    "averageCases": 535,
+    "yearsReported": 10,
+    "firstYear": 1997,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.2783,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.68,
+     "low": 0.14,
+     "high": 2.09
+    },
+    "bedDayUSD2010": {
+     "value": 3.08,
+     "low": 1.29,
+     "high": 6.99
+    }
+   }
+  },
+  "NE": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000317303,
+     "low": 0.000217375,
+     "high": 0.000435262
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000133792,
+     "low": 0.000087199,
+     "high": 0.000192053
+    },
+    "dalysPerPerson": {
+     "value": 0.022270627,
+     "low": 0.01495379,
+     "high": 0.031117693
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.012267777,
+     "low": 0.007653697,
+     "high": 0.01824837
+    },
+    "attributableFraction": {
+     "value": 0.454,
+     "low": 0.325,
+     "high": 0.589
+    },
+    "deaths2019": 7281,
+    "deathsUnder5_2019": 3070
+   },
+   "cholera": {
+    "averageCases": 1372,
+    "yearsReported": 10,
+    "firstYear": 2006,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4486,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.57,
+     "low": 0.12,
+     "high": 1.71
+    },
+    "bedDayUSD2010": {
+     "value": 2,
+     "low": 0.78,
+     "high": 4.5
+    }
+   }
+  },
+  "RW": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000095149,
+     "low": 0.000068228,
+     "high": 0.000127076
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000025224,
+     "low": 0.000017389,
+     "high": 0.000035249
+    },
+    "dalysPerPerson": {
+     "value": 0.005830789,
+     "low": 0.004241192,
+     "high": 0.007678611
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.002441612,
+     "low": 0.001664336,
+     "high": 0.003444265
+    },
+    "attributableFraction": {
+     "value": 0.389,
+     "low": 0.293,
+     "high": 0.498
+    },
+    "deaths2019": 1216,
+    "deathsUnder5_2019": 322
+   },
+   "cholera": {
+    "averageCases": 316,
+    "yearsReported": 10,
+    "firstYear": 2001,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4518,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.98,
+     "low": 0.2,
+     "high": 3
+    },
+    "bedDayUSD2010": {
+     "value": 4.27,
+     "low": 1.71,
+     "high": 9.92
+    }
+   }
+  },
+  "SN": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.00012922,
+     "low": 0.000095475,
+     "high": 0.00016948
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.00004093,
+     "low": 0.00002938,
+     "high": 0.000055438
+    },
+    "dalysPerPerson": {
+     "value": 0.008323207,
+     "low": 0.006116992,
+     "high": 0.010970191
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003951563,
+     "low": 0.002774426,
+     "high": 0.005397991
+    },
+    "attributableFraction": {
+     "value": 0.396,
+     "low": 0.302,
+     "high": 0.504
+    },
+    "deaths2019": 2113,
+    "deathsUnder5_2019": 669
+   },
+   "cholera": {
+    "averageCases": 3896,
+    "yearsReported": 10,
+    "firstYear": 1997,
+    "lastYear": 2012
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4792,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.56,
+     "low": 0.32,
+     "high": 4.87
+    },
+    "bedDayUSD2010": {
+     "value": 7.82,
+     "low": 3.26,
+     "high": 18.95
+    }
+   }
+  },
+  "SL": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000309036,
+     "low": 0.000214061,
+     "high": 0.000421861
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.00013576,
+     "low": 0.000086017,
+     "high": 0.00020085
+    },
+    "dalysPerPerson": {
+     "value": 0.020698299,
+     "low": 0.014619848,
+     "high": 0.027359653
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.012303097,
+     "low": 0.008627227,
+     "high": 0.016444856
+    },
+    "attributableFraction": {
+     "value": 0.453,
+     "low": 0.327,
+     "high": 0.586
+    },
+    "deaths2019": 2389,
+    "deathsUnder5_2019": 1050
+   },
+   "cholera": {
+    "averageCases": 4211,
+    "yearsReported": 10,
+    "firstYear": 1995,
+    "lastYear": 2013
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3605,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.75,
+     "low": 0.14,
+     "high": 2.3
+    },
+    "bedDayUSD2010": {
+     "value": 3.18,
+     "low": 1.27,
+     "high": 7.02
+    }
+   }
+  },
+  "SB": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000124385,
+     "low": 0.000080855,
+     "high": 0.0001744
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000014795,
+     "low": 0.000009235,
+     "high": 0.000021785
+    },
+    "dalysPerPerson": {
+     "value": 0.005386659,
+     "low": 0.003625315,
+     "high": 0.007315465
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.001572381,
+     "low": 0.000983869,
+     "high": 0.002354662
+    },
+    "attributableFraction": {
+     "value": 0.415,
+     "low": 0.284,
+     "high": 0.551
+    },
+    "deaths2019": 91,
+    "deathsUnder5_2019": 11
+   },
+   "cholera": {
+    "averageCases": 0,
+    "yearsReported": 0,
+    "firstYear": null,
+    "lastYear": null
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.7722,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 3.54,
+     "low": 0.8,
+     "high": 10.54
+    },
+    "bedDayUSD2010": {
+     "value": 20.24,
+     "low": 8,
+     "high": 45.25
+    }
+   }
+  },
+  "SO": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000402205,
+     "low": 0.000276395,
+     "high": 0.000567274
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000191239,
+     "low": 0.000115489,
+     "high": 0.0003007
+    },
+    "dalysPerPerson": {
+     "value": 0.027386059,
+     "low": 0.017024398,
+     "high": 0.043363647
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.017195208,
+     "low": 0.008919247,
+     "high": 0.032417706
+    },
+    "attributableFraction": {
+     "value": 0.42,
+     "low": 0.31,
+     "high": 0.545
+    },
+    "deaths2019": 6448,
+    "deathsUnder5_2019": 3066
+   },
+   "cholera": {
+    "averageCases": 17969,
+    "yearsReported": 10,
+    "firstYear": 2007,
+    "lastYear": 2016
+   }
+  },
+  "SS": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000318524,
+     "low": 0.000215506,
+     "high": 0.000439011
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000138344,
+     "low": 0.000083181,
+     "high": 0.000213847
+    },
+    "dalysPerPerson": {
+     "value": 0.02042966,
+     "low": 0.013517076,
+     "high": 0.028692514
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.012547693,
+     "low": 0.007689608,
+     "high": 0.019214888
+    },
+    "attributableFraction": {
+     "value": 0.457,
+     "low": 0.323,
+     "high": 0.596
+    },
+    "deaths2019": 3320,
+    "deathsUnder5_2019": 1442
+   },
+   "cholera": {
+    "averageCases": 4178,
+    "yearsReported": 3,
+    "firstYear": 2014,
+    "lastYear": 2016
+   }
+  },
+  "SD": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000057888,
+     "low": 0.000039106,
+     "high": 0.000079804
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000043152,
+     "low": 0.000028434,
+     "high": 0.000060536
+    },
+    "dalysPerPerson": {
+     "value": 0.005445609,
+     "low": 0.003542298,
+     "high": 0.007808943
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004182232,
+     "low": 0.00261268,
+     "high": 0.006308337
+    },
+    "attributableFraction": {
+     "value": 0.42,
+     "low": 0.292,
+     "high": 0.553
+    },
+    "deaths2019": 2637,
+    "deathsUnder5_2019": 1966
+   },
+   "cholera": {
+    "averageCases": 10079,
+    "yearsReported": 8,
+    "firstYear": 1979,
+    "lastYear": 2009
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4315,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.83,
+     "low": 0.35,
+     "high": 5.42
+    },
+    "bedDayUSD2010": {
+     "value": 10.16,
+     "low": 4.04,
+     "high": 24.3
+    }
+   }
+  },
+  "TZ": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000127413,
+     "low": 0.000091452,
+     "high": 0.000169412
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000053116,
+     "low": 0.000037422,
+     "high": 0.00007219
+    },
+    "dalysPerPerson": {
+     "value": 0.008599335,
+     "low": 0.00610765,
+     "high": 0.011639605
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004873632,
+     "low": 0.003263635,
+     "high": 0.006973125
+    },
+    "attributableFraction": {
+     "value": 0.429,
+     "low": 0.316,
+     "high": 0.553
+    },
+    "deaths2019": 7540,
+    "deathsUnder5_2019": 3143
+   },
+   "cholera": {
+    "averageCases": 5541,
+    "yearsReported": 10,
+    "firstYear": 2006,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3559,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.9,
+     "low": 0.19,
+     "high": 2.82
+    },
+    "bedDayUSD2010": {
+     "value": 4.12,
+     "low": 1.66,
+     "high": 8.99
+    }
+   }
+  },
+  "TL": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.00008302,
+     "low": 0.000056565,
+     "high": 0.000114846
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.00003596,
+     "low": 0.00002309,
+     "high": 0.000051771
+    },
+    "dalysPerPerson": {
+     "value": 0.005391686,
+     "low": 0.003598086,
+     "high": 0.007642512
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003404622,
+     "low": 0.002099352,
+     "high": 0.005157519
+    },
+    "attributableFraction": {
+     "value": 0.379,
+     "low": 0.271,
+     "high": 0.497
+    },
+    "deaths2019": 108,
+    "deathsUnder5_2019": 47
+   },
+   "cholera": {
+    "averageCases": 0,
+    "yearsReported": 0,
+    "firstYear": null,
+    "lastYear": null
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4158,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.14,
+     "low": 0.23,
+     "high": 3.34
+    },
+    "bedDayUSD2010": {
+     "value": 5.37,
+     "low": 2.09,
+     "high": 11.97
+    }
+   }
+  },
+  "TG": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000188655,
+     "low": 0.000130805,
+     "high": 0.000254728
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000063932,
+     "low": 0.000041752,
+     "high": 0.000092218
+    },
+    "dalysPerPerson": {
+     "value": 0.012198946,
+     "low": 0.008693294,
+     "high": 0.016089162
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.006005877,
+     "low": 0.00429148,
+     "high": 0.007930694
+    },
+    "attributableFraction": {
+     "value": 0.451,
+     "low": 0.325,
+     "high": 0.587
+    },
+    "deaths2019": 1438,
+    "deathsUnder5_2019": 487
+   },
+   "cholera": {
+    "averageCases": 244,
+    "yearsReported": 10,
+    "firstYear": 2006,
+    "lastYear": 2015
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4587,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.84,
+     "low": 0.18,
+     "high": 2.36
+    },
+    "bedDayUSD2010": {
+     "value": 3.39,
+     "low": 1.37,
+     "high": 7.08
+    }
+   }
+  },
+  "TV": {
+   "cholera": {
+    "averageCases": 168,
+    "yearsReported": 2,
+    "firstYear": 1990,
+    "lastYear": 1992
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 1.0271,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 4.61,
+     "low": 0.92,
+     "high": 14.42
+    },
+    "bedDayUSD2010": {
+     "value": 26.18,
+     "low": 11.09,
+     "high": 61.25
+    }
+   }
+  },
+  "UG": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000126431,
+     "low": 0.000089076,
+     "high": 0.000171233
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000046854,
+     "low": 0.000032446,
+     "high": 0.000063998
+    },
+    "dalysPerPerson": {
+     "value": 0.00902354,
+     "low": 0.006169038,
+     "high": 0.012585903
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.004458698,
+     "low": 0.002775265,
+     "high": 0.006747227
+    },
+    "attributableFraction": {
+     "value": 0.449,
+     "low": 0.327,
+     "high": 0.582
+    },
+    "deaths2019": 5436,
+    "deathsUnder5_2019": 2015
+   },
+   "cholera": {
+    "averageCases": 2199,
+    "yearsReported": 10,
+    "firstYear": 2006,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3668,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 0.85,
+     "low": 0.17,
+     "high": 2.52
+    },
+    "bedDayUSD2010": {
+     "value": 3.76,
+     "low": 1.5,
+     "high": 8.74
+    }
+   }
+  },
+  "YE": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000040222,
+     "low": 0.00002243,
+     "high": 0.00006054
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000031734,
+     "low": 0.00001719,
+     "high": 0.000049147
+    },
+    "dalysPerPerson": {
+     "value": 0.003919263,
+     "low": 0.002198606,
+     "high": 0.005917361
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003025664,
+     "low": 0.00163853,
+     "high": 0.004766303
+    },
+    "attributableFraction": {
+     "value": 0.323,
+     "low": 0.193,
+     "high": 0.451
+    },
+    "deaths2019": 1412,
+    "deathsUnder5_2019": 1114
+   },
+   "cholera": {
+    "averageCases": 5099,
+    "yearsReported": 10,
+    "firstYear": 1974,
+    "lastYear": 2016
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.3206,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.35,
+     "low": 0.29,
+     "high": 3.99
+    },
+    "bedDayUSD2010": {
+     "value": 7.5,
+     "low": 3.02,
+     "high": 16.43
+    }
+   }
+  },
+  "ZM": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000143785,
+     "low": 0.000101428,
+     "high": 0.000193794
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000063542,
+     "low": 0.000043563,
+     "high": 0.00008809
+    },
+    "dalysPerPerson": {
+     "value": 0.01012418,
+     "low": 0.006945956,
+     "high": 0.014017808
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.005879667,
+     "low": 0.003743297,
+     "high": 0.008730808
+    },
+    "attributableFraction": {
+     "value": 0.424,
+     "low": 0.307,
+     "high": 0.555
+    },
+    "deaths2019": 2662,
+    "deathsUnder5_2019": 1176
+   },
+   "cholera": {
+    "averageCases": 3644,
+    "yearsReported": 10,
+    "firstYear": 2003,
+    "lastYear": 2012
+   },
+   "whoChoice": {
+    "priceLevelRatio2010": 0.4684,
+    "priceLevelEstimated": false,
+    "outpatientVisitUSD2010": {
+     "value": 1.28,
+     "low": 0.26,
+     "high": 4.14
+    },
+    "bedDayUSD2010": {
+     "value": 6.04,
+     "low": 2.4,
+     "high": 13.9
+    }
+   }
+  },
+  "ZW": {
+   "whoSanitation": {
+    "year": 2019,
+    "deathsPerPerson": {
+     "value": 0.000120445,
+     "low": 0.000083823,
+     "high": 0.000164385
+    },
+    "deathsUnder5PerPerson": {
+     "value": 0.000035712,
+     "low": 0.000025237,
+     "high": 0.000047696
+    },
+    "dalysPerPerson": {
+     "value": 0.007184584,
+     "low": 0.005019645,
+     "high": 0.009763292
+    },
+    "dalysUnder5PerPerson": {
+     "value": 0.003372137,
+     "low": 0.002339109,
+     "high": 0.00460284
+    },
+    "attributableFraction": {
+     "value": 0.4,
+     "low": 0.286,
+     "high": 0.531
+    },
+    "deaths2019": 1839,
+    "deathsUnder5_2019": 545
+   },
+   "cholera": {
+    "averageCases": 13184,
+    "yearsReported": 10,
+    "firstYear": 2005,
+    "lastYear": 2016
+   }
+  }
+ }
+}

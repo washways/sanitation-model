@@ -128,9 +128,9 @@ This module is high-impact and needs strong transparency: small changes in assum
 **Typical formula (illustrative):**
 - `Affected population × trips per day × minutes per trip × value of time proxy`
 
-Conservative practice is to value time at a fraction of wage (e.g., 30%) unless stronger evidence exists.
+The default is about 10 extra minutes per person per day for people aged 5 and over, urban and rural separately (Hickling & Hutton 2014; Radin et al. 2020), with adults' time at 50% of the wage and children's (5–14) at 25%.
 
-The default is about 10 extra minutes per person per day for people aged 5 and over (Hickling & Hutton 2014; Radin et al. 2020). See ASSUMPTIONS.md.
+The model's current defaults, data sources (WHO country estimates, WHO-CHOICE unit costs, World Bank) and their evidence are listed in **ASSUMPTIONS.md**, which is kept up to date; the sections here describe the general approach.
 
 ### 6) 🌍 Climate impact (GHG)
 **Logic:** Unmanaged excreta and certain sanitation pathways emit methane (CH₄) and other GHGs.

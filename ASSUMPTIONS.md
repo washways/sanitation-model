@@ -1,105 +1,139 @@
 # Model assumptions and their evidence
 
-Reviewed 2026-11-25 (v1.3.0). Each default is listed with its value, where it comes from, and how solid it is.
+Reviewed 2026-11-26 (v1.6.0). Each default is listed with its value, where it comes from, and how solid it is.
 **Strong** = recent peer-reviewed or WHO/World Bank figure. **Reasonable** = defensible proxy or convention. **Weak** = little or no direct evidence; treat as illustrative and replace with local data when possible.
 Every value can be changed in the Inputs panel, and each input's source badge repeats the note.
 
-## Data from the World Bank (by country, analysis year)
+## What is being measured
+The annual economic loss from people **not having at least basic sanitation** (a private improved toilet, JMP definition). Every category is measured against that.
+Health losses use WHO's country estimates for *inadequate* sanitation, whose reference level is stricter than basic, so they include some benefit of going beyond basic. This is a known, stated limitation.
+
+**Headline total:** health care, days lost to illness, premature deaths, time lost to open defecation, cholera and funerals.
+**Shown separately** (can be added to the total in Inputs): stunting, tourism, carbon. See each section for why.
+
+## Data sources
+### World Bank (by country, analysis year; one request per country)
 | Input | Indicator | Notes |
 |---|---|---|
 | Population | SP.POP.TOTL | |
 | GDP per person | NY.GDP.PCAP.CD | |
 | Under-5 mortality | SH.DYN.MORT | |
 | Birth rate | SP.DYN.CBRT.IN | Used for the under-5 share of the population |
-| Health spending per person | SH.XPD.CHEX.PC.CD | Used for unit treatment costs |
-| Basic sanitation coverage | SH.STA.BASS.ZS | Used for the carbon calculation |
-| Open defecation | SH.STA.ODFC.ZS | Before v1.3.0 the app used a code that no longer exists (SH.STA.ODEF.ZS), so every country silently got 5% |
+| Children aged 0-14 | SP.POP.0014.TO.ZS | Minus the under-5 share = children aged 5-14 (valued at a lower rate) |
+| Health spending per person | SH.XPD.CHEX.PC.CD | Only used where WHO-CHOICE has no estimate |
+| Basic sanitation coverage | SH.STA.BASS.ZS, .UR.ZS, .RU.ZS | National, urban and rural; for the carbon calculation |
+| Open defecation | SH.STA.ODFC.ZS, .UR.ZS, .RU.ZS | National, urban and rural. SH.STA.ODEF.ZS no longer exists |
+| Urban population | SP.URB.TOTL.IN.ZS | Weights the urban and rural figures |
+| Official exchange rate | PA.NUS.FCRF | For the analysis year, so local-currency results are in the same year's prices as the US$ results. Today's market rate (open.er-api.com) is used only if the official rate is missing or is for an older currency unit (more than 10× different; e.g. Zimbabwe, Somalia) |
 | Stunting | SH.STA.STNT.ZS | Survey-based, most recent value up to the analysis year |
-| Deaths from unsafe WASH | SH.STA.WASH.P5 (SDG 3.9.2) | WHO modelled estimate, 2019 only |
+| Deaths from unsafe WASH | SH.STA.WASH.P5 | Only a fallback now; WHO's sanitation-specific estimates are used where they exist |
 | Tourism receipts | ST.INT.RCPT.CD | |
+| US GDP per person, US GDP deflator | NY.GDP.PCAP.CD, NY.GDP.DEFL.ZS (USA) | For the VSL transfer and to inflate WHO-CHOICE 2010 costs |
 
-The World Bank diarrhoea prevalence series (SH.STA.DIAR.ZS / SH.STA.DIRH.ZS) has been archived and can no longer be fetched, so incidence uses the income-based default below.
+### WHO and WHO-CHOICE (saved in `data/countryEvidence.json` by `scripts/build-evidence.mjs`)
+WHO's data service sends no CORS headers, so the browser cannot load it; the figures are saved with the app. Re-run the script to refresh them.
+| Data | Source | Notes |
+|---|---|---|
+| Diarrhoea deaths from inadequate sanitation, total and under 5, with 95% interval | WHO GHO WSH_10_SAN (2019; WHO 2023) | Converted to a rate per person with 2019 World Bank population, then applied to the analysis-year population. 44 of 45 countries (not Tuvalu) |
+| Share of diarrhoea attributable to inadequate sanitation, with 95% interval | WHO GHO WSH_20_SAN | Country-specific, e.g. Malawi 44% (32–57%), Niger 45%, Bangladesh 40%. Global 38% |
+| Diarrhoea DALYs from inadequate sanitation | WHO GHO WSH_30_SAN | Used to estimate average age at death |
+| Reported cholera cases | WHO GHO CHOLERA_0000000001 | Average of the last 10 reported years. WHO's series ends about 2016–2017 |
+| Cost per outpatient visit (health centre, no beds) and per bed-day (primary hospital), with 95% interval | WHO-CHOICE, Stenberg et al. (2018), WHO 2021 technical document | 2010 international dollars, converted to 2010 US$ with the World Bank PPP factor ÷ official exchange rate (2010). Extracted from the PDF tables into `scripts/data/who-choice-2010-intl-dollars.json`. No estimate for Somalia, South Sudan or Zimbabwe (health-spending proxy used). Djibouti, Liberia and Myanmar have no usable 2010 price level (missing, mixed currencies, or Myanmar's fixed official rate), so the median of the other countries (0.44) is used |
 
 ## Health: diarrhoea
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| **Share of diarrhoea caused by unsafe sanitation** | **38%** | WHO (2023) 2019 update and Wolf et al. (Lancet 2023): 564,000 diarrhoea deaths from unsafe sanitation out of about 1.5 million diarrhoea deaths (1,035,000 WASH-attributable deaths = 69% of the total). Global average; likely higher where coverage is low. | Strong |
-| *Replaced:* 88% when WASH data were missing | — | WHO (2004) figure for water, sanitation **and** hygiene combined; out of date and not sanitation alone. | — |
-| *Replaced:* 100% when WASH data were present | — | Wrong. The WHO WASH death rate covers water + sanitation + hygiene and four diseases, not sanitation alone. Worse, the 100% was also applied to all diarrhoea **cases**, so every case of diarrhoea was counted as caused by poor sanitation. | — |
-| All diarrhoea deaths | WASH deaths × 0.74 ÷ 0.69 | WHO 2023: diarrhoea is 1,035,000 of 1.4 million WASH deaths (74%), and WASH causes 69% of diarrhoea deaths. | Strong |
-| Under-5 share of diarrhoea deaths | 26% | WHO 2023: 273,000 of 1,035,000. Global; higher in sub-Saharan Africa. Was 70%. Does not change the cost (all deaths are valued the same way). | Reasonable |
-| Fallback when WASH deaths are missing | 9% of under-5 deaths are diarrhoea | UNICEF/WHO child cause-of-death estimates (about 9%). | Reasonable |
-| Under-5 share of population | 5 × birth rate, less half of under-5 deaths | Demographic identity. Was a fixed 15%, which overstated it for Asian countries (Bangladesh is about 10%). | Strong |
-| Under-5 episodes per child per year | 3.5 (GDP < US$2,000), 1.5, 0.5 | In line with about 3 episodes per child-year in low-income settings (Fischer Walker et al., Lancet 2013). | Reasonable |
-| Over-5 episodes | 15% of the under-5 rate | No direct source; plausible against GBD all-age rates. | Weak |
-| Treatment seeking | 40–95%, rising with GDP | Rough proxy; DHS surveys typically show 40–70% for children in low-income countries. | Weak |
-| Outpatient cost | 10% of health spending per person | Proxy; gives about US$3–5, similar to WHO-CHOICE primary-care visit costs for low-income countries. | Weak |
-| Inpatient cost / share admitted | 8 × outpatient; 10% admitted | Approximates a 3–4 day stay. | Weak |
-| Days lost per case | 2 days at 50% of the wage proxy | WSP Economic Impacts of Sanitation convention (covers carer time for children). | Reasonable |
+| **Share of diarrhoea caused by inadequate sanitation** | **WHO country estimate** (38% global fallback) | WHO 2023 / Wolf et al. 2023, country attributable fractions. Applied to cases, deaths and cholera. Uncertainty range = WHO's 95% interval | Strong |
+| **Diarrhoea deaths** | **WHO country estimate** of sanitation deaths ÷ the sanitation share = all diarrhoea deaths | WHO 2023. Fallback: WASH death rate × 0.74 ÷ 0.69, or 9% of under-5 deaths | Strong |
+| Under-5 share of the population | 5 × birth rate, less half of under-5 deaths | Demographic identity | Strong |
+| Under-5 episodes per child per year | 3.5 (GDP < US$2,000), 1.5, 0.5 | About 3 episodes per child-year in low-income settings (Fischer Walker et al., Lancet 2013). The World Bank prevalence series is archived | Reasonable |
+| Over-5 episodes | 15% of the under-5 rate | No direct source | Weak |
+| Treatment seeking | 40–95%, rising with GDP | DHS surveys typically show 40–70% for children in low-income countries | Weak |
+| **Outpatient case** | **WHO-CHOICE health-centre visit**, inflated with the US GDP deflator, + US$0.50 for ORS and zinc | WHO-CHOICE excludes drugs; the drug cost is approximate. Malawi: US$1.57. Fallback 10% of health spending per person | Reasonable |
+| **Hospital admission** | **3 WHO-CHOICE primary-hospital bed-days** + US$3 for fluids and drugs; 10% of treated cases | 3-day stay and drug cost are assumptions. Malawi: US$15.54 | Reasonable |
+| Days lost per case | 2 days at 50% of the wage proxy | Sick person or carer. 50% = adult time value in Radin et al. 2020 | Reasonable |
 
 ## Deaths
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Valuation method | Human capital: 20 years of GDP per person, discounted | Conservative convention. Does not depend on age at death. | Reasonable |
-| **Discount rate** | **5%** (was 10%) | Haacker, Hallett & Atun (Health Policy and Planning, 2020): at least 5% for low- and lower-middle-income countries. The iDSI reference case uses 3%. 10% had no source and roughly halved long-term costs. | Strong |
-| Value of statistical life | 70 × GDP per person (optional method) | Robinson, Hammitt & O'Keeffe (2019) give a wide range for low-income countries, often well below 70×. | Weak |
-| Funeral cost | 20% of GDP per person per death | No direct source. | Weak |
-
-## Stunting
-| Assumption | Default | Evidence | Rating |
-|---|---|---|---|
-| **Share of stunting caused by unsafe sanitation** | **16%** (was 50%) | Danaei et al. (PLOS Medicine 2016): 7.2 of 44.1 million stunting cases attributable to unimproved sanitation. An upper bound: the WASH Benefits (Bangladesh, Kenya) and SHINE (Zimbabwe) trials found household WASH did not improve growth (Pickering et al., Lancet Global Health 2019). The 50% came from an old, loosely sourced WHO statement covering all of WASH. | Strong (as upper bound) |
-| Future wage penalty | 10% | Hoddinott et al. (2013): 1 SD more height-for-age goes with 21% higher household spending. Galasso & Wagstaff (2019): about 7% population-wide income penalty. | Reasonable |
-| Working life | Ages 15–55, wage proxy | Convention. | Reasonable |
+| **Valuation in the total** | **Human capital by age at death** | Present value of GDP per person over the rest of the working life (ages 15–64), discounted to the age at death. Replaces "20 years of GDP per person for every death" | Reasonable |
+| Age at death, under 5 | 1 year | Most under-5 diarrhoea deaths are in the first two years | Reasonable |
+| **Age at death, 5 and over** | **From WHO DALYs per death**: about 92 − DALYs per death (Malawi 46, Niger 37, Bangladesh 57) | WHO's standard life table has life expectancy at birth of about 92. DALYs include some illness, so the age is slightly understated. Where this gives an age under 15 (Afghanistan, Sudan, Yemen: few deaths over 5, so illness dominates), 45 is used. Deaths after 64 lose no working years | Reasonable |
+| Discount rate | 5% | Haacker, Hallett & Atun 2020: at least 5% for low- and lower-middle-income countries. Range 3–7% | Strong |
+| **Value of statistical life (shown alongside)** | max(20 × GDP per person, 160 × US GDP per person × (GDP ratio)^1.5) | Robinson, Hammitt & O'Keeffe 2019 reference case. For most LDCs the 20× floor applies (Malawi US$12,700 per death), so VSL is only about 1.7× the human capital value. With elasticity 1.0 it would be 160× income | Strong (as a convention) |
+| Funeral cost | 20% of GDP per person per death | No direct source | Weak |
 
 ## Access time
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| **Extra time per person in open defecation** | **10 minutes/day** (was 30, i.e. 0.5 hours) | Compared with a latrine at home. WSP sector experts: 2.5 days a year, about 10 minutes a day (Hickling & Hutton 2014). Radin et al. (2020) use 8 minutes saved per latrine visit (range 4–12), citing about 7 minutes a day per adult in rural India (Dickinson et al. 2015) and 6 minutes vs 2 minutes per trip in Ethiopia. The old 30 minutes had no source and was three times these figures. | Reasonable |
-| Who is counted | People aged 5 and over in open defecation | Radin et al. (2020) give under-5s' time no value. Before v1.4.0 everyone was counted. | Reasonable |
-| Value of that time | 30% of the wage proxy | Common convention in WASH cost-benefit studies (Hutton). Radin et al. (2020) use 50% for adults and 25% for school-age children. | Reasonable |
-| Wage proxy | GDP per person ÷ 2,080 hours × 0.8 | Proxy. | Reasonable |
+| Who is counted | People aged 5+ who defecate in the open, urban and rural separately | JMP urban and rural rates. Under-5s not counted (Radin et al. 2020) | Strong |
+| Extra time per person | 10 minutes/day, urban and rural (editable separately) | WSP sector experts: 2.5 days a year, about 10 minutes a day (Hickling & Hutton 2014). Radin et al. 2020: 8 minutes saved per visit (4–12) | Reasonable |
+| **Value of time** | **Adults 15+ 50% of the wage, children 5–14 25%** | Radin et al. 2020 (ranges 25–75% and 0–50%). Was 30% for everyone | Reasonable |
+| Wage proxy | GDP per person ÷ 2,080 hours × 0.8 | Proxy | Reasonable |
+| Not included | Queueing at shared toilets; safety and dignity, especially for women and girls | No reliable time data; dignity cannot be fairly given a money value | — |
 
-## Carbon (shown separately, not in the total since v1.3.1)
-Excluded from the total by default (can be switched on under Inputs → Carbon), because:
-1. Basic pit latrines emit as much methane as unimproved ones, and open defecation emits little, so moving people to basic sanitation does not remove these emissions. Only treatment, safe emptying or container-based systems do. It is not a cost of *poor* sanitation.
-2. The social cost of carbon is damage to the whole world; the country bears a tiny share of it. Mixing it into a national economic burden is inconsistent.
-3. It is valued at a global price (US$100/t) while health losses are valued at local incomes, so it dominates in low-income countries. For Malawi it was the largest single item (US$38m of US$125m).
-
+## Cholera and funerals
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Population counted | Everyone without basic sanitation | See point 1 above. | Weak |
-| Emission factor | 35 kg CO2e/person/year (IPCC); SCARE 52 kg | Cheng et al. (Environmental Research 2022): non-sewered sanitation emits 377 Mt CO2e a year (range 22–1,003). Very uncertain. | Reasonable |
-| Social cost of carbon | US$100/t | Conservative; recent central estimates are about US$185–190/t (Rennert et al., Nature 2022; US EPA 2023). | Reasonable |
+| Cholera cases | Average of the last 10 years reported to WHO | WHO GHO. Misses recent outbreaks (e.g. Malawi 2022–23): enter national figures if available | Reasonable |
+| Cost per case | One hospital admission + 4 lost working days at 50% of the wage | Outbreak response (surveillance, vaccination) not included | Weak |
+| Sanitation share | Same as diarrhoea | Cholera spreads mainly through water; the share is an approximation | Weak |
 
-## Other
+## Shown separately: stunting
+Not in the total by default: the WASH Benefits (Bangladesh, Kenya) and SHINE (Zimbabwe) trials found household WASH did not improve child growth (Pickering et al. 2019).
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
-| Cholera response | 0.01% of GDP every year (was 2,000 × GDP per person) | No source. Placeholder; replace with the national cholera response plan budget or set to 0. The old rule did not scale with population, so it was 21% of GDP for Tuvalu and the largest item for Kiribati. | Weak |
-| Tourism loss | 5% of tourism receipts | No published estimate found. | Weak |
+| Share of stunting caused by unsafe sanitation | 16% | Danaei et al. 2016: 7.2 of 44.1 million cases. An upper bound. Range 0–24% | Weak (upper bound) |
+| Future wage penalty | 10% | Hoddinott et al. 2013; Galasso & Wagstaff 2019 (about 7%) | Reasonable |
+| Real wage growth | 1.5% a year | Radin et al. 2020 | Reasonable |
+| Working life | Ages 15–55 | Convention | Reasonable |
 
-## Effect of the v1.3.0 review (World Bank data, 2023)
-| Country | Before | After |
-|---|---|---|
-| Malawi | US$211m (1.58% of GDP) | US$125m (0.94%) |
-| Bangladesh | US$2,637m (0.60%) | US$1,161m (0.27%) |
-| Niger | US$341m (2.01%) | US$466m (2.75%; real open-defecation rate of 67% instead of 5%) |
+## Shown separately: tourism
+| Assumption | Default | Evidence | Rating |
+|---|---|---|---|
+| Tourism loss | 5% of receipts | No published estimate | Weak |
 
-With carbon taken out of the total (v1.3.1): Malawi US$88m (0.65%), Bangladesh US$957m (0.22%), Niger US$389m (2.30%).
+## Shown separately: carbon
+Excluded because (1) basic pit latrines emit as much methane as unimproved ones and open defecation emits little, so reaching basic sanitation does not remove these emissions; (2) the social cost of carbon is worldwide damage; (3) it is priced globally while health losses use local incomes.
+| Assumption | Default | Evidence | Rating |
+|---|---|---|---|
+| Population counted | Everyone without at least basic sanitation (urban and rural) | See point 1 | Weak |
+| Emission factor | 35 kg CO2e/person/year (IPCC); SCARE 52 kg | Cheng et al. 2022: 377 Mt CO2e a year (range 22–1,003) | Reasonable |
+| Social cost of carbon | US$100/t | Recent central estimates about US$185–190/t (Rennert et al. 2022; US EPA 2023) | Reasonable |
 
-With 10 minutes of open-defecation time for people aged 5+ and the cholera placeholder scaled to GDP (v1.4.0): Malawi US$83m (0.62%), Bangladesh US$995m (0.23%), Niger US$215m (1.27%).
+## Uncertainty
+- Each uncertain input has a low and high value (`inputs.ranges`): WHO's and WHO-CHOICE's 95% intervals where the country has them, otherwise the defaults in `constants.ts` (each with its basis).
+- **What drives the estimate** (tornado chart): the total with one input at a time at each end of its range.
+- **Conservative / upper scenarios**: every input at the end of its range that lowers / raises the total at once. Deliberately extreme.
+- **Monte Carlo**: each input drawn from a triangular distribution over its range, independently; 90% range shown.
+- Shared links carry any changed inputs as query parameters (e.g. `?access.dailyTimeForODRural=0.25`).
+
+## Comparison with earlier studies
+The World Bank Economics of Sanitation Initiative reported larger losses, e.g. about 6.4% of GDP for India (2006) and about 2% for Cambodia, Indonesia, the Philippines and Vietnam combined (Hutton et al. 2008). They attributed 88% of diarrhoea to water, sanitation and hygiene combined (WHO 2004) and also counted water-related costs. This tool counts sanitation only, with WHO's 2019 country estimates, so its results are lower.
+
+## Effect of each review (World Bank data, 2023)
+| Country | v1.2.0 | v1.3.0 | v1.4.0 | v1.6.0 |
+|---|---|---|---|---|
+| Malawi | US$211m (1.58%) | US$125m (0.94%) | US$83m (0.62%) | US$54m (0.40%); range US$42–77m |
+| Bangladesh | US$2,637m (0.60%) | US$1,161m (0.27%) | US$995m (0.23%) | US$507m (0.12%) |
+| Niger | US$341m (2.01%) | US$466m (2.75%) | US$215m (1.27%) | US$199m (1.17%) |
+
+v1.6.0 changes for Malawi: WHO's country share (44%) replaced the global 38%; WHO-CHOICE unit costs replaced the health-spending proxy (outpatient case US$4 → US$1.57); deaths valued by age; adults' time at 50% (days lost to illness went up); stunting and tourism moved out of the total; the 2023 official exchange rate (1,161 kwacha per US$) replaced today's (about 1,745).
 
 ## Sources
-- WHO (2023). *Burden of disease attributable to unsafe drinking-water, sanitation and hygiene: 2019 update.* Geneva: WHO.
+- WHO (2023). *Burden of disease attributable to unsafe drinking-water, sanitation and hygiene: 2019 update.* Geneva: WHO. Country data: WHO Global Health Observatory, indicators WSH_10_SAN, WSH_20_SAN, WSH_30_SAN.
 - Wolf J. et al. (2023). Burden of disease attributable to unsafe drinking water, sanitation, and hygiene in domestic settings. *Lancet* 401:2060–71.
+- WHO Global Health Observatory. Number of reported cases of cholera (CHOLERA_0000000001).
+- Stenberg K. et al. (2018). Econometric estimation of WHO-CHOICE country-specific costs for inpatient and outpatient health service delivery. *Cost Effectiveness and Resource Allocation* 16:11. Tables: WHO (2021), *WHO-CHOICE estimates of cost for inpatient and outpatient health service delivery*.
+- Robinson L.A., Hammitt J.K., O'Keeffe L. (2019). Valuing mortality risk reductions in global benefit-cost analysis. *Journal of Benefit-Cost Analysis* 10(S1):15–50.
+- Radin M., Jeuland M., Wang H., Whittington D. (2020). Benefit–cost analysis of community-led total sanitation: incorporating results from recent evaluations. *Journal of Benefit-Cost Analysis* 11(3):380–417.
+- Hickling S., Hutton G. (2014). *Economic assessment of sanitation interventions.* Water and Sanitation Program, World Bank (as cited by Radin et al. 2020).
+- Hutton G. et al. (2008). *Economic impacts of sanitation in Southeast Asia.* Water and Sanitation Program, World Bank.
 - Danaei G. et al. (2016). Risk factors for childhood stunting in 137 developing countries. *PLOS Medicine* 13(11):e1002164.
 - Pickering A.J. et al. (2019). The WASH Benefits and SHINE trials: interpretation of WASH intervention effects on linear growth and diarrhoea. *Lancet Global Health* 7:e1139–46.
 - Haacker M., Hallett T.B., Atun R. (2020). On discount rates for economic evaluations in global health. *Health Policy and Planning*.
-- Robinson L.A., Hammitt J.K., O'Keeffe L. (2019). Valuing mortality risk reductions in global benefit-cost analysis. *Journal of Benefit-Cost Analysis* 10(S1):15–50.
 - Hoddinott J. et al. (2013). Adult consequences of growth failure in early childhood. *American Journal of Clinical Nutrition*.
-- Galasso E., Wagstaff A. (2019). The aggregate income losses from childhood stunting and the returns to a nutrition intervention aimed at reducing stunting. *Economics & Human Biology* (World Bank WPS8536).
+- Galasso E., Wagstaff A. (2019). The aggregate income losses from childhood stunting and the returns to a nutrition intervention aimed at reducing stunting. *Economics & Human Biology*.
 - Cheng S. et al. (2022). Non-negligible greenhouse gas emissions from non-sewered sanitation systems: a meta-analysis. *Environmental Research* 212:113468.
 - Rennert K. et al. (2022). Comprehensive evidence implies a higher social cost of CO2. *Nature*.
-- Radin M., Jeuland M., Wang H., Whittington D. (2020). Benefit–cost analysis of community-led total sanitation: incorporating results from recent evaluations. *Journal of Benefit-Cost Analysis* 11(3):380–417.
-- Hickling S., Hutton G. (2014). *Economic assessment of sanitation interventions.* Water and Sanitation Program, World Bank (as cited by Radin et al. 2020).
 - Fischer Walker C.L. et al. (2013). Global burden of childhood pneumonia and diarrhoea. *Lancet*.

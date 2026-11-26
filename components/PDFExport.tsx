@@ -1,9 +1,10 @@
 import React from 'react';
 import { Document, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer';
 import { DataSourceMap, DataSourceInfo, ModelInputs, ModelOutputs, YearExplanation } from '../types';
-import { costEntries, formatNumber } from '../utils/calculations';
+import { costEntries, excludedEntries, formatNumber } from '../utils/calculations';
 import { COST_LABELS } from '../utils/export';
 import { runSimulation } from '../utils/monteCarlo';
+import { runSensitivity } from '../utils/uncertainty';
 import { COLOR_PALETTE } from '../constants';
 
 interface SanitationReportProps {
@@ -89,11 +90,20 @@ const money = (value: number, currency = 'USD') => {
   return `${prefix}${Math.round(value).toLocaleString('en-US')}`;
 };
 
+/** "US$40.3–68.9 million": a range in one unit so it fits a narrow column. */
+const moneyRange = (low: number, high: number) => {
+  const units: [number, string][] = [[1e12, 'trillion'], [1e9, 'billion'], [1e6, 'million'], [1e3, 'thousand']];
+  const [size, word] = units.find(([u]) => Math.abs(high) >= u) ?? [1, ''];
+  const f = (v: number) => (v / size).toLocaleString('en-US', { maximumFractionDigits: 1 });
+  return `US$${f(low)}–${f(high)}${word ? ` ${word}` : ''}`;
+};
+
 const pct = (fraction: number) => `${formatNumber(fraction * 100)}%`;
 
 const sourceText = (src?: DataSourceInfo) => {
   if (!src) return 'Model input';
   const year = src.actualYear ? ` ${src.actualYear}` : '';
+  if (src.sourceName?.startsWith('WHO')) return src.label;
   switch (src.kind) {
     case 'api': return `World Bank${year}`;
     case 'live': return `Live rate${year}`;
@@ -117,6 +127,12 @@ const Footer = ({ version }: { version: string }) => (
 
 export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName, inputs, outputs, sources, yearExplanation, dataYear, version }) => {
   const sim = runSimulation(inputs, 3000);
+  const sens = runSensitivity(inputs);
+  const drivers = sens.rows.slice(0, 5);
+  const excluded = excludedEntries(outputs);
+  const otherMortality = inputs.macro.mortalityMethod === 'vsl'
+    ? { label: 'human capital (lost output)', value: outputs.mortalityHumanCapitalUSD }
+    : { label: `the value of a statistical life (${money(outputs.vslPerDeathUSD)} per death)`, value: outputs.mortalityVslUSD };
   const breakdown = costEntries(outputs)
     .map(([key, value]) => ({ key, label: COST_LABELS[key] ?? key, value, share: outputs.totalCostUSD > 0 ? value / outputs.totalCostUSD : 0 }))
     .sort((a, b) => b.value - a.value);
@@ -129,12 +145,12 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
     ['GDP per person', money(inputs.macro.gdpPerCapita), sources.gdpPerCapita],
     ['Exchange rate', `${formatNumber(inputs.macro.exchangeRate)} ${inputs.macro.currencyCode} per US$`, sources.exchangeRate],
     ['Hourly wage', `US$${inputs.macro.hourlyWage.toFixed(2)}`, sources.hourlyWage],
-    ['Diarrhoea caused by unsafe sanitation', pct(inputs.health.attributionToSanitation), sources.attributionToSanitation],
-    ['Stunting (under-5)', pct(inputs.nutrition.stuntingPrevalence), sources.stuntingPrevalence],
-    ['Stunting caused by unsafe sanitation', pct(inputs.nutrition.attributionStunting), sources.attributionStunting],
-    ['Open defecation', pct(inputs.access.openDefecationPrevalence), sources.openDefecationPrevalence],
-    ['Poor sanitation (carbon)', pct(inputs.carbon.percentWithPoorSanitation), sources.percentWithPoorSanitation],
-    ['Deaths valued by', inputs.macro.mortalityMethod === 'vsl' ? `Value of statistical life (${inputs.macro.vslMultiplier}× GDP per person)` : `Human capital (lost output, ${pct(inputs.macro.discountRate)} discount rate)`, undefined],
+    ['Diarrhoea caused by inadequate sanitation', pct(inputs.health.attributionToSanitation), sources.attributionToSanitation],
+    ['Diarrhoea deaths from sanitation', Math.round(outputs.attributableDeaths).toLocaleString('en-US'), sources.diarrheaDeathsUnder5],
+    ['Outpatient case / admission', `US$${inputs.health.costOutpatient.toFixed(2)} / US$${inputs.health.costInpatient.toFixed(2)}`, sources.costOutpatient],
+    ['Open defecation (urban / rural)', `${pct(inputs.access.openDefecationUrban)} / ${pct(inputs.access.openDefecationRural)}`, sources.openDefecationRural],
+    ['Cholera cases a year', Math.round(inputs.other.choleraCasesPerYear).toLocaleString('en-US'), sources.choleraCasesPerYear],
+    ['Deaths valued by', inputs.macro.mortalityMethod === 'vsl' ? `Value of statistical life (Robinson et al. 2019)` : `Human capital by age at death (${pct(inputs.macro.discountRate)} discount rate)`, undefined],
   ];
 
   return (
@@ -192,12 +208,37 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
                 <Text style={[s.cellText, { width: 40, textAlign: 'right', color: C.muted }]}>{formatNumber(b.share * 100)}%</Text>
               </View>
             ))}
-            {!outputs.carbonIncluded && (
-              <Text style={[s.small, { marginTop: 5 }]}>
-                Not included: greenhouse gas emissions from sanitation, about {money(outputs.carbonCostUSD)} a year at US${inputs.carbon.socialCostOfCarbon} per tonne. This is worldwide climate damage, and basic pit latrines emit as much methane as unimproved ones, so it is not a cost of poor sanitation to this economy.
+            <Text style={[s.small, { marginTop: 5 }]}>
+              Valuing deaths by {otherMortality.label} instead would put the deaths line at {money(otherMortality.value)}.
+            </Text>
+            {excluded.length > 0 && (
+              <Text style={[s.small, { marginTop: 3 }]}>
+                Shown separately, not in the total: {excluded.map(([key, value]) => `${inSentence(COST_LABELS[key] ?? key)} ${money(value)}`).join('; ')}.
+                {' '}Stunting is left out because large trials found household sanitation did not improve child growth; tourism because there is no published estimate; carbon because it is worldwide climate damage and basic pit latrines emit as much methane as unimproved ones.
               </Text>
             )}
           </View>
+
+          {drivers.length > 0 && (
+            <View style={s.section} wrap={false}>
+              <Text style={s.h2}>What drives the estimate</Text>
+              <Text style={s.para}>
+                Changing one input at a time across its plausible range moves the total as shown. With every input at the low end the total is {money(sens.conservative)}; at the high end, {money(sens.upper)}.
+              </Text>
+              <View style={s.tableHead}>
+                <Text style={[s.th, { width: '34%' }]}>Input</Text>
+                <Text style={[s.th, { width: 130 }]}>Total, low to high</Text>
+                <Text style={[s.th, { flex: 1 }]}>Range based on</Text>
+              </View>
+              {drivers.map((d) => (
+                <View key={d.key} style={s.row} wrap={false}>
+                  <Text style={[s.cellText, { width: '34%' }]}>{d.label}</Text>
+                  <Text style={[s.cellText, { width: 130 }]}>{moneyRange(Math.min(d.lowTotal, d.highTotal), Math.max(d.lowTotal, d.highTotal))}</Text>
+                  <Text style={[s.cellText, { flex: 1, color: C.muted, fontSize: 8 }]}>{d.basis}</Text>
+                </View>
+              ))}
+            </View>
+          )}
 
           <View style={s.section} wrap={false}>
             <Text style={s.h2}>Why it matters</Text>
@@ -209,6 +250,7 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
               Comparing these annual losses with the cost of extending and maintaining sanitation services helps frame investment as a growth and fiscal decision.
             </Text>
           </View>
+
 
           <View style={s.section} wrap={false}>
             <Text style={s.h2}>Which year the data are from</Text>
@@ -254,11 +296,12 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
           <View style={s.section} wrap={false}>
             <Text style={s.h2}>Method and caveats</Text>
             <Text style={s.para}>
-              Bottom-up cost-of-illness and human-capital approach, modelled on the World Bank Water and Sanitation Program economic studies.
-              Inputs come from World Bank Open Data where available; the rest are model estimates or standard assumptions, which users can change in the tool.
+              The losses are measured against everyone having at least basic sanitation. Bottom-up cost-of-illness and human-capital approach, modelled on the World Bank Water and Sanitation Program economic studies.
+              Health figures are WHO's country estimates for inadequate sanitation (2019; WHO 2023), treatment costs are WHO-CHOICE unit costs, and other inputs come from World Bank Open Data, published studies or stated assumptions, all of which can be changed in the tool.
             </Text>
             <Text style={s.small}>
-              This is an indicative estimate for advocacy and planning, not an official statistic. The companion CSV export lists every input with its source, data year and notes.
+              Earlier World Bank studies reported larger losses (for example about 6.4% of GDP for India in 2006 and about 2% for four South-East Asian countries) mainly because they attributed most diarrhoea (88%) to water, sanitation and hygiene combined, and counted water-related costs. This tool counts sanitation only, using WHO's 2019 country estimates.
+              It is an indicative estimate for advocacy and planning, not an official statistic. The CSV export lists every input with its source, data year and notes.
             </Text>
           </View>
         </View>

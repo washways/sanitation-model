@@ -1,0 +1,692 @@
+{
+ "AFG": {
+  "pdfName": "Afghanistan",
+  "bed": {
+   "pred": 4.18,
+   "low": 1.68,
+   "high": 8.52,
+   "page": 1
+  },
+  "opd": {
+   "pred": 1.21,
+   "low": 0.24,
+   "high": 3.56,
+   "page": 16
+  }
+ },
+ "AGO": {
+  "pdfName": "Angola",
+  "bed": {
+   "pred": 61.01,
+   "low": 22.04,
+   "high": 134.78,
+   "page": 1
+  },
+  "opd": {
+   "pred": 8.46,
+   "low": 1.7,
+   "high": 24.67,
+   "page": 16
+  }
+ },
+ "BGD": {
+  "pdfName": "Bangladesh",
+  "bed": {
+   "pred": 13.96,
+   "low": 5.43,
+   "high": 30.42,
+   "page": 1
+  },
+  "opd": {
+   "pred": 2.9,
+   "low": 0.6,
+   "high": 8.49,
+   "page": 16
+  }
+ },
+ "BEN": {
+  "pdfName": "Benin",
+  "bed": {
+   "pred": 12.59,
+   "low": 4.87,
+   "high": 27.8,
+   "page": 2
+  },
+  "opd": {
+   "pred": 2.69,
+   "low": 0.58,
+   "high": 7.69,
+   "page": 17
+  }
+ },
+ "BFA": {
+  "pdfName": "Burkina Faso",
+  "bed": {
+   "pred": 10.4,
+   "low": 4.08,
+   "high": 23.54,
+   "page": 2
+  },
+  "opd": {
+   "pred": 2.34,
+   "low": 0.5,
+   "high": 7.07,
+   "page": 17
+  }
+ },
+ "BDI": {
+  "pdfName": "Burundi",
+  "bed": {
+   "pred": 3.65,
+   "low": 1.46,
+   "high": 8.45,
+   "page": 2
+  },
+  "opd": {
+   "pred": 1.1,
+   "low": 0.22,
+   "high": 3.24,
+   "page": 17
+  }
+ },
+ "KHM": {
+  "pdfName": "Cambodia",
+  "bed": {
+   "pred": 19.48,
+   "low": 7.91,
+   "high": 44.13,
+   "page": 2
+  },
+  "opd": {
+   "pred": 3.69,
+   "low": 0.73,
+   "high": 11.63,
+   "page": 17
+  }
+ },
+ "CAF": {
+  "pdfName": "Central African Republic",
+  "bed": {
+   "pred": 5.95,
+   "low": 2.56,
+   "high": 14.15,
+   "page": 2
+  },
+  "opd": {
+   "pred": 1.56,
+   "low": 0.33,
+   "high": 4.96,
+   "page": 17
+  }
+ },
+ "TCD": {
+  "pdfName": "Chad",
+  "bed": {
+   "pred": 11.9,
+   "low": 4.92,
+   "high": 25.9,
+   "page": 2
+  },
+  "opd": {
+   "pred": 2.58,
+   "low": 0.53,
+   "high": 7.45,
+   "page": 17
+  }
+ },
+ "COM": {
+  "pdfName": "Comoros",
+  "bed": {
+   "pred": 9.47,
+   "low": 3.72,
+   "high": 21.3,
+   "page": 2
+  },
+  "opd": {
+   "pred": 2.19,
+   "low": 0.46,
+   "high": 6.7,
+   "page": 17
+  }
+ },
+ "COD": {
+  "pdfName": "Democratic Republic of the Congo",
+  "bed": {
+   "pred": 2.41,
+   "low": 0.9,
+   "high": 5.73,
+   "page": 2
+  },
+  "opd": {
+   "pred": 0.81,
+   "low": 0.17,
+   "high": 2.65,
+   "page": 17
+  }
+ },
+ "DJI": {
+  "pdfName": "Djibouti",
+  "bed": {
+   "pred": 21.72,
+   "low": 8.51,
+   "high": 47.6,
+   "page": 2
+  },
+  "opd": {
+   "pred": 4.0,
+   "low": 0.8,
+   "high": 12.06,
+   "page": 17
+  }
+ },
+ "ERI": {
+  "pdfName": "Eritrea",
+  "bed": {
+   "pred": 3.4,
+   "low": 1.37,
+   "high": 7.51,
+   "page": 2
+  },
+  "opd": {
+   "pred": 1.04,
+   "low": 0.21,
+   "high": 3.14,
+   "page": 17
+  }
+ },
+ "ETH": {
+  "pdfName": "Ethiopia",
+  "bed": {
+   "pred": 7.69,
+   "low": 2.91,
+   "high": 17.06,
+   "page": 2
+  },
+  "opd": {
+   "pred": 1.88,
+   "low": 0.37,
+   "high": 5.87,
+   "page": 17
+  }
+ },
+ "GMB": {
+  "pdfName": "Gambia",
+  "bed": {
+   "pred": 17.43,
+   "low": 7.01,
+   "high": 36.8,
+   "page": 3
+  },
+  "opd": {
+   "pred": 3.4,
+   "low": 0.76,
+   "high": 10.25,
+   "page": 18
+  }
+ },
+ "GIN": {
+  "pdfName": "Guinea",
+  "bed": {
+   "pred": 7.79,
+   "low": 3.35,
+   "high": 16.94,
+   "page": 3
+  },
+  "opd": {
+   "pred": 1.9,
+   "low": 0.39,
+   "high": 5.81,
+   "page": 18
+  }
+ },
+ "GNB": {
+  "pdfName": "Guinea-Bissau",
+  "bed": {
+   "pred": 9.36,
+   "low": 3.79,
+   "high": 21.32,
+   "page": 3
+  },
+  "opd": {
+   "pred": 2.17,
+   "low": 0.44,
+   "high": 6.49,
+   "page": 18
+  }
+ },
+ "HTI": {
+  "pdfName": "Haiti",
+  "bed": {
+   "pred": 8.88,
+   "low": 3.74,
+   "high": 19.62,
+   "page": 3
+  },
+  "opd": {
+   "pred": 2.09,
+   "low": 0.41,
+   "high": 6.41,
+   "page": 18
+  }
+ },
+ "KIR": {
+  "pdfName": "Kiribati",
+  "bed": {
+   "pred": 21.41,
+   "low": 8.68,
+   "high": 48.71,
+   "page": 3
+  },
+  "opd": {
+   "pred": 3.95,
+   "low": 0.89,
+   "high": 11.63,
+   "page": 18
+  }
+ },
+ "LAO": {
+  "pdfName": "Lao People's Democratic Republic",
+  "bed": {
+   "pred": 23.19,
+   "low": 9.83,
+   "high": 51.3,
+   "page": 3
+  },
+  "opd": {
+   "pred": 4.19,
+   "low": 0.88,
+   "high": 12.98,
+   "page": 18
+  }
+ },
+ "LSO": {
+  "pdfName": "Lesotho",
+  "bed": {
+   "pred": 15.54,
+   "low": 6.39,
+   "high": 36.44,
+   "page": 3
+  },
+  "opd": {
+   "pred": 3.13,
+   "low": 0.64,
+   "high": 8.78,
+   "page": 18
+  }
+ },
+ "LBR": {
+  "pdfName": "Liberia",
+  "bed": {
+   "pred": 3.81,
+   "low": 1.58,
+   "high": 9.0,
+   "page": 3
+  },
+  "opd": {
+   "pred": 1.13,
+   "low": 0.22,
+   "high": 3.36,
+   "page": 18
+  }
+ },
+ "MDG": {
+  "pdfName": "Madagascar",
+  "bed": {
+   "pred": 7.19,
+   "low": 2.89,
+   "high": 15.66,
+   "page": 3
+  },
+  "opd": {
+   "pred": 1.79,
+   "low": 0.35,
+   "high": 5.1,
+   "page": 18
+  }
+ },
+ "MWI": {
+  "pdfName": "Malawi",
+  "bed": {
+   "pred": 6.53,
+   "low": 2.58,
+   "high": 14.13,
+   "page": 3
+  },
+  "opd": {
+   "pred": 1.67,
+   "low": 0.35,
+   "high": 5.25,
+   "page": 18
+  }
+ },
+ "MLI": {
+  "pdfName": "Mali",
+  "bed": {
+   "pred": 9.87,
+   "low": 4.05,
+   "high": 21.49,
+   "page": 3
+  },
+  "opd": {
+   "pred": 2.25,
+   "low": 0.45,
+   "high": 6.67,
+   "page": 18
+  }
+ },
+ "MRT": {
+  "pdfName": "Mauritania",
+  "bed": {
+   "pred": 20.33,
+   "low": 8.69,
+   "high": 43.29,
+   "page": 3
+  },
+  "opd": {
+   "pred": 3.81,
+   "low": 0.75,
+   "high": 11.71,
+   "page": 18
+  }
+ },
+ "MOZ": {
+  "pdfName": "Mozambique",
+  "bed": {
+   "pred": 6.84,
+   "low": 2.74,
+   "high": 15.29,
+   "page": 4
+  },
+  "opd": {
+   "pred": 1.73,
+   "low": 0.33,
+   "high": 4.86,
+   "page": 19
+  }
+ },
+ "MMR": {
+  "pdfName": "Myanmar",
+  "bed": {
+   "pred": 9.6,
+   "low": 3.67,
+   "high": 21.83,
+   "page": 4
+  },
+  "opd": {
+   "pred": 2.21,
+   "low": 0.47,
+   "high": 6.45,
+   "page": 19
+  }
+ },
+ "NPL": {
+  "pdfName": "Nepal",
+  "bed": {
+   "pred": 11.06,
+   "low": 4.64,
+   "high": 25.13,
+   "page": 4
+  },
+  "opd": {
+   "pred": 2.45,
+   "low": 0.52,
+   "high": 7.51,
+   "page": 19
+  }
+ },
+ "NER": {
+  "pdfName": "Niger",
+  "bed": {
+   "pred": 4.45,
+   "low": 1.73,
+   "high": 10.04,
+   "page": 4
+  },
+  "opd": {
+   "pred": 1.26,
+   "low": 0.27,
+   "high": 3.82,
+   "page": 19
+  }
+ },
+ "RWA": {
+  "pdfName": "Rwanda",
+  "bed": {
+   "pred": 9.45,
+   "low": 3.78,
+   "high": 21.95,
+   "page": 4
+  },
+  "opd": {
+   "pred": 2.18,
+   "low": 0.45,
+   "high": 6.65,
+   "page": 19
+  }
+ },
+ "SEN": {
+  "pdfName": "Senegal",
+  "bed": {
+   "pred": 16.31,
+   "low": 6.8,
+   "high": 39.54,
+   "page": 4
+  },
+  "opd": {
+   "pred": 3.25,
+   "low": 0.66,
+   "high": 10.16,
+   "page": 19
+  }
+ },
+ "SLE": {
+  "pdfName": "Sierra Leone",
+  "bed": {
+   "pred": 8.82,
+   "low": 3.53,
+   "high": 19.47,
+   "page": 4
+  },
+  "opd": {
+   "pred": 2.08,
+   "low": 0.4,
+   "high": 6.39,
+   "page": 19
+  }
+ },
+ "SLB": {
+  "pdfName": "Solomon Islands",
+  "bed": {
+   "pred": 26.21,
+   "low": 10.36,
+   "high": 58.6,
+   "page": 4
+  },
+  "opd": {
+   "pred": 4.58,
+   "low": 1.03,
+   "high": 13.65,
+   "page": 19
+  }
+ },
+ "SOM": {
+  "pdfName": "Somalia",
+  "bed": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 4
+  },
+  "opd": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 19
+  }
+ },
+ "SSD": {
+  "pdfName": "South Sudan",
+  "bed": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 4
+  },
+  "opd": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 19
+  }
+ },
+ "SDN": {
+  "pdfName": "Sudan",
+  "bed": {
+   "pred": 23.54,
+   "low": 9.37,
+   "high": 56.31,
+   "page": 5
+  },
+  "opd": {
+   "pred": 4.24,
+   "low": 0.81,
+   "high": 12.56,
+   "page": 20
+  }
+ },
+ "TLS": {
+  "pdfName": "Timor-Leste",
+  "bed": {
+   "pred": 12.92,
+   "low": 5.02,
+   "high": 28.79,
+   "page": 5
+  },
+  "opd": {
+   "pred": 2.74,
+   "low": 0.56,
+   "high": 8.04,
+   "page": 20
+  }
+ },
+ "TGO": {
+  "pdfName": "Togo",
+  "bed": {
+   "pred": 7.39,
+   "low": 2.98,
+   "high": 15.43,
+   "page": 5
+  },
+  "opd": {
+   "pred": 1.83,
+   "low": 0.39,
+   "high": 5.15,
+   "page": 20
+  }
+ },
+ "TUV": {
+  "pdfName": "Tuvalu",
+  "bed": {
+   "pred": 25.49,
+   "low": 10.8,
+   "high": 59.64,
+   "page": 5
+  },
+  "opd": {
+   "pred": 4.49,
+   "low": 0.9,
+   "high": 14.04,
+   "page": 20
+  }
+ },
+ "UGA": {
+  "pdfName": "Uganda",
+  "bed": {
+   "pred": 10.25,
+   "low": 4.08,
+   "high": 23.83,
+   "page": 5
+  },
+  "opd": {
+   "pred": 2.32,
+   "low": 0.46,
+   "high": 6.86,
+   "page": 20
+  }
+ },
+ "TZA": {
+  "pdfName": "United Republic of Tanzania",
+  "bed": {
+   "pred": 11.57,
+   "low": 4.65,
+   "high": 25.27,
+   "page": 5
+  },
+  "opd": {
+   "pred": 2.53,
+   "low": 0.54,
+   "high": 7.93,
+   "page": 20
+  }
+ },
+ "USA": {
+  "pdfName": "United States of America",
+  "bed": {
+   "pred": 764.62,
+   "low": 293.85,
+   "high": 1700.93,
+   "page": 5
+  },
+  "opd": {
+   "pred": 53.04,
+   "low": 10.33,
+   "high": 153.67,
+   "page": 20
+  }
+ },
+ "YEM": {
+  "pdfName": "Yemen",
+  "bed": {
+   "pred": 23.38,
+   "low": 9.41,
+   "high": 51.24,
+   "page": 5
+  },
+  "opd": {
+   "pred": 4.22,
+   "low": 0.91,
+   "high": 12.46,
+   "page": 20
+  }
+ },
+ "ZMB": {
+  "pdfName": "Zambia",
+  "bed": {
+   "pred": 12.9,
+   "low": 5.12,
+   "high": 29.67,
+   "page": 5
+  },
+  "opd": {
+   "pred": 2.74,
+   "low": 0.56,
+   "high": 8.84,
+   "page": 20
+  }
+ },
+ "ZWE": {
+  "pdfName": "Zimbabwe",
+  "bed": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 5
+  },
+  "opd": {
+   "pred": null,
+   "low": null,
+   "high": null,
+   "page": 20
+  }
+ }
+}

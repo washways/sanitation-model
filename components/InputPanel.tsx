@@ -174,6 +174,16 @@ const SelectField = ({ label, value, options, onChange, source }: SelectFieldPro
     </div>
 );
 
+const IncludeToggle = ({ checked, onChange, children }: { checked: boolean; onChange: (v: boolean) => void; children: React.ReactNode }) => (
+  <div className="md:col-span-2 bg-slate-50 p-3 rounded border border-line text-xs text-slate-600 leading-relaxed">
+    {children}
+    <label className="flex items-center gap-2 mt-2 font-semibold text-slate-700 cursor-pointer">
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="accent-brand-primary" />
+      Include in the total
+    </label>
+  </div>
+);
+
 export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, onUpdate }) => {
   const [openSection, setOpenSection] = useState<string>('macro');
 
@@ -185,12 +195,13 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
   const updateHealth = (key: keyof HealthInputs, val: number) => {
     onUpdate({ ...inputs, health: { ...inputs.health, [key]: val } });
   };
-  const updateNutrition = (key: keyof NutritionInputs, val: number) => {
+  const updateNutrition = (key: keyof NutritionInputs, val: number | boolean) => {
     onUpdate({ ...inputs, nutrition: { ...inputs.nutrition, [key]: val } });
   };
   const updateAccess = (key: keyof AccessTimeInputs, val: number) => {
     onUpdate({ ...inputs, access: { ...inputs.access, [key]: val } });
   };
+  const minutes = (hours: number) => Math.round(hours * 60 * 10) / 10;
   const updateCarbon = (key: keyof CarbonInputs, val: number | string | boolean) => {
     // If source changes, update factor using presets
     if (key === 'emissionFactorSource') {
@@ -210,7 +221,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
         onUpdate({ ...inputs, carbon: { ...inputs.carbon, [key]: val } });
     }
   };
-  const updateOther = (key: keyof OtherCostsInputs, val: number) => {
+  const updateOther = (key: keyof OtherCostsInputs, val: number | boolean) => {
     onUpdate({ ...inputs, other: { ...inputs.other, [key]: val } });
   };
 
@@ -257,36 +268,38 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
                     source={sources['mortalityMethod']}
                 />
                 
-                {inputs.macro.mortalityMethod === 'humanCapital' ? (
-                     <NumberField 
-                        label="Discount Rate" 
-                        value={inputs.macro.discountRate * 100} 
-                        onChange={(v) => updateMacro('discountRate', v / 100)} 
-                        step={0.1} 
-                        unit="%" 
-                        source={sources['discountRate']}
-                    />
-                ) : (
-                    <NumberField 
-                        label="VSL Multiplier (x GDPpc)" 
-                        value={inputs.macro.vslMultiplier} 
-                        onChange={(v) => updateMacro('vslMultiplier', v)} 
-                        source={sources['vslMultiplier']}
-                    />
-                )}
+                <NumberField
+                    label="Discount Rate"
+                    value={inputs.macro.discountRate * 100}
+                    onChange={(v) => updateMacro('discountRate', v / 100)}
+                    step={0.1}
+                    unit="%"
+                    source={sources['discountRate']}
+                />
+                <NumberField
+                    label="VSL Income Elasticity"
+                    value={inputs.macro.vslIncomeElasticity}
+                    onChange={(v) => updateMacro('vslIncomeElasticity', v)}
+                    step={0.1}
+                    source={sources['vslIncomeElasticity']}
+                />
+                <NumberField
+                    label="US GDP Per Capita (USD)"
+                    value={inputs.macro.usGdpPerCapita}
+                    onChange={(v) => updateMacro('usGdpPerCapita', v)}
+                    source={sources['usGdpPerCapita']}
+                />
             </div>
             <div className="mt-3 bg-slate-50 text-slate-600 text-xs p-3 rounded border border-slate-200">
-                {inputs.macro.mortalityMethod === 'humanCapital' 
-                    ? <span><strong>Note:</strong> The Human Capital Approach is conservative. It values life based solely on future economic output (GDP contribution).</span>
-                    : <span><strong>Note:</strong> VSL (Value of Statistical Life) values risk reduction based on "Willingness to Pay". It captures the intrinsic value of living and is typically 50-100x higher than Human Capital.</span>
-                }
+                <strong>Human capital</strong> (default) values each death at the output lost over the rest of the person's working life (ages 15–64), discounted, so it depends on age at death. <strong>Value of statistical life</strong> is what people would pay to reduce their risk of dying (Robinson et al. 2019). The results show both.
             </div>
         </div>
       </InputGroup>
 
-      <InputGroup title="2. Health (Diarrhea)" isOpen={openSection === 'health'} onToggle={() => toggle('health')}>
+      <InputGroup title="2. Health (Diarrhoea)" isOpen={openSection === 'health'} onToggle={() => toggle('health')}>
         <NumberField label="Total Population" value={inputs.health.population} onChange={(v) => updateHealth('population', v)} source={sources['population']} />
         <NumberField label="Population Under 5" value={inputs.health.under5Share * 100} onChange={(v) => updateHealth('under5Share', v / 100)} step={0.1} unit="%" source={sources['under5Share']} />
+        <NumberField label="Population Aged 5–14" value={inputs.health.children5to14Share * 100} onChange={(v) => updateHealth('children5to14Share', v / 100)} step={0.1} unit="%" source={sources['children5to14Share']} />
         <NumberField
             label="Share Caused by Unsafe Sanitation"
             value={inputs.health.attributionToSanitation * 100} 
@@ -306,38 +319,62 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
              <h4 className="col-span-2 text-xs font-bold text-slate-400 uppercase">Over 5 Years</h4>
             <NumberField label="Incidence (Cases/Year)" value={inputs.health.diarrheaIncidenceOver5} onChange={(v) => updateHealth('diarrheaIncidenceOver5', v)} step={0.1} source={sources['diarrheaIncidenceOver5']} />
             <NumberField label="All Diarrhoea Deaths / Year" value={inputs.health.diarrheaDeathsOver5} onChange={(v) => updateHealth('diarrheaDeathsOver5', v)} source={sources['diarrheaDeathsOver5']} />
+            <NumberField label="Average Age at Death" value={inputs.health.ageAtDeathOver5} onChange={(v) => updateHealth('ageAtDeathOver5', v)} unit="yrs" source={sources['ageAtDeathOver5']} />
         </div>
 
         <NumberField label="Treatment Seeking Rate" value={inputs.health.treatmentSeekingRate * 100} onChange={(v) => updateHealth('treatmentSeekingRate', v/100)} unit="%" source={sources['treatmentSeekingRate']} />
-        <NumberField label="Outpatient Cost (USD)" value={inputs.health.costOutpatient} onChange={(v) => updateHealth('costOutpatient', v)} unit="$" source={sources['costOutpatient']} />
+        <NumberField label="Outpatient Case (USD)" value={inputs.health.costOutpatient} onChange={(v) => updateHealth('costOutpatient', v)} step={0.1} unit="$" source={sources['costOutpatient']} />
+        <NumberField label="Hospital Admission (USD)" value={inputs.health.costInpatient} onChange={(v) => updateHealth('costInpatient', v)} step={0.1} unit="$" source={sources['costInpatient']} />
       </InputGroup>
 
-      <InputGroup title="3. Stunting (Child Development)" isOpen={openSection === 'stunting'} onToggle={() => toggle('stunting')}>
+      <InputGroup title="3. Access Time (Open Defecation)" isOpen={openSection === 'access'} onToggle={() => toggle('access')}>
+        <NumberField label="Urban Population" value={inputs.access.urbanShare * 100} onChange={(v) => updateAccess('urbanShare', v / 100)} step={0.1} unit="%" source={sources['urbanShare']} />
+        <div />
+        <NumberField label="Open Defecation, Urban" value={inputs.access.openDefecationUrban * 100} onChange={(v) => updateAccess('openDefecationUrban', v / 100)} step={0.1} unit="%" source={sources['openDefecationUrban']} />
+        <NumberField label="Open Defecation, Rural" value={inputs.access.openDefecationRural * 100} onChange={(v) => updateAccess('openDefecationRural', v / 100)} step={0.1} unit="%" source={sources['openDefecationRural']} />
+        <NumberField label="Extra Minutes / Day, Urban" value={minutes(inputs.access.dailyTimeForODUrban)} onChange={(v) => updateAccess('dailyTimeForODUrban', v / 60)} step={1} unit="min" source={sources['dailyTimeForODUrban']} />
+        <NumberField label="Extra Minutes / Day, Rural" value={minutes(inputs.access.dailyTimeForODRural)} onChange={(v) => updateAccess('dailyTimeForODRural', v / 60)} step={1} unit="min" source={sources['dailyTimeForODRural']} />
+        <NumberField label="Value of Time, Adults 15+" value={inputs.access.valueOfTimeAdult * 100} onChange={(v) => updateAccess('valueOfTimeAdult', v / 100)} unit="% wage" source={sources['valueOfTimeAdult']} />
+        <NumberField label="Value of Time, Children 5–14" value={inputs.access.valueOfTimeChild * 100} onChange={(v) => updateAccess('valueOfTimeChild', v / 100)} unit="% wage" source={sources['valueOfTimeChild']} />
+      </InputGroup>
+
+      <InputGroup title="4. Cholera and Funerals" isOpen={openSection === 'other'} onToggle={() => toggle('other')}>
+        <NumberField label="Cholera Cases / Year" value={inputs.other.choleraCasesPerYear} onChange={(v) => updateOther('choleraCasesPerYear', v)} source={sources['choleraCasesPerYear']} />
+        <NumberField label="Cost per Cholera Case (USD)" value={inputs.other.choleraCostPerCase} onChange={(v) => updateOther('choleraCostPerCase', v)} step={0.1} unit="$" source={sources['choleraCostPerCase']} />
+        <NumberField label="Funeral Cost (Per Death)" value={inputs.other.funeralCostPerDeath} onChange={(v) => updateOther('funeralCostPerDeath', v)} unit="$" source={sources['funeralCostPerDeath']} />
+      </InputGroup>
+
+      <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mt-6 mb-2">Shown separately (not in the total unless included)</p>
+
+      <InputGroup title="5. Stunting" isOpen={openSection === 'stunting'} onToggle={() => toggle('stunting')}>
+        <IncludeToggle checked={!!inputs.nutrition.includeInTotal} onChange={(v) => updateNutrition('includeInTotal', v)}>
+          Lost future earnings of children stunted because of poor sanitation. <strong>Not in the total by default:</strong> large trials (WASH Benefits in Bangladesh and Kenya, SHINE in Zimbabwe) found household water, sanitation and hygiene did not improve child growth, so the 16% share is an upper bound.
+        </IncludeToggle>
         <NumberField label="Stunting Prevalence (U5)" value={inputs.nutrition.stuntingPrevalence * 100} onChange={(v) => updateNutrition('stuntingPrevalence', v/100)} unit="%" source={sources['stuntingPrevalence']} />
         <NumberField label="Share Caused by Unsafe Sanitation" value={inputs.nutrition.attributionStunting * 100} onChange={(v) => updateNutrition('attributionStunting', v/100)} unit="%" source={sources['attributionStunting']} />
         <NumberField label="Future Wage Penalty" value={inputs.nutrition.wageLossPercent * 100} onChange={(v) => updateNutrition('wageLossPercent', v/100)} unit="%" source={sources['wageLossPercent']} />
+        <NumberField label="Real Wage Growth / Year" value={inputs.nutrition.realWageGrowth * 100} onChange={(v) => updateNutrition('realWageGrowth', v/100)} step={0.1} unit="%" source={sources['realWageGrowth']} />
       </InputGroup>
 
-      <InputGroup title="4. Access Time (Open Defecation)" isOpen={openSection === 'access'} onToggle={() => toggle('access')}>
-        <NumberField label="OD Prevalence" value={inputs.access.openDefecationPrevalence * 100} onChange={(v) => updateAccess('openDefecationPrevalence', v/100)} unit="%" source={sources['openDefecationPrevalence']} />
-        <NumberField label="Extra Time per Person (Minutes/Day)" value={Math.round(inputs.access.dailyTimeForOD * 60 * 10) / 10} onChange={(v) => updateAccess('dailyTimeForOD', v / 60)} step={1} unit="min" source={sources['dailyTimeForOD']} />
+      <InputGroup title="6. Tourism" isOpen={openSection === 'tourism'} onToggle={() => toggle('tourism')}>
+        <IncludeToggle checked={!!inputs.other.includeTourismInTotal} onChange={(v) => updateOther('includeTourismInTotal', v)}>
+          Tourism income lost because of poor sanitation. <strong>Not in the total by default:</strong> there is no published estimate of the share lost.
+        </IncludeToggle>
+        <NumberField label="Annual Tourism Receipts (USD)" value={inputs.other.tourismReceipts} onChange={(v) => updateOther('tourismReceipts', v)} source={sources['tourismReceipts']} />
+        <NumberField label="Tourism Loss Attributable" value={inputs.other.tourismLossPercentage * 100} onChange={(v) => updateOther('tourismLossPercentage', v/100)} unit="%" source={sources['tourismLossPercentage']} />
       </InputGroup>
-      
-      <InputGroup title="5. Carbon (GHG) Emissions" isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>
-         <div className="md:col-span-2 bg-slate-50 p-3 rounded border border-line text-xs text-slate-600 leading-relaxed">
-            Methane from pit latrines and septic tanks, valued at the social cost of carbon. <strong>Not included in the total by default</strong>, for three reasons:
+
+      <InputGroup title="7. Carbon (GHG) Emissions" isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>
+         <IncludeToggle checked={!!inputs.carbon.includeInTotal} onChange={(v) => updateCarbon('includeInTotal', v)}>
+            Methane from pit latrines and septic tanks, valued at the social cost of carbon. <strong>Not in the total by default</strong>, for three reasons:
             <ul className="list-disc pl-4 mt-1 space-y-0.5">
               <li>Basic pit latrines emit as much methane as unimproved ones (open defecation emits little), so better basic sanitation does not remove these emissions; only treatment does.</li>
               <li>The social cost of carbon is damage to the whole world, not a cost to this country's economy.</li>
               <li>It is valued at a global price (US$100/t) while health losses are valued at local incomes, so it looks large next to them in low-income countries.</li>
             </ul>
-            <label className="flex items-center gap-2 mt-2 font-semibold text-slate-700 cursor-pointer">
-              <input type="checkbox" checked={!!inputs.carbon.includeInTotal} onChange={(e) => updateCarbon('includeInTotal', e.target.checked)} className="accent-brand-primary" />
-              Include carbon in the total
-            </label>
-         </div>
-         <NumberField 
-            label="Pop. with Poor Sanitation" 
+         </IncludeToggle>
+         <NumberField
+            label="Pop. Without Basic Sanitation"
             value={inputs.carbon.percentWithPoorSanitation * 100} 
             onChange={(v) => updateCarbon('percentWithPoorSanitation', v/100)} 
             unit="%" 
@@ -373,13 +410,6 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
             unit="$"
             source={{ label: 'Ref: Rennert et al. 2022 / EPA', kind: 'assumption', tone: 'neutral' }}
         />
-      </InputGroup>
-
-      <InputGroup title="6. Other Costs" isOpen={openSection === 'other'} onToggle={() => toggle('other')}>
-        <NumberField label="Annual Tourism Receipts (USD)" value={inputs.other.tourismReceipts} onChange={(v) => updateOther('tourismReceipts', v)} source={sources['tourismReceipts']} />
-        <NumberField label="Tourism Loss Attributable" value={inputs.other.tourismLossPercentage * 100} onChange={(v) => updateOther('tourismLossPercentage', v/100)} unit="%" source={sources['tourismLossPercentage']} />
-        <NumberField label="Cholera Response (USD)" value={inputs.other.choleraResponseCost} onChange={(v) => updateOther('choleraResponseCost', v)} source={sources['choleraResponseCost']} />
-        <NumberField label="Funeral Cost (Per Death)" value={inputs.other.funeralCostPerDeath} onChange={(v) => updateOther('funeralCostPerDeath', v)} unit="$" source={sources['funeralCostPerDeath']} />
       </InputGroup>
     </div>
   );

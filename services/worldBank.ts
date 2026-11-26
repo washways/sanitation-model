@@ -71,9 +71,73 @@ const INDICATORS = {
     shortLabel: 'Basic sanitation coverage',
     link: 'https://data.worldbank.org/indicator/SH.STA.BASS.ZS',
   },
+  URBAN_SHARE: {
+    code: 'SP.URB.TOTL.IN.ZS',
+    label: 'Urban population (% of total population)',
+    shortLabel: 'Urban population',
+    link: 'https://data.worldbank.org/indicator/SP.URB.TOTL.IN.ZS',
+  },
+  OD_URBAN: {
+    code: 'SH.STA.ODFC.UR.ZS',
+    label: 'People practicing open defecation, urban (% of urban population)',
+    shortLabel: 'Open defecation (urban)',
+    link: 'https://data.worldbank.org/indicator/SH.STA.ODFC.UR.ZS',
+  },
+  OD_RURAL: {
+    code: 'SH.STA.ODFC.RU.ZS',
+    label: 'People practicing open defecation, rural (% of rural population)',
+    shortLabel: 'Open defecation (rural)',
+    link: 'https://data.worldbank.org/indicator/SH.STA.ODFC.RU.ZS',
+  },
+  BASIC_URBAN: {
+    code: 'SH.STA.BASS.UR.ZS',
+    label: 'People using at least basic sanitation services, urban (% of urban population)',
+    shortLabel: 'Basic sanitation (urban)',
+    link: 'https://data.worldbank.org/indicator/SH.STA.BASS.UR.ZS',
+  },
+  BASIC_RURAL: {
+    code: 'SH.STA.BASS.RU.ZS',
+    label: 'People using at least basic sanitation services, rural (% of rural population)',
+    shortLabel: 'Basic sanitation (rural)',
+    link: 'https://data.worldbank.org/indicator/SH.STA.BASS.RU.ZS',
+  },
+  CHILDREN_0_14: {
+    code: 'SP.POP.0014.TO.ZS',
+    label: 'Population ages 0-14 (% of total population)',
+    shortLabel: 'Children 0-14',
+    link: 'https://data.worldbank.org/indicator/SP.POP.0014.TO.ZS',
+  },
+  OFFICIAL_FX: {
+    code: 'PA.NUS.FCRF',
+    label: 'Official exchange rate (LCU per US$, period average)',
+    shortLabel: 'Exchange rate',
+    link: 'https://data.worldbank.org/indicator/PA.NUS.FCRF',
+  },
 } as const satisfies Record<string, IndicatorDefinition>;
 
+// Fields fetched from the World Bank, in one request per country.
+const FIELD_INDICATORS: [keyof CountryApiData['fields'], IndicatorDefinition][] = [
+  ['population', INDICATORS.POPULATION],
+  ['gdpPerCapita', INDICATORS.GDP_PER_CAPITA],
+  ['openDefecation', INDICATORS.OPEN_DEFECATION],
+  ['mortalityUnder5Rate', INDICATORS.MORTALITY_U5],
+  ['tourismReceipts', INDICATORS.TOURISM_RECEIPTS],
+  ['birthRate', INDICATORS.BIRTH_RATE],
+  ['healthExpenditure', INDICATORS.HEALTH_EXPENDITURE],
+  ['stuntingPrevalence', INDICATORS.STUNTING],
+  ['washMortality', INDICATORS.WASH_MORTALITY],
+  ['basicSanitation', INDICATORS.BASIC_SANITATION],
+  ['urbanShare', INDICATORS.URBAN_SHARE],
+  ['openDefecationUrban', INDICATORS.OD_URBAN],
+  ['openDefecationRural', INDICATORS.OD_RURAL],
+  ['basicSanitationUrban', INDICATORS.BASIC_URBAN],
+  ['basicSanitationRural', INDICATORS.BASIC_RURAL],
+  ['children0to14Share', INDICATORS.CHILDREN_0_14],
+  ['exchangeRate', INDICATORS.OFFICIAL_FX],
+];
+
 interface WBResponseItem {
+  indicator?: { id: string };
   date: string;
   value: number | null;
 }
@@ -127,15 +191,15 @@ const buildApiSource = (
   };
 };
 
-const buildExchangeRateSource = (currencyCode: string): DataSourceInfo => ({
+const buildExchangeRateSource = (currencyCode: string, reason: string): DataSourceInfo => ({
   label: `Live FX ${CURRENT_YEAR}`,
   kind: 'live',
   sourceName: 'open.er-api.com',
   requestedYear: CURRENT_YEAR,
   actualYear: CURRENT_YEAR,
-  fallbackUsed: false,
-  tone: 'neutral',
-  notes: `Live USD/${currencyCode} market exchange rate fetched at export/runtime.`,
+  fallbackUsed: true,
+  tone: 'warning',
+  notes: `Today's USD/${currencyCode} market rate. ${reason} Costs are in analysis-year US dollars, so the local-currency figure mixes years.`,
 });
 
 const buildMissingExchangeRateSource = (): DataSourceInfo => ({
@@ -296,46 +360,101 @@ const fetchIndicatorSeries = async (
   }
 };
 
-// Fetch live exchange rates from open.er-api.com (free, no key required).
-const fetchLiveExchangeRate = async (currencyCode: string): Promise<CountryIndicatorValue> => {
-  try {
-    const response = await fetch('https://open.er-api.com/v6/latest/USD');
-    const data = await response.json();
-    if (data?.rates?.[currencyCode]) {
-      return {
-        value: data.rates[currencyCode],
-        source: buildExchangeRateSource(currencyCode),
-      };
+/**
+ * All indicators for one country in a single request (source=2 is World Development Indicators).
+ * Falls back to one request per indicator if the combined request fails.
+ */
+const fetchAllSeries = async (isoCode: string): Promise<IndicatorSeriesResult[]> => {
+  const codes = FIELD_INDICATORS.map(([, d]) => d.code).join(';');
+  const url = `https://api.worldbank.org/v2/country/${isoCode}/indicator/${codes}?source=2&format=json&per_page=2000&date=${FIRST_YEAR}:${LAST_REQUEST_YEAR}`;
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const response = await fetch(url);
+      const data: WBResponse = await response.json();
+      const rows = data[1];
+      if (!Array.isArray(rows)) throw new Error('No rows');
+      return FIELD_INDICATORS.map(([key, definition]) => ({
+        key,
+        definition,
+        series: rows
+          .filter((r) => r.indicator?.id === definition.code && r.value !== null)
+          .map((r) => ({ year: Number.parseInt(r.date, 10), value: r.value as number }))
+          .filter((p) => Number.isFinite(p.year))
+          .sort((a, b) => b.year - a.year),
+      }));
+    } catch (error) {
+      console.warn(`Combined World Bank request failed for ${isoCode} (attempt ${attempt + 1})`, error);
     }
-
-    return {
-      value: null,
-      source: buildMissingExchangeRateSource(),
-    };
-  } catch (error) {
-    console.warn(`Failed to fetch live rate for ${currencyCode}`, error);
-    return {
-      value: null,
-      source: buildMissingExchangeRateSource(),
-    };
   }
+  return Promise.all(FIELD_INDICATORS.map(([key, definition]) => fetchIndicatorSeries(isoCode, key, definition)));
 };
 
-export const fetchCountryData = async (isoCode: string, currencyCode: string = 'USD'): Promise<CountryApiData> => {
-  const indicatorResults = await Promise.all([
-    fetchIndicatorSeries(isoCode, 'population', INDICATORS.POPULATION),
-    fetchIndicatorSeries(isoCode, 'gdpPerCapita', INDICATORS.GDP_PER_CAPITA),
-    fetchIndicatorSeries(isoCode, 'openDefecation', INDICATORS.OPEN_DEFECATION),
-    fetchIndicatorSeries(isoCode, 'mortalityUnder5Rate', INDICATORS.MORTALITY_U5),
-    fetchIndicatorSeries(isoCode, 'tourismReceipts', INDICATORS.TOURISM_RECEIPTS),
-    fetchIndicatorSeries(isoCode, 'birthRate', INDICATORS.BIRTH_RATE),
-    fetchIndicatorSeries(isoCode, 'healthExpenditure', INDICATORS.HEALTH_EXPENDITURE),
-    fetchIndicatorSeries(isoCode, 'stuntingPrevalence', INDICATORS.STUNTING),
-    fetchIndicatorSeries(isoCode, 'washMortality', INDICATORS.WASH_MORTALITY),
-    fetchIndicatorSeries(isoCode, 'basicSanitation', INDICATORS.BASIC_SANITATION),
-  ]);
+// Today's market rates from open.er-api.com (free, no key). Only used when the official rate for the
+// analysis year is missing or belongs to an older currency.
+let liveRatesPromise: Promise<Record<string, number>> | null = null;
+const fetchLiveRates = () => {
+  if (!liveRatesPromise) {
+    liveRatesPromise = fetch('https://open.er-api.com/v6/latest/USD')
+      .then((r) => r.json())
+      .then((d) => d?.rates || {})
+      .catch((error) => {
+        console.warn('Could not fetch live exchange rates', error);
+        liveRatesPromise = null;
+        return {};
+      });
+  }
+  return liveRatesPromise;
+};
 
-  const exchangeRate = await fetchLiveExchangeRate(currencyCode);
+/**
+ * The official exchange rate for the analysis year matches the analysis-year US$ costs. Today's rate is used
+ * only if there is no official rate, or if it is out of line with today's rate by more than 10× (the currency
+ * was redenominated, e.g. Sierra Leone 2022, Zimbabwe 2024).
+ */
+const chooseExchangeRate = async (official: CountryIndicatorValue, currencyCode: string): Promise<CountryIndicatorValue> => {
+  if (currencyCode === 'USD') {
+    return { value: 1, source: { label: 'US dollar', kind: 'api', tone: 'success', notes: 'The country uses the US dollar.' } };
+  }
+  const live = (await fetchLiveRates())[currencyCode];
+  if (official.value && (!live || (official.value / live < 10 && live / official.value < 10))) {
+    return official;
+  }
+  if (live) {
+    const reason = official.value
+      ? `The World Bank official rate (${official.value.toFixed(2)}) is for an older currency unit, so today's rate is used.`
+      : 'No World Bank official rate is available for the analysis year.';
+    return { value: live, source: buildExchangeRateSource(currencyCode, reason) };
+  }
+  return { value: null, source: buildMissingExchangeRateSource() };
+};
+
+// US GDP per person (for the VSL transfer) and the US GDP deflator (to inflate WHO-CHOICE 2010 costs).
+let usSeriesPromise: Promise<{ gdp: IndicatorSeriesPoint[]; deflator: IndicatorSeriesPoint[] }> | null = null;
+const fetchUsSeries = () => {
+  if (!usSeriesPromise) {
+    usSeriesPromise = fetch(`https://api.worldbank.org/v2/country/US/indicator/NY.GDP.PCAP.CD;NY.GDP.DEFL.ZS?source=2&format=json&per_page=200&date=2010:${LAST_REQUEST_YEAR}`)
+      .then((r) => r.json())
+      .then((data: WBResponse) => {
+        const rows = data[1] || [];
+        const series = (code: string) => rows
+          .filter((r) => r.indicator?.id === code && r.value !== null)
+          .map((r) => ({ year: Number.parseInt(r.date, 10), value: r.value as number }));
+        return { gdp: series('NY.GDP.PCAP.CD'), deflator: series('NY.GDP.DEFL.ZS') };
+      })
+      .catch((error) => {
+        console.warn('Could not fetch US reference series', error);
+        usSeriesPromise = null;
+        return { gdp: [], deflator: [] };
+      });
+  }
+  return usSeriesPromise;
+};
+
+const valueAtOrBefore = (series: IndicatorSeriesPoint[], year: number) =>
+  series.filter((p) => p.year <= year).sort((a, b) => b.year - a.year)[0]?.value ?? null;
+
+export const fetchCountryData = async (isoCode: string, currencyCode: string = 'USD'): Promise<CountryApiData> => {
+  const [indicatorResults, us] = await Promise.all([fetchAllSeries(isoCode), fetchUsSeries()]);
   const { analysisYear, alignmentStrategy } = selectAlignedYear(indicatorResults);
 
   const fieldEntries = indicatorResults.map((result) => [
@@ -343,20 +462,23 @@ export const fetchCountryData = async (isoCode: string, currencyCode: string = '
     selectValueForYear(result.definition, analysisYear, result.series),
   ]) as [keyof CountryApiData['fields'], CountryIndicatorValue][];
 
-  const fields = Object.fromEntries(fieldEntries) as Omit<CountryApiData['fields'], 'exchangeRate'>;
+  const fields = Object.fromEntries(fieldEntries) as CountryApiData['fields'];
+  fields.exchangeRate = await chooseExchangeRate(fields.exchangeRate, currencyCode);
   const fallbackFields = fieldEntries
     .filter(([, value]) => value.source.fallbackUsed)
     .map(([key]) => key);
+
+  const deflatorNow = valueAtOrBefore(us.deflator, analysisYear);
+  const deflator2010 = us.deflator.find((p) => p.year === 2010)?.value ?? null;
 
   return {
     analysisYear,
     alignmentStrategy,
     fallbackFields,
     yearExplanation: explainYear(indicatorResults, analysisYear),
-    fields: {
-      ...fields,
-      exchangeRate,
-    },
+    fields,
+    usGdpPerCapita: valueAtOrBefore(us.gdp, analysisYear),
+    usDeflatorRatio: deflatorNow && deflator2010 ? deflatorNow / deflator2010 : null,
   };
 };
 
@@ -368,30 +490,12 @@ export const fetchAllLDCData = async (onProgress: (progress: number) => void) =>
   const allData: Record<string, CountryApiData | null> = {};
   const batchSize = 3;
 
-  let baseRates: Record<string, number> = {};
-  try {
-    const rateRes = await fetch('https://open.er-api.com/v6/latest/USD');
-    const rateData = await rateRes.json();
-    baseRates = rateData.rates || {};
-  } catch (error) {
-    console.warn('Could not fetch batch exchange rates', error);
-  }
-
   for (let i = 0; i < SUPPORTED_COUNTRIES.length; i += batchSize) {
     const batch = SUPPORTED_COUNTRIES.slice(i, i + batchSize);
 
     await Promise.all(batch.map(async (country) => {
       try {
-        const data = await fetchCountryData(country.code, country.currency);
-
-        if (baseRates[country.currency]) {
-          data.fields.exchangeRate = {
-            value: baseRates[country.currency],
-            source: buildExchangeRateSource(country.currency),
-          };
-        }
-
-        allData[country.code] = data;
+        allData[country.code] = await fetchCountryData(country.code, country.currency);
       } catch (error) {
         console.error(`Error batch fetching ${country.name}`, error);
         allData[country.code] = null;

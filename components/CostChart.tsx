@@ -26,18 +26,23 @@ const CustomTooltip = ({ active, payload }: any) => {
 export const CostChart: React.FC<CostChartProps> = ({ outputs }) => {
   const rawData: ChartDataPoint[] = [
     { name: 'Health Care', value: outputs.costsUSD.healthCare, color: COLOR_PALETTE.healthCare },
-    { name: 'Productivity', value: outputs.costsUSD.productivity, color: COLOR_PALETTE.productivity },
-    { name: 'Mortality', value: outputs.costsUSD.mortality, color: COLOR_PALETTE.mortality },
+    { name: 'Days Lost to Illness', value: outputs.costsUSD.productivity, color: COLOR_PALETTE.productivity },
+    { name: 'Premature Deaths', value: outputs.costsUSD.mortality, color: COLOR_PALETTE.mortality },
     { name: 'Stunting', value: outputs.costsUSD.nutrition, color: COLOR_PALETTE.nutrition },
     { name: 'Access Time', value: outputs.costsUSD.accessTime, color: COLOR_PALETTE.accessTime },
     { name: 'Carbon (GHG)', value: outputs.costsUSD.carbon, color: COLOR_PALETTE.carbon },
-    { name: 'Cholera', value: outputs.costsUSD.choleraAndFunerals, color: COLOR_PALETTE.choleraAndFunerals },
+    { name: 'Cholera & Funerals', value: outputs.costsUSD.choleraAndFunerals, color: COLOR_PALETTE.choleraAndFunerals },
     { name: 'Tourism', value: outputs.costsUSD.tourism, color: COLOR_PALETTE.tourism },
   ];
 
-  // Carbon is only charted when it is part of the total.
+  // Stunting, tourism and carbon are only charted when they are part of the total.
+  const excluded = new Set([
+    ...(outputs.included.nutrition ? [] : ['Stunting']),
+    ...(outputs.included.tourism ? [] : ['Tourism']),
+    ...(outputs.included.carbon ? [] : ['Carbon (GHG)']),
+  ]);
   const data = rawData
-    .filter((d) => d.name !== 'Carbon (GHG)' || outputs.carbonIncluded)
+    .filter((d) => !excluded.has(d.name))
     .sort((a, b) => b.value - a.value);
 
   return (

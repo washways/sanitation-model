@@ -1,185 +1,188 @@
-
-import { ModelInputs, ModelOutputs, CostBreakdown } from '../types';
+import { ModelInputs, ModelOutputs, CostBreakdown, ExtendedCostKey } from '../types';
 
 /**
- * Calculates the Net Present Value (NPV) multiplier for premature mortality.
- * Simplified Human Capital Approach.
+ * Counterfactual (decided 2026-11-26): the costs are what the country loses each year because people do not
+ * have at least basic sanitation. Health losses come from WHO's country estimates for inadequate sanitation,
+ * whose reference level is stricter than basic, so they include some benefit beyond basic (see ASSUMPTIONS.md).
  */
-const calculateMortalityMultiplier = (gdpPerCapita: number, discountRate: number, yearsLost: number = 20): number => {
-  let multiplier = 0;
-  for (let t = 0; t < yearsLost; t++) {
-    multiplier += gdpPerCapita / Math.pow(1 + discountRate, t);
+
+// Working life used for lost earnings.
+const WORK_START_AGE = 15;
+const WORK_END_AGE = 65; // exclusive: last working year is 64
+// Most under-5 diarrhoea deaths happen in the first two years of life.
+export const AGE_AT_DEATH_UNDER5 = 1;
+// Admissions for diarrhoea or cholera: share of treated cases admitted.
+const SHARE_ADMITTED = 0.1;
+const DAYS_LOST_PER_EPISODE = 2;
+
+/**
+ * Present value, at the age of death, of the GDP per person a person would have produced over the rest of
+ * their working life (ages 15-64). Human capital approach, valued by age at death.
+ */
+export const humanCapitalPerDeath = (gdpPerCapita: number, discountRate: number, ageAtDeath: number): number => {
+  let value = 0;
+  for (let age = Math.max(WORK_START_AGE, Math.ceil(ageAtDeath)); age < WORK_END_AGE; age++) {
+    value += gdpPerCapita / Math.pow(1 + discountRate, age - ageAtDeath);
   }
-  return multiplier;
+  return value;
 };
 
 /**
- * Calculates NPV of future lost wages due to stunting.
- * Method: Incidence-based Human Capital Approach.
- * We estimate the present value of the future income deficit for the cohort of children
- * who become stunted in the current year.
- * 
- * Assumptions:
- * - Child starts working in 15 years.
- * - Works for 40 years.
- * - Discount rate applies from year 0 (now) to year t.
+ * Value of a statistical life, Robinson, Hammitt & O'Keeffe (2019) reference case: the US VSL (160 × US income)
+ * transferred with an income elasticity (1.5), never below 20 × income per person.
  */
-const calculateNutritionMultiplier = (hourlyWage: number, wageLossPercent: number, discountRate: number): number => {
-  const dailyWage = hourlyWage * 8;
-  const annualWage = dailyWage * 260;
-  const annualLoss = annualWage * wageLossPercent;
-  
-  let npv = 0;
-  const startWorkAge = 15;
-  const workDuration = 40;
+export const valueOfStatisticalLife = (gdpPerCapita: number, usGdpPerCapita: number, elasticity: number): number => {
+  const transferred = 160 * usGdpPerCapita * Math.pow(gdpPerCapita / usGdpPerCapita, elasticity);
+  return Math.max(20 * gdpPerCapita, transferred);
+};
 
-  for (let t = startWorkAge; t < startWorkAge + workDuration; t++) {
-    npv += annualLoss / Math.pow(1 + discountRate, t);
+/**
+ * Present value of the future earnings lost by one stunted child (incidence-based human capital approach).
+ * Earnings start at 15 and last 40 years, grow in real terms, and are discounted to today.
+ */
+const stuntingLossPerChild = (annualWage: number, wageLossPercent: number, discountRate: number, wageGrowth: number): number => {
+  const annualLoss = annualWage * wageLossPercent;
+  let npv = 0;
+  for (let t = WORK_START_AGE; t < WORK_START_AGE + 40; t++) {
+    npv += (annualLoss * Math.pow(1 + wageGrowth, t)) / Math.pow(1 + discountRate, t);
   }
   return npv;
 };
 
 export const calculateModelOutputs = (inputs: ModelInputs): ModelOutputs => {
   const { macro, health, nutrition, access, carbon, other } = inputs;
+  const dailyWage = macro.hourlyWage * 8;
 
-  // --- 1. Health Care Costs ---
+  // --- 1. Health care ---
   const populationUnder5 = health.population * health.under5Share;
   const totalDiarrheaCases =
     (health.diarrheaIncidenceUnder5 * populationUnder5) +
     (health.diarrheaIncidenceOver5 * (health.population - populationUnder5));
-
   const attributableCases = totalDiarrheaCases * health.attributionToSanitation;
   const treatedCases = attributableCases * health.treatmentSeekingRate;
-  
-  const averageTreatmentCost = (health.costOutpatient * 0.9) + (health.costInpatient * 0.1);
+  const averageTreatmentCost = (health.costOutpatient * (1 - SHARE_ADMITTED)) + (health.costInpatient * SHARE_ADMITTED);
   const healthCareCostUSD = treatedCases * averageTreatmentCost;
 
-  // --- 2. Productivity Loss ---
-  const daysLostPerEpisode = 2;
-  const dailyWage = macro.hourlyWage * 8;
-  const productivityCostUSD = attributableCases * daysLostPerEpisode * dailyWage * 0.5;
+  // --- 2. Days lost to illness (the sick person, or a carer for a child), adult time at 50% of the wage ---
+  const productivityCostUSD = attributableCases * DAYS_LOST_PER_EPISODE * dailyWage * access.valueOfTimeAdult;
 
-  // --- 3. Mortality Costs ---
-  const totalDeaths = health.diarrheaDeathsUnder5 + health.diarrheaDeathsOver5;
-  const attributableDeaths = totalDeaths * health.attributionToSanitation;
-  
-  let mortalityCostUSD = 0;
+  // --- 3. Premature deaths ---
+  const deathsUnder5 = health.diarrheaDeathsUnder5 * health.attributionToSanitation;
+  const deathsOver5 = health.diarrheaDeathsOver5 * health.attributionToSanitation;
+  const attributableDeaths = deathsUnder5 + deathsOver5;
+  const mortalityHumanCapitalUSD =
+    deathsUnder5 * humanCapitalPerDeath(macro.gdpPerCapita, macro.discountRate, AGE_AT_DEATH_UNDER5) +
+    deathsOver5 * humanCapitalPerDeath(macro.gdpPerCapita, macro.discountRate, health.ageAtDeathOver5);
+  const vslPerDeathUSD = valueOfStatisticalLife(macro.gdpPerCapita, macro.usGdpPerCapita, macro.vslIncomeElasticity);
+  const mortalityVslUSD = attributableDeaths * vslPerDeathUSD;
+  const mortalityCostUSD = macro.mortalityMethod === 'vsl' ? mortalityVslUSD : mortalityHumanCapitalUSD;
 
-  if (macro.mortalityMethod === 'vsl') {
-      // Value of Statistical Life approach
-      const vsl = macro.gdpPerCapita * macro.vslMultiplier;
-      mortalityCostUSD = attributableDeaths * vsl;
-  } else {
-      // Human Capital Approach (Default)
-      const mortalityMultiplier = calculateMortalityMultiplier(macro.gdpPerCapita, macro.discountRate);
-      mortalityCostUSD = attributableDeaths * mortalityMultiplier;
-  }
-
-  // --- 4. Stunting Costs (Nutrition) ---
-  // One yearly cohort of children (the under-5 population divided by 5).
+  // --- 4. Stunting (extended) ---
   const annualCohort = populationUnder5 / 5;
-  
-  const newStuntedCases = annualCohort * nutrition.stuntingPrevalence;
-  const attributableStunted = newStuntedCases * nutrition.attributionStunting;
-  
-  // Calculate NPV of future lost wages for this cohort
-  const stuntingCostPerChild = calculateNutritionMultiplier(macro.hourlyWage, nutrition.wageLossPercent, macro.discountRate);
-  const nutritionCostUSD = attributableStunted * stuntingCostPerChild;
+  const attributableStunted = annualCohort * nutrition.stuntingPrevalence * nutrition.attributionStunting;
+  const nutritionCostUSD = attributableStunted *
+    stuntingLossPerChild(dailyWage * macro.workingDaysPerYear, nutrition.wageLossPercent, macro.discountRate, nutrition.realWageGrowth);
 
-  // --- 5. Access Time Costs ---
-  // Children under 5 are not counted: their time has no wage value (Radin et al. 2020 values under-5s at zero).
-  const odPopulation = health.population * (1 - health.under5Share) * access.openDefecationPrevalence;
-  const valueOfAccessTime = macro.hourlyWage * 0.3; 
-  const accessTimeCostUSD = odPopulation * 365 * access.dailyTimeForOD * valueOfAccessTime;
+  // --- 5. Access time: people aged 5+ who defecate in the open, urban and rural separately ---
+  // Adults 15+ valued at valueOfTimeAdult of the wage, children 5-14 at valueOfTimeChild, under-5s not counted.
+  const share5plus = Math.max(1e-9, 1 - health.under5Share);
+  const childShareOf5plus = Math.min(1, health.children5to14Share / share5plus);
+  const valuePerHour = macro.hourlyWage *
+    ((1 - childShareOf5plus) * access.valueOfTimeAdult + childShareOf5plus * access.valueOfTimeChild);
+  const urbanPeople5plus = health.population * share5plus * access.urbanShare;
+  const ruralPeople5plus = health.population * share5plus * (1 - access.urbanShare);
+  const hoursPerYear =
+    urbanPeople5plus * access.openDefecationUrban * access.dailyTimeForODUrban * 365 +
+    ruralPeople5plus * access.openDefecationRural * access.dailyTimeForODRural * 365;
+  const accessTimeCostUSD = hoursPerYear * valuePerHour;
 
-  // --- 6. Carbon (GHG) Costs ---
-  // Population with poor sanitation (OD, unimproved latrines, septic without treatment)
-  const populationPoorSanitation = health.population * carbon.percentWithPoorSanitation;
-  
-  // Total Annual Emissions in Metric Tons of CO2e
-  // Input emissionFactor is kg/person/year -> divide by 1000 for metric tons
-  const totalEmissionsTons = (populationPoorSanitation * carbon.emissionFactor) / 1000;
-  
-  // Economic cost = Emissions * Social Cost of Carbon (NPV of future damage)
-  // Note: We do not discount again because SCC typically represents the Present Value of damage per ton emitted *today*.
+  // --- 6. Carbon (extended): people without at least basic sanitation ---
+  const totalEmissionsTons = (health.population * carbon.percentWithPoorSanitation * carbon.emissionFactor) / 1000;
   const carbonCostAll = totalEmissionsTons * carbon.socialCostOfCarbon;
-  // Excluded from the national total by default: the social cost of carbon is worldwide damage, and
-  // basic pit latrines emit as much methane as unimproved ones, so it is not a cost of *poor* sanitation.
-  const carbonIncluded = !!carbon.includeInTotal;
-  const carbonCostUSD = carbonIncluded ? carbonCostAll : 0;
 
-  // --- 7. Cholera & Funerals ---
+  // --- 7. Cholera and funerals ---
+  // Cholera cases are costed as admissions; the sanitation share of diarrhoea is applied, as for other diarrhoea.
+  const choleraUSD = other.choleraCasesPerYear * health.attributionToSanitation * other.choleraCostPerCase;
   const funeralCostsUSD = attributableDeaths * other.funeralCostPerDeath;
-  const choleraAndFuneralsUSD = other.choleraResponseCost + funeralCostsUSD;
+  const choleraAndFuneralsUSD = choleraUSD + funeralCostsUSD;
 
-  // --- 8. Tourism ---
+  // --- 8. Tourism (extended) ---
   const tourismCostUSD = other.tourismReceipts * other.tourismLossPercentage;
 
-  // --- Aggregation ---
-  const costsUSD: CostBreakdown = {
+  const allCostsUSD: CostBreakdown = {
     healthCare: healthCareCostUSD,
     productivity: productivityCostUSD,
     mortality: mortalityCostUSD,
     nutrition: nutritionCostUSD,
     accessTime: accessTimeCostUSD,
-    carbon: carbonCostUSD,
+    carbon: carbonCostAll,
     choleraAndFunerals: choleraAndFuneralsUSD,
-    tourism: tourismCostUSD
+    tourism: tourismCostUSD,
   };
 
-  const totalCostUSD = 
-    healthCareCostUSD + 
-    productivityCostUSD + 
-    mortalityCostUSD + 
-    nutritionCostUSD +
-    accessTimeCostUSD + 
-    carbonCostUSD +
-    choleraAndFuneralsUSD + 
-    tourismCostUSD;
-
-  // Convert to Local Currency
-  const costsLocal: CostBreakdown = {
-    healthCare: healthCareCostUSD * macro.exchangeRate,
-    productivity: productivityCostUSD * macro.exchangeRate,
-    mortality: mortalityCostUSD * macro.exchangeRate,
-    nutrition: nutritionCostUSD * macro.exchangeRate,
-    accessTime: accessTimeCostUSD * macro.exchangeRate,
-    carbon: carbonCostUSD * macro.exchangeRate,
-    choleraAndFunerals: choleraAndFuneralsUSD * macro.exchangeRate,
-    tourism: tourismCostUSD * macro.exchangeRate
+  const included: Record<ExtendedCostKey, boolean> = {
+    nutrition: !!nutrition.includeInTotal,
+    tourism: !!other.includeTourismInTotal,
+    carbon: !!carbon.includeInTotal,
   };
 
-  const totalCostLocal = totalCostUSD * macro.exchangeRate;
+  const costsUSD: CostBreakdown = {
+    ...allCostsUSD,
+    nutrition: included.nutrition ? nutritionCostUSD : 0,
+    tourism: included.tourism ? tourismCostUSD : 0,
+    carbon: included.carbon ? carbonCostAll : 0,
+  };
+
+  const totalCostUSD = Object.values(costsUSD).reduce((sum, v) => sum + v, 0);
+  const costsLocal = Object.fromEntries(
+    Object.entries(costsUSD).map(([k, v]) => [k, v * macro.exchangeRate])
+  ) as unknown as CostBreakdown;
 
   const totalNationalGDP = health.population * macro.gdpPerCapita;
   const percentGDP = totalNationalGDP > 0 ? (totalCostUSD / totalNationalGDP) * 100 : 0;
 
   return {
     costsUSD,
+    allCostsUSD,
+    included,
     carbonCostUSD: carbonCostAll,
-    carbonIncluded,
+    carbonIncluded: included.carbon,
     costsLocal,
     totalCostUSD,
-    totalCostLocal,
+    totalCostLocal: totalCostUSD * macro.exchangeRate,
     percentGDP,
-    currencyCode: macro.currencyCode
+    currencyCode: macro.currencyCode,
+    mortalityHumanCapitalUSD,
+    mortalityVslUSD,
+    vslPerDeathUSD,
+    attributableDeaths,
+    attributableCases,
   };
 };
 
-/** Cost categories that make up the total (carbon only when it is included). */
+export const EXTENDED_COSTS: ExtendedCostKey[] = ['nutrition', 'tourism', 'carbon'];
+
+const isExtended = (key: keyof CostBreakdown): key is ExtendedCostKey =>
+  (EXTENDED_COSTS as string[]).includes(key);
+
+/** Cost categories that make up the total (extended costs only when included). */
 export const costEntries = (outputs: ModelOutputs): [keyof CostBreakdown, number][] =>
   (Object.entries(outputs.costsUSD) as [keyof CostBreakdown, number][])
-    .filter(([key]) => key !== 'carbon' || outputs.carbonIncluded);
+    .filter(([key]) => !isExtended(key) || outputs.included[key]);
+
+/** Extended costs that are shown separately because they are not in the total. */
+export const excludedEntries = (outputs: ModelOutputs): [ExtendedCostKey, number][] =>
+  EXTENDED_COSTS.filter((key) => !outputs.included[key]).map((key) => [key, outputs.allCostsUSD[key]]);
 
 export const formatCurrency =(val: number, currency: string = 'USD') => {
   // If > 10, round to integer (fractionDigits: 0)
   const fractionDigits = Math.abs(val) >= 10 ? 0 : 2;
-  
+
   try {
-    return new Intl.NumberFormat('en-US', { 
-        style: 'currency', 
-        currency: currency, 
-        maximumFractionDigits: fractionDigits 
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: currency,
+        maximumFractionDigits: fractionDigits
     }).format(val);
   } catch (e) {
     // Fallback logic for unsupported currencies

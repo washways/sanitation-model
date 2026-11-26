@@ -33,15 +33,20 @@ Repo: github.com/washways/sanitation-model. Work directly on `main`; keep local 
 - `services/worldBank.ts` `CORE_KEYS`: the analysis year is the latest year where all six core annual indicators have data. Sparse survey/modelled series must NOT set the year (they dragged Malawi back to 2019). `explainYear()` builds the `YearExplanation` shown by `components/YearNotice.tsx`, the PDF and the CSV.
 - The World Bank API sometimes returns an HTML error page under load; those series come back empty and the notice says so.
 
-## Model assumptions (reviewed 2026-11-25, v1.3.0)
+## Model assumptions (reviewed 2026-11-26, v1.6.0; decisions by the user)
 - `ASSUMPTIONS.md` lists every default with its source and a strength rating. Keep it in step with `utils/estimators.ts` and the source-badge notes when changing a default.
-- Diarrhoea deaths inputs are ALL diarrhoea deaths; `attributionToSanitation` (default 0.38, WHO 2023 sanitation-only) is applied to both cases and deaths. Never set it to 1.0 because WASH data exist: SDG 3.9.2 is water+sanitation+hygiene and four diseases.
-- Stunting attribution 0.16 (Danaei 2016), discount rate 5% (Haacker 2020).
-- Open-defecation time is 10 min/person/day (`OD_HOURS_PER_DAY`, Hickling & Hutton 2014; Radin et al. 2020), applied to ages 5+ only; the input field shows minutes but stores hours. Cholera placeholder is 0.01% of GDP. Anything per country must scale with population (the old 2,000 × GDP per person cholera rule broke for Tuvalu).
-- Country list (`SUPPORTED_COUNTRIES` in `constants.ts`) = all 44 UN LDCs + Zimbabwe (v1.4.0). Kiribati and Tuvalu use AUD.
-- Carbon is excluded from the total by default (`carbon.includeInTotal`, decided 2026-11-25 after the user found it unrealistic as Malawi's biggest cost). `costsUSD.carbon` is 0 when excluded; `outputs.carbonCostUSD` always holds the value. Use `costEntries(outputs)` from `utils/calculations.ts` to list the categories in the total.
+- Counterfactual: everyone has at least basic sanitation. Headline total = health care, days lost, deaths, access time, cholera+funerals. Stunting, tourism and carbon are "shown separately" (`nutrition.includeInTotal`, `other.includeTourismInTotal`, `carbon.includeInTotal`, all false). `costsUSD` holds 0 for excluded ones; `allCostsUSD` always has values. Use `costEntries()` / `excludedEntries()` from `utils/calculations.ts`.
+- Health uses WHO country estimates from `data/countryEvidence.json` (WSH_10_SAN deaths, WSH_20_SAN attributable fraction, WSH_30_SAN DALYs, cholera cases, WHO-CHOICE unit costs). WHO's API has no CORS, so the browser can't fetch it: refresh with `node scripts/build-evidence.mjs`. WHO-CHOICE values were extracted from WHO's 2021 PDF into `scripts/data/who-choice-2010-intl-dollars.json` (I$ 2010, converted with PA.NUS.PPP ÷ PA.NUS.FCRF for 2010; PA.NUS.PPPC.RF is archived).
+- Deaths inputs are ALL diarrhoea deaths (= WHO sanitation deaths ÷ sanitation share); `attributionToSanitation` is applied to cases, deaths and cholera. Never set it to 1.0.
+- Deaths: human capital by age at death (headline; under-5 at age 1, over-5 age ≈ 92 − WHO DALYs per death) and VSL (Robinson 2019: max(20×, 160 × US × ratio^1.5)) are both always computed; `mortalityMethod` picks the one in the total.
+- Time value: adults 50%, children 5–14 25%, under-5 0 (Radin 2020). OD time 10 min/day urban and rural; fields show minutes, store hours.
+- Uncertainty: `inputs.ranges` (low/high multiples) drive Monte Carlo (triangular draws), the tornado (`utils/uncertainty.ts`, `components/SensitivityPanel.tsx`) and scenarios. WHO / WHO-CHOICE intervals override `DEFAULT_RANGES`.
+- Exchange rate: World Bank official rate (PA.NUS.FCRF) for the analysis year; today's rate only if missing or >10× off (redenominated currencies: Zimbabwe, Somalia).
+- Changed inputs are written to the URL query (`utils/scenarioUrl.ts`) and applied on first load only.
+- Country list lives in `data/countries.json` (code, iso3, name, currency) = all 44 UN LDCs + Zimbabwe. Anything per country must scale with population (the old flat cholera rule broke for Tuvalu).
 - World Bank codes go stale: SH.STA.ODEF.ZS was retired (use SH.STA.ODFC.ZS); diarrhoea prevalence (SH.STA.DIAR/DIRH) is archived. When adding an indicator, curl `api.worldbank.org/v2/country/MW/indicator/<code>?format=json` first. Treat 0 as a valid value, not as missing.
-- `scratch/`-style check: load `services/worldBank.ts`, `utils/estimators.ts` and `utils/calculations.ts` through Vite `ssrLoadModule` to print per-country cost breakdowns.
+- `scratch/`-style check: load `services/worldBank.ts`, `utils/estimators.ts` and `utils/calculations.ts` through Vite `ssrLoadModule` to print per-country cost breakdowns. For the PDF, import `react` and `@react-pdf/renderer` normally (not via ssrLoadModule, which fails on CommonJS react).
+- Python with pypdf is at `C:/Users/jrobertson/AppData/Local/Python/bin/python.exe` (no project venv); use it to extract PDF text.
 
 ## PDF export (`components/PDFExport.tsx`, @react-pdf/renderer)
 - Set `lineHeight` on every text style; inherited lineHeight makes large text overlap.

@@ -5,10 +5,10 @@ interface SplashScreenProps {
 }
 
 const FEATURES: [string, string][] = [
-  ['Health & mortality', 'Treatment costs and the value of premature deaths (Human Capital or VSL).'],
-  ['Access time', 'Productive time lost searching for open defecation sites.'],
-  ['Stunting', 'Future wage losses from childhood stunting and cognitive delay.'],
-  ['Uncertainty', 'Monte Carlo simulation gives a confidence range, not just one number.'],
+  ['Health & mortality', 'WHO country estimates of illness and deaths from inadequate sanitation, with treatment costs and the value of lives lost.'],
+  ['Access time', 'Productive time lost walking to open defecation sites, urban and rural.'],
+  ['Shown separately', 'Stunting, tourism and carbon, which have weaker evidence, can be added to the total.'],
+  ['Uncertainty', 'A range and a chart of which assumptions drive the result, not just one number.'],
 ];
 
 const STEPS = ['Select a country', 'Adjust the inputs', 'Read the costs'];

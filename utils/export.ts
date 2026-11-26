@@ -1,60 +1,61 @@
 import { ModelInputs, ModelOutputs, DataSourceMap, YearExplanation } from '../types';
-import { costEntries, formatCurrency, formatNumber } from './calculations';
+import { costEntries, excludedEntries, formatCurrency, formatNumber } from './calculations';
+import { runSensitivity } from './uncertainty';
 
 interface ExportField {
   section: string;
-  key: keyof DataSourceMap | string;
+  key: string; // key into the sources map
   label: string;
-  value: number | string;
   unit?: string;
+  get: (i: ModelInputs) => number | string;
 }
 
-const INPUT_FIELDS: ExportField[] = [
-  { section: 'Macro', key: 'analysisYear', label: 'Analysis Year', value: 0, unit: 'year' },
-  { section: 'Macro', key: 'exchangeRate', label: 'Exchange Rate', value: 0, unit: 'LCU per USD' },
-  { section: 'Macro', key: 'gdpPerCapita', label: 'GDP Per Capita', value: 0, unit: 'USD/person' },
-  { section: 'Macro', key: 'hourlyWage', label: 'Hourly Wage', value: 0, unit: 'USD/hour' },
-  { section: 'Macro', key: 'discountRate', label: 'Discount Rate', value: 0, unit: '%' },
-  { section: 'Macro', key: 'mortalityMethod', label: 'Mortality Method', value: '' },
-  { section: 'Macro', key: 'vslMultiplier', label: 'VSL Multiplier', value: 0, unit: 'x GDPpc' },
-  { section: 'Health', key: 'population', label: 'Population', value: 0, unit: 'people' },
-  { section: 'Health', key: 'under5Share', label: 'Population Under 5', value: 0, unit: '%' },
-  { section: 'Health', key: 'attributionToSanitation', label: 'Share of Diarrhoea Caused by Unsafe Sanitation', value: 0, unit: '%' },
-  { section: 'Health', key: 'diarrheaIncidenceUnder5', label: 'Under-5 Diarrhea Incidence', value: 0, unit: 'cases/person/year' },
-  { section: 'Health', key: 'diarrheaDeathsUnder5', label: 'Under-5 Diarrhea Deaths (all causes)', value: 0, unit: 'deaths/year' },
-  { section: 'Health', key: 'diarrheaIncidenceOver5', label: 'Over-5 Diarrhea Incidence', value: 0, unit: 'cases/person/year' },
-  { section: 'Health', key: 'diarrheaDeathsOver5', label: 'Over-5 Diarrhea Deaths (all causes)', value: 0, unit: 'deaths/year' },
-  { section: 'Health', key: 'treatmentSeekingRate', label: 'Treatment Seeking Rate', value: 0, unit: '%' },
-  { section: 'Health', key: 'costOutpatient', label: 'Outpatient Cost', value: 0, unit: 'USD/case' },
-  { section: 'Health', key: 'costInpatient', label: 'Inpatient Cost', value: 0, unit: 'USD/case' },
-  { section: 'Nutrition', key: 'stuntingPrevalence', label: 'Stunting Prevalence', value: 0, unit: '%' },
-  { section: 'Nutrition', key: 'attributionStunting', label: 'Share of Stunting Caused by Unsafe Sanitation', value: 0, unit: '%' },
-  { section: 'Nutrition', key: 'wageLossPercent', label: 'Future Wage Penalty', value: 0, unit: '%' },
-  { section: 'Access', key: 'openDefecationPrevalence', label: 'Open Defecation Prevalence', value: 0, unit: '%' },
-  { section: 'Access', key: 'dailyTimeForOD', label: 'Extra Time per Person for OD (aged 5+)', value: 0, unit: 'hours/day' },
-  { section: 'Carbon', key: 'percentWithPoorSanitation', label: 'Population with Poor Sanitation', value: 0, unit: '%' },
-  { section: 'Carbon', key: 'emissionFactorSource', label: 'Emission Factor Source', value: '' },
-  { section: 'Carbon', key: 'emissionFactor', label: 'Emission Factor', value: 0, unit: 'kg CO2e/person/year' },
-  { section: 'Carbon', key: 'socialCostOfCarbon', label: 'Social Cost of Carbon', value: 0, unit: 'USD/tCO2e' },
-  { section: 'Other', key: 'tourismReceipts', label: 'Tourism Receipts', value: 0, unit: 'USD/year' },
-  { section: 'Other', key: 'tourismLossPercentage', label: 'Tourism Loss Attributable', value: 0, unit: '%' },
-  { section: 'Other', key: 'choleraResponseCost', label: 'Cholera Response Cost', value: 0, unit: 'USD/year' },
-  { section: 'Other', key: 'funeralCostPerDeath', label: 'Funeral Cost per Death', value: 0, unit: 'USD/death' },
-];
+const pct = (v: number) => v * 100;
 
-const OUTPUT_FIELDS: ExportField[] = [
-  { section: 'Outputs', key: 'totalCostUSD', label: 'Total Annual Cost (USD)', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'totalCostLocal', label: 'Total Annual Cost (Local Currency)', value: 0, unit: 'local/year' },
-  { section: 'Outputs', key: 'percentGDP', label: 'Impact on GDP', value: 0, unit: '%' },
-  { section: 'Outputs', key: 'healthCare', label: 'Health Care Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'productivity', label: 'Productivity Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'mortality', label: 'Mortality Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'nutrition', label: 'Stunting Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'accessTime', label: 'Access Time Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'carbon', label: 'Carbon Cost (in total only if included)', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'carbonIncluded', label: 'Carbon Included in Total', value: '' },
-  { section: 'Outputs', key: 'choleraAndFunerals', label: 'Cholera and Funeral Cost', value: 0, unit: 'USD/year' },
-  { section: 'Outputs', key: 'tourism', label: 'Tourism Cost', value: 0, unit: 'USD/year' },
+const INPUT_FIELDS: ExportField[] = [
+  { section: 'Macro', key: 'analysisYear', label: 'Analysis Year', unit: 'year', get: (i) => i.macro.analysisYear },
+  { section: 'Macro', key: 'exchangeRate', label: 'Exchange Rate', unit: 'LCU per USD', get: (i) => i.macro.exchangeRate },
+  { section: 'Macro', key: 'gdpPerCapita', label: 'GDP Per Capita', unit: 'USD/person', get: (i) => i.macro.gdpPerCapita },
+  { section: 'Macro', key: 'hourlyWage', label: 'Hourly Wage', unit: 'USD/hour', get: (i) => i.macro.hourlyWage },
+  { section: 'Macro', key: 'discountRate', label: 'Discount Rate', unit: '%', get: (i) => pct(i.macro.discountRate) },
+  { section: 'Macro', key: 'mortalityMethod', label: 'Mortality Method in Total', get: (i) => i.macro.mortalityMethod },
+  { section: 'Macro', key: 'vslIncomeElasticity', label: 'VSL Income Elasticity', get: (i) => i.macro.vslIncomeElasticity },
+  { section: 'Macro', key: 'usGdpPerCapita', label: 'US GDP Per Capita', unit: 'USD/person', get: (i) => i.macro.usGdpPerCapita },
+  { section: 'Health', key: 'population', label: 'Population', unit: 'people', get: (i) => i.health.population },
+  { section: 'Health', key: 'under5Share', label: 'Population Under 5', unit: '%', get: (i) => pct(i.health.under5Share) },
+  { section: 'Health', key: 'children5to14Share', label: 'Population Aged 5-14', unit: '%', get: (i) => pct(i.health.children5to14Share) },
+  { section: 'Health', key: 'attributionToSanitation', label: 'Share of Diarrhoea Caused by Inadequate Sanitation', unit: '%', get: (i) => pct(i.health.attributionToSanitation) },
+  { section: 'Health', key: 'diarrheaIncidenceUnder5', label: 'Under-5 Diarrhoea Incidence', unit: 'cases/person/year', get: (i) => i.health.diarrheaIncidenceUnder5 },
+  { section: 'Health', key: 'diarrheaDeathsUnder5', label: 'Under-5 Diarrhoea Deaths (all causes)', unit: 'deaths/year', get: (i) => i.health.diarrheaDeathsUnder5 },
+  { section: 'Health', key: 'diarrheaIncidenceOver5', label: 'Over-5 Diarrhoea Incidence', unit: 'cases/person/year', get: (i) => i.health.diarrheaIncidenceOver5 },
+  { section: 'Health', key: 'diarrheaDeathsOver5', label: 'Over-5 Diarrhoea Deaths (all causes)', unit: 'deaths/year', get: (i) => i.health.diarrheaDeathsOver5 },
+  { section: 'Health', key: 'ageAtDeathOver5', label: 'Average Age at Death (5+)', unit: 'years', get: (i) => i.health.ageAtDeathOver5 },
+  { section: 'Health', key: 'treatmentSeekingRate', label: 'Treatment Seeking Rate', unit: '%', get: (i) => pct(i.health.treatmentSeekingRate) },
+  { section: 'Health', key: 'costOutpatient', label: 'Outpatient Case Cost', unit: 'USD/case', get: (i) => i.health.costOutpatient },
+  { section: 'Health', key: 'costInpatient', label: 'Hospital Admission Cost', unit: 'USD/admission', get: (i) => i.health.costInpatient },
+  { section: 'Access', key: 'urbanShare', label: 'Urban Population', unit: '%', get: (i) => pct(i.access.urbanShare) },
+  { section: 'Access', key: 'openDefecationUrban', label: 'Open Defecation, Urban', unit: '%', get: (i) => pct(i.access.openDefecationUrban) },
+  { section: 'Access', key: 'openDefecationRural', label: 'Open Defecation, Rural', unit: '%', get: (i) => pct(i.access.openDefecationRural) },
+  { section: 'Access', key: 'dailyTimeForODUrban', label: 'Extra Time for OD, Urban', unit: 'minutes/day', get: (i) => i.access.dailyTimeForODUrban * 60 },
+  { section: 'Access', key: 'dailyTimeForODRural', label: 'Extra Time for OD, Rural', unit: 'minutes/day', get: (i) => i.access.dailyTimeForODRural * 60 },
+  { section: 'Access', key: 'valueOfTimeAdult', label: 'Value of Time, Adults 15+', unit: '% of wage', get: (i) => pct(i.access.valueOfTimeAdult) },
+  { section: 'Access', key: 'valueOfTimeChild', label: 'Value of Time, Children 5-14', unit: '% of wage', get: (i) => pct(i.access.valueOfTimeChild) },
+  { section: 'Cholera', key: 'choleraCasesPerYear', label: 'Cholera Cases per Year', unit: 'cases/year', get: (i) => i.other.choleraCasesPerYear },
+  { section: 'Cholera', key: 'choleraCostPerCase', label: 'Cost per Cholera Case', unit: 'USD/case', get: (i) => i.other.choleraCostPerCase },
+  { section: 'Cholera', key: 'funeralCostPerDeath', label: 'Funeral Cost per Death', unit: 'USD/death', get: (i) => i.other.funeralCostPerDeath },
+  { section: 'Stunting', key: 'stuntingIncluded', label: 'Stunting Included in Total', get: (i) => (i.nutrition.includeInTotal ? 'Yes' : 'No') },
+  { section: 'Stunting', key: 'stuntingPrevalence', label: 'Stunting Prevalence', unit: '%', get: (i) => pct(i.nutrition.stuntingPrevalence) },
+  { section: 'Stunting', key: 'attributionStunting', label: 'Share of Stunting Caused by Unsafe Sanitation', unit: '%', get: (i) => pct(i.nutrition.attributionStunting) },
+  { section: 'Stunting', key: 'wageLossPercent', label: 'Future Wage Penalty', unit: '%', get: (i) => pct(i.nutrition.wageLossPercent) },
+  { section: 'Stunting', key: 'realWageGrowth', label: 'Real Wage Growth', unit: '%/year', get: (i) => pct(i.nutrition.realWageGrowth) },
+  { section: 'Tourism', key: 'tourismIncluded', label: 'Tourism Included in Total', get: (i) => (i.other.includeTourismInTotal ? 'Yes' : 'No') },
+  { section: 'Tourism', key: 'tourismReceipts', label: 'Tourism Receipts', unit: 'USD/year', get: (i) => i.other.tourismReceipts },
+  { section: 'Tourism', key: 'tourismLossPercentage', label: 'Tourism Loss Attributable', unit: '%', get: (i) => pct(i.other.tourismLossPercentage) },
+  { section: 'Carbon', key: 'carbonIncluded', label: 'Carbon Included in Total', get: (i) => (i.carbon.includeInTotal ? 'Yes' : 'No') },
+  { section: 'Carbon', key: 'percentWithPoorSanitation', label: 'Population Without Basic Sanitation', unit: '%', get: (i) => pct(i.carbon.percentWithPoorSanitation) },
+  { section: 'Carbon', key: 'emissionFactorSource', label: 'Emission Factor Source', get: (i) => i.carbon.emissionFactorSource },
+  { section: 'Carbon', key: 'emissionFactor', label: 'Emission Factor', unit: 'kg CO2e/person/year', get: (i) => i.carbon.emissionFactor },
+  { section: 'Carbon', key: 'socialCostOfCarbon', label: 'Social Cost of Carbon', unit: 'USD/tCO2e', get: (i) => i.carbon.socialCostOfCarbon },
 ];
 
 const csvEscape = (value: string | number | boolean | undefined) => {
@@ -66,7 +67,7 @@ const csvEscape = (value: string | number | boolean | undefined) => {
 };
 
 const triggerDownload = (content: string, filename: string, type: string) => {
-  const blob = new Blob(['\uFEFF', content], { type });
+  const blob = new Blob(['﻿', content], { type });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
@@ -75,53 +76,6 @@ const triggerDownload = (content: string, filename: string, type: string) => {
   link.click();
   link.remove();
   URL.revokeObjectURL(url);
-};
-
-const getInputValue = (inputs: ModelInputs, key: string) => {
-  switch (key) {
-    case 'analysisYear': return inputs.macro.analysisYear;
-    case 'exchangeRate': return inputs.macro.exchangeRate;
-    case 'gdpPerCapita': return inputs.macro.gdpPerCapita;
-    case 'hourlyWage': return inputs.macro.hourlyWage;
-    case 'discountRate': return inputs.macro.discountRate * 100;
-    case 'mortalityMethod': return inputs.macro.mortalityMethod;
-    case 'vslMultiplier': return inputs.macro.vslMultiplier;
-    case 'population': return inputs.health.population;
-    case 'under5Share': return inputs.health.under5Share * 100;
-    case 'attributionToSanitation': return inputs.health.attributionToSanitation * 100;
-    case 'diarrheaIncidenceUnder5': return inputs.health.diarrheaIncidenceUnder5;
-    case 'diarrheaDeathsUnder5': return inputs.health.diarrheaDeathsUnder5;
-    case 'diarrheaIncidenceOver5': return inputs.health.diarrheaIncidenceOver5;
-    case 'diarrheaDeathsOver5': return inputs.health.diarrheaDeathsOver5;
-    case 'treatmentSeekingRate': return inputs.health.treatmentSeekingRate * 100;
-    case 'costOutpatient': return inputs.health.costOutpatient;
-    case 'costInpatient': return inputs.health.costInpatient;
-    case 'stuntingPrevalence': return inputs.nutrition.stuntingPrevalence * 100;
-    case 'attributionStunting': return inputs.nutrition.attributionStunting * 100;
-    case 'wageLossPercent': return inputs.nutrition.wageLossPercent * 100;
-    case 'openDefecationPrevalence': return inputs.access.openDefecationPrevalence * 100;
-    case 'dailyTimeForOD': return inputs.access.dailyTimeForOD;
-    case 'percentWithPoorSanitation': return inputs.carbon.percentWithPoorSanitation * 100;
-    case 'emissionFactorSource': return inputs.carbon.emissionFactorSource;
-    case 'emissionFactor': return inputs.carbon.emissionFactor;
-    case 'socialCostOfCarbon': return inputs.carbon.socialCostOfCarbon;
-    case 'tourismReceipts': return inputs.other.tourismReceipts;
-    case 'tourismLossPercentage': return inputs.other.tourismLossPercentage * 100;
-    case 'choleraResponseCost': return inputs.other.choleraResponseCost;
-    case 'funeralCostPerDeath': return inputs.other.funeralCostPerDeath;
-    default: return '';
-  }
-};
-
-const getOutputValue = (outputs: ModelOutputs, key: string) => {
-  switch (key) {
-    case 'totalCostUSD': return outputs.totalCostUSD;
-    case 'totalCostLocal': return outputs.totalCostLocal;
-    case 'percentGDP': return outputs.percentGDP;
-    case 'carbon': return outputs.carbonCostUSD;
-    case 'carbonIncluded': return outputs.carbonIncluded ? 'Yes' : 'No';
-    default: return outputs.costsUSD[key as keyof typeof outputs.costsUSD] ?? '';
-  }
 };
 
 export const downloadAnalysisCsv = (
@@ -135,8 +89,10 @@ export const downloadAnalysisCsv = (
   const rows: (string | number)[][] = [
     ['Country', countryName],
     ['Exported At', exportDate],
+    ['Tool version', __APP_VERSION__],
     ['Aligned Analysis Year', inputs.macro.analysisYear],
     ['Currency Code', inputs.macro.currencyCode],
+    ['Counterfactual', 'Everyone has at least basic sanitation'],
   ];
   if (yearExplanation) {
     rows.push(['How the year is chosen', yearExplanation.rule]);
@@ -147,26 +103,15 @@ export const downloadAnalysisCsv = (
   }
   rows.push(
     [],
-    [
-      'Section',
-      'Parameter',
-      'Value',
-      'Unit',
-      'Source Label',
-      'Source Name',
-      'Aligned Year',
-      'Data Year Used',
-      'Fallback Used',
-      'Notes',
-    ],
+    ['Section', 'Parameter', 'Value', 'Unit', 'Source Label', 'Source Name', 'Aligned Year', 'Data Year Used', 'Fallback Used', 'Notes'],
   );
 
   INPUT_FIELDS.forEach((field) => {
-    const source = sources[field.key as keyof DataSourceMap];
+    const source = sources[field.key];
     rows.push([
       field.section,
       field.label,
-      getInputValue(inputs, field.key),
+      field.get(inputs),
       field.unit || '',
       source?.label || 'Manual / calculated',
       source?.sourceName || '',
@@ -177,20 +122,21 @@ export const downloadAnalysisCsv = (
     ]);
   });
 
-  OUTPUT_FIELDS.forEach((field) => {
-    rows.push([
-      field.section,
-      field.label,
-      getOutputValue(outputs, field.key),
-      field.unit || '',
-      'Calculated output',
-      'Sanitation Impact Modeler',
-      inputs.macro.analysisYear,
-      inputs.macro.analysisYear,
-      'No',
-      '',
-    ]);
-  });
+  const out = (label: string, value: number | string, unit = 'USD/year', notes = '') =>
+    rows.push(['Outputs', label, value, unit, 'Calculated output', 'Sanitation Impact Modeler', inputs.macro.analysisYear, inputs.macro.analysisYear, 'No', notes]);
+  out('Total Annual Cost (USD)', outputs.totalCostUSD);
+  out('Total Annual Cost (Local Currency)', outputs.totalCostLocal, 'local/year');
+  out('Impact on GDP', outputs.percentGDP, '%');
+  costEntries(outputs).forEach(([key, value]) => out(COST_LABELS[key] ?? key, value));
+  excludedEntries(outputs).forEach(([key, value]) => out(`${COST_LABELS[key] ?? key} (not in total)`, value));
+  out('Deaths valued by human capital', outputs.mortalityHumanCapitalUSD, 'USD/year', 'Lost output over the remaining working life, by age at death');
+  out('Deaths valued by VSL', outputs.mortalityVslUSD, 'USD/year', `Value of statistical life ${formatCurrency(outputs.vslPerDeathUSD)} per death (Robinson et al. 2019)`);
+  out('Deaths attributable to inadequate sanitation', outputs.attributableDeaths, 'deaths/year');
+
+  const sens = runSensitivity(inputs);
+  out('Conservative scenario total', sens.conservative, 'USD/year', 'Every uncertain input at the end of its range that lowers the total');
+  out('Upper scenario total', sens.upper, 'USD/year', 'Every uncertain input at the end of its range that raises the total');
+  sens.rows.forEach((r) => out(`Sensitivity: ${r.label}`, `${Math.round(r.lowTotal)} to ${Math.round(r.highTotal)}`, 'USD/year (total at low / high)', r.basis));
 
   const content = rows.map((row) => row.map((cell) => csvEscape(cell as string | number | boolean | undefined)).join(',')).join('\n');
   const filename = `${countryName.toLowerCase().replace(/[^a-z0-9]+/g, '-')}-sanitation-analysis.csv`;
@@ -199,12 +145,12 @@ export const downloadAnalysisCsv = (
 
 export const COST_LABELS: Record<string, string> = {
   healthCare: 'Health care',
-  productivity: 'Lost productivity (illness)',
+  productivity: 'Days lost to illness',
   mortality: 'Premature deaths',
   nutrition: 'Stunting (future earnings)',
   accessTime: 'Time lost to open defecation',
   carbon: 'Greenhouse gas emissions',
-  choleraAndFunerals: 'Cholera response and funerals',
+  choleraAndFunerals: 'Cholera and funerals',
   tourism: 'Tourism losses',
 };
 

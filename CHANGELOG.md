@@ -4,6 +4,21 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.6.0 — 2026-11-26
+A review of the methods from a sanitation economist's point of view. Full details and sources are in ASSUMPTIONS.md.
+- **One clear baseline:** the costs are what the country loses because people don't have at least basic sanitation.
+- **Country-specific health figures from WHO.** The share of diarrhoea caused by inadequate sanitation, and the deaths it causes, are now WHO's estimates for each country (for example 44% in Malawi) instead of one global figure. Uncertainty ranges use WHO's own intervals.
+- **Treatment costs from WHO-CHOICE.** Each country's cost of a health-centre visit and a hospital bed-day (Stenberg et al. 2018) replaces "10% of health spending per person", plus drug costs. For most countries this is lower: about US$1.60 per outpatient case in Malawi instead of about US$4.
+- **Deaths valued by age.** Each death is valued at the output lost over the rest of the person's working life, using the age at death (from WHO data). The value of a statistical life (Robinson et al. 2019) is shown alongside, and can be chosen for the total.
+- **Stunting and tourism are now shown separately**, like carbon, and can be added back. Large trials found household sanitation did not improve child growth, and there is no published estimate for tourism.
+- **Cholera from real case data:** average yearly cases reported to WHO, costed as hospital admissions. Replaces the 0.01% of GDP placeholder.
+- **Urban and rural open defecation** are now separate, and time is valued by age (adults at 50% of the wage, children 5–14 at 25%).
+- **Exchange rate for the data year.** Local-currency results use the World Bank official rate for the analysis year, not today's rate (Malawi: 1,161 kwacha per US$ instead of about 1,745).
+- **New "What drives the estimate" chart** shows which assumptions move the total most, with conservative, central and upper scenarios. It is also in the PDF and CSV.
+- **Links carry your changes.** If you change inputs, the address bar updates, so a shared link opens the same scenario.
+- The PDF and methodology now explain why results are lower than earlier World Bank studies (which counted water and hygiene too).
+- Results change: Malawi goes from US$83m (0.62% of GDP) to US$54m (0.40%), likely range US$42–77m.
+
 ## v1.5.0 — 2026-11-25
 - **Each country has its own link**, for example washways.org/sanitation-model/kiribati. Opening it goes straight to that country, without the welcome screen. The address bar updates when you pick a country, so you can copy and send it. Link previews (email, WhatsApp, social media) show the country name.
 - Names with spaces use hyphens, e.g. /solomon-islands, /dem-rep-congo, /burkina-faso.

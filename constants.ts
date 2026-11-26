@@ -1,59 +1,36 @@
-
-import { ModelInputs } from './types';
+import { ModelInputs, UncertaintyRanges } from './types';
+import COUNTRIES from './data/countries.json';
 
 // All 44 UN Least Developed Countries (list after São Tomé and Príncipe graduated in Dec 2024; Bangladesh,
 // Lao PDR and Nepal were scheduled to graduate on 24 Nov 2026 and are kept), plus Zimbabwe (not an LDC).
-export const SUPPORTED_COUNTRIES = [
-  { code: 'AF', name: 'Afghanistan', currency: 'AFN' },
-  { code: 'AO', name: 'Angola', currency: 'AOA' },
-  { code: 'BD', name: 'Bangladesh', currency: 'BDT' },
-  { code: 'BJ', name: 'Benin', currency: 'XOF' },
-  { code: 'BF', name: 'Burkina Faso', currency: 'XOF' },
-  { code: 'BI', name: 'Burundi', currency: 'BIF' },
-  { code: 'KH', name: 'Cambodia', currency: 'KHR' },
-  { code: 'CF', name: 'Central African Republic', currency: 'XAF' },
-  { code: 'TD', name: 'Chad', currency: 'XAF' },
-  { code: 'KM', name: 'Comoros', currency: 'KMF' },
-  { code: 'CD', name: 'Dem. Rep. Congo', currency: 'CDF' },
-  { code: 'DJ', name: 'Djibouti', currency: 'DJF' },
-  { code: 'ER', name: 'Eritrea', currency: 'ERN' },
-  { code: 'ET', name: 'Ethiopia', currency: 'ETB' },
-  { code: 'GM', name: 'Gambia', currency: 'GMD' },
-  { code: 'GN', name: 'Guinea', currency: 'GNF' },
-  { code: 'GW', name: 'Guinea-Bissau', currency: 'XOF' },
-  { code: 'HT', name: 'Haiti', currency: 'HTG' },
-  { code: 'KI', name: 'Kiribati', currency: 'AUD' },
-  { code: 'LA', name: 'Laos', currency: 'LAK' },
-  { code: 'LS', name: 'Lesotho', currency: 'LSL' },
-  { code: 'LR', name: 'Liberia', currency: 'LRD' },
-  { code: 'MG', name: 'Madagascar', currency: 'MGA' },
-  { code: 'MW', name: 'Malawi', currency: 'MWK' },
-  { code: 'ML', name: 'Mali', currency: 'XOF' },
-  { code: 'MR', name: 'Mauritania', currency: 'MRU' },
-  { code: 'MZ', name: 'Mozambique', currency: 'MZN' },
-  { code: 'MM', name: 'Myanmar', currency: 'MMK' },
-  { code: 'NP', name: 'Nepal', currency: 'NPR' },
-  { code: 'NE', name: 'Niger', currency: 'XOF' },
-  { code: 'RW', name: 'Rwanda', currency: 'RWF' },
-  { code: 'SN', name: 'Senegal', currency: 'XOF' },
-  { code: 'SL', name: 'Sierra Leone', currency: 'SLE' },
-  { code: 'SB', name: 'Solomon Islands', currency: 'SBD' },
-  { code: 'SO', name: 'Somalia', currency: 'SOS' },
-  { code: 'SS', name: 'South Sudan', currency: 'SSP' },
-  { code: 'SD', name: 'Sudan', currency: 'SDG' },
-  { code: 'TZ', name: 'Tanzania', currency: 'TZS' },
-  { code: 'TL', name: 'Timor-Leste', currency: 'USD' },
-  { code: 'TG', name: 'Togo', currency: 'XOF' },
-  { code: 'TV', name: 'Tuvalu', currency: 'AUD' },
-  { code: 'UG', name: 'Uganda', currency: 'UGX' },
-  { code: 'YE', name: 'Yemen', currency: 'YER' },
-  { code: 'ZM', name: 'Zambia', currency: 'ZMW' },
-  { code: 'ZW', name: 'Zimbabwe', currency: 'ZWG' },
-];
+// The list lives in data/countries.json so scripts/build-evidence.mjs can read it too.
+export const SUPPORTED_COUNTRIES: { code: string; iso3: string; name: string; currency: string }[] = COUNTRIES;
 
 export const EMISSION_PRESETS = {
   IPCC: 35, // kg CO2e/person/year (Typical Pit Latrine/Septic in warm climate - IPCC 2019)
   SCARE: 52, // kg CO2e/person/year (Higher estimates from SCARE tool for containment + emptying)
+};
+
+/**
+ * Default uncertainty ranges (low and high as multiples of the input). Country estimates replace the first few
+ * with WHO's and WHO-CHOICE's own 95% uncertainty intervals where they exist (utils/estimators.ts).
+ */
+export const DEFAULT_RANGES: UncertaintyRanges = {
+  attributionToSanitation: { low: 0.75, high: 1.25, basis: '±25% (no country interval available)' },
+  diarrheaDeaths: { low: 0.7, high: 1.3, basis: '±30% (no country interval available)' },
+  diarrheaIncidence: { low: 0.6, high: 1.4, basis: '±40%: income-based estimate, no country data' },
+  costOutpatient: { low: 0.5, high: 2, basis: 'Half to double (no WHO-CHOICE interval available)' },
+  costInpatient: { low: 0.5, high: 2, basis: 'Half to double (no WHO-CHOICE interval available)' },
+  treatmentSeekingRate: { low: 0.75, high: 1.25, basis: '±25%: rough proxy' },
+  discountRate: { low: 0.6, high: 1.4, basis: '3% to 7% (iDSI reference case 3%; Haacker et al. 2020 at least 5%)' },
+  hourlyWage: { low: 0.7, high: 1.3, basis: '±30%: GDP-based wage proxy' },
+  ageAtDeathOver5: { low: 0.75, high: 1.25, basis: '±25%: derived from WHO deaths and DALYs' },
+  dailyTimeForOD: { low: 0.5, high: 1.5, basis: '5 to 15 minutes (Radin et al. 2020: 4–12 minutes per visit)' },
+  choleraCasesPerYear: { low: 0.5, high: 2, basis: 'Half to double: outbreaks vary a lot from year to year' },
+  attributionStunting: { low: 0, high: 1.5, basis: '0 to 24%: trials found no effect of household WASH on growth' },
+  tourismLossPercentage: { low: 0, high: 2, basis: '0 to 10%: no published estimate' },
+  emissionFactor: { low: 0.06, high: 2.7, basis: 'Cheng et al. 2022 range (22–1,003 around 377 Mt CO2e)' },
+  socialCostOfCarbon: { low: 0.5, high: 1.9, basis: 'US$50–190 per tonne (Rennert et al. 2022)' },
 };
 
 // Approximate fallback baseline values used before country-specific data is loaded
@@ -61,48 +38,61 @@ export const DEFAULT_INPUTS: ModelInputs = {
   macro: {
     analysisYear: 2023,
     currencyCode: 'MWK',
-    exchangeRate: 1700, 
-    gdpPerCapita: 600, 
+    exchangeRate: 1161,
+    gdpPerCapita: 600,
     discountRate: 0.05,
-    hourlyWage: 0.50, 
+    hourlyWage: 0.23,
     workingDaysPerYear: 260,
     mortalityMethod: 'humanCapital',
-    vslMultiplier: 70, 
+    usGdpPerCapita: 82000,
+    vslIncomeElasticity: 1.5,
   },
   health: {
     population: 20000000,
     under5Share: 0.15,
+    children5to14Share: 0.27,
     diarrheaIncidenceUnder5: 3.5,
     diarrheaIncidenceOver5: 0.5,
     diarrheaDeathsUnder5: 1800, // all diarrhoea deaths
     diarrheaDeathsOver5: 5000,
-    attributionToSanitation: 0.38, // WHO 2023: unsafe sanitation alone
-    treatmentSeekingRate: 0.60, 
-    costOutpatient: 5.0, 
-    costInpatient: 40.0, 
+    attributionToSanitation: 0.38, // WHO 2023 global: unsafe sanitation alone
+    ageAtDeathOver5: 45,
+    treatmentSeekingRate: 0.60,
+    costOutpatient: 2.0,
+    costInpatient: 15.0,
   },
   nutrition: {
-    stuntingPrevalence: 0.30, // Updated to 30% to align with broader LDC averages
+    stuntingPrevalence: 0.30,
     attributionStunting: 0.16, // Danaei et al. 2016: unimproved sanitation
     wageLossPercent: 0.10, // 10% future wage penalty
+    realWageGrowth: 0.015, // Radin et al. 2020
+    includeInTotal: false,
   },
   access: {
-    openDefecationPrevalence: 0.06, 
-    dailyTimeForOD: 10 / 60, // about 10 minutes (Hickling & Hutton 2014; Radin et al. 2020)
+    urbanShare: 0.18,
+    openDefecationUrban: 0.01,
+    openDefecationRural: 0.03,
+    dailyTimeForODUrban: 10 / 60, // about 10 minutes (Hickling & Hutton 2014; Radin et al. 2020)
+    dailyTimeForODRural: 10 / 60,
+    valueOfTimeAdult: 0.5, // Radin et al. 2020
+    valueOfTimeChild: 0.25,
   },
   carbon: {
-    percentWithPoorSanitation: 0.60, // Default estimate (Unimproved + OD)
-    emissionFactor: EMISSION_PRESETS.IPCC, // Default to IPCC
+    percentWithPoorSanitation: 0.50, // without at least basic sanitation
+    emissionFactor: EMISSION_PRESETS.IPCC,
     emissionFactorSource: 'IPCC',
     socialCostOfCarbon: 100, // USD per ton
     includeInTotal: false,
   },
   other: {
-    choleraResponseCost: 2000000, 
-    funeralCostPerDeath: 200, 
-    tourismReceipts: 50000000, 
-    tourismLossPercentage: 0.05, 
-  }
+    choleraCasesPerYear: 0,
+    choleraCostPerCase: 20,
+    funeralCostPerDeath: 120,
+    tourismReceipts: 50000000,
+    tourismLossPercentage: 0.05,
+    includeTourismInTotal: false,
+  },
+  ranges: DEFAULT_RANGES,
 };
 
 export const COLOR_PALETTE = {

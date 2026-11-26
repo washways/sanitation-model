@@ -1,10 +1,10 @@
 
-import React, { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, lazy, Suspense } from 'react';
 import { DEFAULT_INPUTS, SUPPORTED_COUNTRIES } from './constants';
 import { ModelInputs, DataSourceMap, YearExplanation } from './types';
 import { YearNotice } from './components/YearNotice';
-import { calculateModelOutputs, costEntries, formatCurrency, formatNumber } from './utils/calculations';
-import { downloadAnalysisCsv } from './utils/export';
+import { calculateModelOutputs, costEntries, excludedEntries, formatCurrency, formatNumber } from './utils/calculations';
+import { COST_LABELS, downloadAnalysisCsv } from './utils/export';
 import { InputPanel } from './components/InputPanel';
 // Chart-heavy views (Recharts) are split out of the initial bundle so the splash screen
 // appears immediately; they are preloaded in the background while the splash is shown.
@@ -24,6 +24,8 @@ import { ChangelogDialog, APP_VERSION } from './components/ChangelogDialog';
 import { fetchCountryData } from './services/worldBank';
 import { useBottomOverlayInset } from './utils/useBottomOverlayInset';
 import { countryCodeFromPath, countryPath } from './utils/countryRoute';
+import { applyScenario, scenarioQuery } from './utils/scenarioUrl';
+import { SensitivityPanel } from './components/SensitivityPanel';
 import { estimateInputs } from './utils/estimators';
 
 const MobileStickyFooter = ({ outputs, currency }: { outputs: any, currency: string }) => (
@@ -54,8 +56,11 @@ const MethodologySection = () => (
         </h3>
         
         <p className="text-slate-400 mb-10 max-w-4xl text-sm leading-relaxed">
-            This model applies the <strong>Economics of Sanitation Initiative (ESI)</strong> methodology developed by the World Bank WSP. 
-            It estimates the economic costs of poor sanitation by comparing the current status against a counterfactual of universal access to safely managed sanitation.
+            This model follows the <strong>Economics of Sanitation Initiative (ESI)</strong> approach developed by the World Bank Water and Sanitation Program.
+            It estimates what a country loses each year because people do not have <strong>at least basic sanitation</strong> (a private improved toilet, JMP definition).
+            Health losses use WHO's country estimates for inadequate sanitation, whose reference level is stricter than basic, so they include some benefit beyond basic.
+            Costs in the headline total: health care, days lost to illness, premature deaths, time lost to open defecation, cholera and funerals.
+            Stunting, tourism and carbon are shown separately because the evidence is weak or the cost does not fall on the national economy; each can be added back.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-sm leading-relaxed mb-12">
@@ -70,26 +75,31 @@ const MethodologySection = () => (
                 <div className="mb-6">
                     <strong className="text-white block mb-1">Health Care (Treatment)</strong>
                     <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded mb-2">
-                        Cost = Cases × %Seeking × (AvgCost<sub>OP</sub> + AvgCost<sub>IP</sub>)
+                        Cost = Cases × Attr% × %Treated × (90% Cost<sub>OP</sub> + 10% Cost<sub>admission</sub>)
                     </p>
-                    <p className="text-xs">Diarrhoea cases and deaths × the share caused by unsafe sanitation alone: 38% by default (WHO 2023: 564,000 of about 1.5 million diarrhoea deaths in 2019). Water, sanitation and hygiene together cause 69%. Unit costs derived from national health expenditure data.</p>
+                    <p className="text-xs">The share of diarrhoea caused by inadequate sanitation is WHO's estimate for each country (2019; WHO 2023), for example 44% in Malawi; 38% globally. Unit costs are WHO-CHOICE estimates per health-centre visit and hospital bed-day (Stenberg et al. 2018), inflated to the analysis year, plus drugs.</p>
+                </div>
+
+                <div className="mb-6">
+                    <strong className="text-white block mb-1">Premature Mortality</strong>
+                    <p className="text-xs mb-2">Deaths are WHO's country estimates of diarrhoea deaths from inadequate sanitation. Both valuations are shown:</p>
+                    <ul className="space-y-3 text-xs">
+                        <li className="bg-slate-800 p-2 rounded">
+                            <span className="text-white font-bold block">Human capital, by age at death (headline)</span>
+                            <span className="text-slate-400">Output lost over the rest of the working life (ages 15–64), discounted at 5%. Under-5 deaths at age 1; deaths aged 5+ at the average age implied by WHO's DALYs.</span>
+                            <br/><em className="text-[10px] text-slate-500">Σ<sub>age=15..64</sub> GDPpc / (1+r)<sup>age − age at death</sup></em>
+                        </li>
+                        <li className="bg-slate-800 p-2 rounded">
+                            <span className="text-white font-bold block">Value of statistical life</span>
+                            <span className="text-slate-400">Robinson, Hammitt &amp; O'Keeffe (2019): US VSL transferred by income with elasticity 1.5, at least 20 × GDP per person.</span>
+                            <br/><em className="text-[10px] text-slate-500">max(20 × GDPpc, 160 × US GDPpc × (GDPpc / US GDPpc)<sup>1.5</sup>)</em>
+                        </li>
+                    </ul>
                 </div>
 
                 <div>
-                    <strong className="text-white block mb-1">Premature Mortality</strong>
-                    <p className="text-xs mb-2">Valued using one of two methods:</p>
-                    <ul className="space-y-3 text-xs">
-                        <li className="bg-slate-800 p-2 rounded border-l-2 border-brand-primary">
-                            <span className="text-white font-bold block">Human Capital Approach (HCA)</span>
-                            <span className="text-slate-400">NPV of lost future GDP contribution. Conservative.</span>
-                            <br/><em className="text-[10px] text-slate-500">Formula: Σ (GDPpc / (1+r)^t)</em>
-                        </li>
-                        <li className="bg-slate-800 p-2 rounded border-l-2 border-brand-accent">
-                            <span className="text-white font-bold block">Value of Statistical Life (VSL)</span>
-                            <span className="text-slate-400">Willingness-to-pay to reduce risk. Captures intrinsic value.</span>
-                            <br/><em className="text-[10px] text-slate-500">Formula: Deaths × GDPpc × Multiplier (typ. 50-100)</em>
-                        </li>
-                    </ul>
+                    <strong className="text-white block mb-1">Cholera and Funerals</strong>
+                    <p className="text-xs">Average yearly cholera cases reported to WHO over the last 10 reported years × sanitation share × the cost of an admission and 4 lost working days. Funerals at 20% of GDP per person per death.</p>
                 </div>
             </div>
 
@@ -101,29 +111,29 @@ const MethodologySection = () => (
                 </h4>
                 
                 <div className="mb-6">
-                    <strong className="text-white block mb-1">Stunting (Long-term)</strong>
+                    <strong className="text-white block mb-1">Days Lost to Illness</strong>
+                    <p className="text-xs mb-2">Time lost by the sick person, or a carer for a sick child.</p>
+                    <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded">
+                        Cost = Cases × Attr% × 2 days × Daily wage × 50%
+                    </p>
+                    <em className="text-[10px] text-slate-500">Adult time valued at 50% of the wage (Radin et al. 2020).</em>
+                </div>
+
+                <div className="mb-6">
+                    <strong className="text-white block mb-1">Access Time</strong>
+                    <p className="text-xs">Extra time walking to open defecation sites compared with a toilet at home: about 10 minutes a day (Hickling &amp; Hutton 2014; Radin et al. 2020), urban and rural separately. Adults 15+ valued at 50% of the wage, children 5–14 at 25%, under-5s not counted.</p>
+                    <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded">
+                         Σ<sub>urban, rural</sub> Pop<sub>5+</sub> × OD% × 365 × Hours × Value of time
+                    </p>
+                </div>
+
+                <div>
+                    <strong className="text-white block mb-1">Stunting (shown separately)</strong>
                     <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded mb-2">
                         Loss = Cohort × Stunt% × Attr% × WagePenalty% × NPV
                     </p>
                     <p className="text-xs">
-                        Share of stunting caused by unsafe sanitation: 16% by default (<em>Danaei et al. 2016</em>). Treat it as an upper bound, since household WASH trials found no effect on growth. Future wage penalty 10% (<em>Hoddinott et al. 2013</em>; <em>Galasso &amp; Wagstaff 2019</em>), as an NPV over a 40-year working life.
-                    </p>
-                </div>
-
-                <div className="mb-6">
-                    <strong className="text-white block mb-1">Productivity (Sick Days)</strong>
-                    <p className="text-xs mb-2">Value of time lost to illness for adults and caregivers.</p>
-                    <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded">
-                        Cost = Cases × Days × Wage × 50%
-                    </p>
-                    <em className="text-[10px] text-slate-500">50% adjustment for labor substitution (WSP methodology).</em>
-                </div>
-
-                <div>
-                    <strong className="text-white block mb-1">Access Time</strong>
-                    <p className="text-xs">Opportunity cost of walking to open defecation sites: about 10 extra minutes a day for people aged 5 and over (Hickling &amp; Hutton 2014; Radin et al. 2020).</p>
-                    <p className="font-mono text-xs text-brand-accent bg-slate-800 p-2 rounded">
-                         Pop<sub>OD, 5+</sub> × 365 × Hours × (30% Wage)
+                        16% of stunting caused by unimproved sanitation (<em>Danaei et al. 2016</em>), an upper bound: household WASH trials found no effect on growth. Wage penalty 10% (<em>Hoddinott et al. 2013</em>; <em>Galasso &amp; Wagstaff 2019</em>) over a 40-year working life, wages growing 1.5% a year.
                     </p>
                 </div>
             </div>
@@ -168,7 +178,12 @@ const MethodologySection = () => (
         </div>
 
         <div className="border-t border-slate-800 pt-8">
-            <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">Primary Data Sources (World Bank Open Data)</h4>
+            <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">How this compares with earlier studies</h4>
+            <p className="text-xs text-slate-400 mb-8 max-w-4xl leading-relaxed">
+                The World Bank's earlier Economics of Sanitation studies reported larger losses, for example about 6.4% of GDP for India (2006) and about 2% of GDP for Cambodia, Indonesia, the Philippines and Vietnam combined (Hutton et al. 2008).
+                They attributed most diarrhoea (88%) to water, sanitation and hygiene combined and also counted water-related costs. This tool counts sanitation only, with WHO's 2019 country estimates, so its results are lower. Uncertainty ranges use WHO's and WHO-CHOICE's own 95% intervals where they exist; the "What drives the estimate" chart shows which assumptions matter most.
+            </p>
+            <h4 className="text-white font-bold mb-4 uppercase tracking-widest text-xs">Primary Data Sources</h4>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 text-xs">
                 <a href="https://data.worldbank.org/indicator/NY.GDP.PCAP.CD" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> GDP per Capita
@@ -176,10 +191,19 @@ const MethodologySection = () => (
                 <a href="https://data.worldbank.org/indicator/SP.POP.TOTL" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Population
                 </a>
-                <a href="https://data.worldbank.org/indicator/SH.STA.WASH.P5" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> WASH Mortality
+                <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/attributable-fraction-of-diarrhoea-to-inadequate-sanitation" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> WHO: sanitation burden
                 </a>
-                <a href="https://data.worldbank.org/indicator/SH.STA.ODEF.ZS" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
+                <a href="https://www.who.int/publications/m/item/who-choice-estimates-of-cost-for-inpatient-and-outpatient-health-service-delivery" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> WHO-CHOICE unit costs
+                </a>
+                <a href="https://www.who.int/data/gho/data/indicators/indicator-details/GHO/number-of-reported-cases-of-cholera" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> WHO: cholera cases
+                </a>
+                <a href="https://data.worldbank.org/indicator/PA.NUS.FCRF" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
+                    <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Exchange rate
+                </a>
+                <a href="https://data.worldbank.org/indicator/SH.STA.ODFC.ZS" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
                     <span className="w-1.5 h-1.5 rounded-full bg-brand-primary"></span> Open Defecation
                 </a>
                 <a href="https://data.worldbank.org/indicator/SH.XPD.CHEX.PC.CD" target="_blank" rel="noreferrer" className="flex items-center gap-2 hover:text-brand-primary transition-colors text-slate-400">
@@ -193,7 +217,7 @@ const MethodologySection = () => (
                 </a>
             </div>
             <p className="mt-8 text-xs text-slate-600">
-                © 2025 Sanitation Impact Modeler. Not an official UNICEF product. Currency rates via Open Exchange Rates.
+                Sanitation Impact Modeler. Not an official WHO, World Bank or UNICEF product. Exchange rates: World Bank official rate for the analysis year (today's rate from open.er-api.com only if missing).
             </p>
         </div>
     </div>
@@ -207,12 +231,15 @@ const App = () => {
   const [activeTab, setActiveTab] = useState<'analysis' | 'comparison'>('analysis');
   const [selectedCountry, setSelectedCountry] = useState(linkedCountry || 'MW'); // Default Malawi
   const [inputs, setInputs] = useState<ModelInputs>(DEFAULT_INPUTS);
+  // The country's estimated inputs, before any user changes (for the shareable scenario link).
+  const [baseline, setBaseline] = useState<ModelInputs | null>(null);
   const [sources, setSources] = useState<DataSourceMap>({});
   const [isLoading, setIsLoading] = useState(false);
   const [isExportingPdf, setIsExportingPdf] = useState(false);
   const [showChangelog, setShowChangelog] = useState(false);
   const [yearExplanation, setYearExplanation] = useState<YearExplanation | null>(null);
   const [dataYear, setDataYear] = useState<number | null>(null);
+  const scenarioLoaded = useRef(false);
   useBottomOverlayInset();
 
   // Initial Load
@@ -225,12 +252,17 @@ const App = () => {
   const loadCountryData = async (code: string, keepUrl = false) => {
       setIsLoading(true);
       setSelectedCountry(code);
+      setBaseline(null);
       const country = SUPPORTED_COUNTRIES.find(c => c.code === code);
+      // Scenario changes in the link apply on first load only; picking another country starts fresh.
+      const isFirstLoad = !scenarioLoaded.current;
+      const scenarioSearch = isFirstLoad ? window.location.search : '';
+      scenarioLoaded.current = true;
       if (country && !keepUrl) {
           // Keep the address bar on a shareable link for the chosen country.
           const path = countryPath(code, import.meta.env.BASE_URL);
-          if (window.location.pathname !== path) {
-              window.history.replaceState(null, '', path + window.location.search + window.location.hash);
+          if (window.location.pathname !== path || (!isFirstLoad && window.location.search)) {
+              window.history.replaceState(null, '', path + (isFirstLoad ? window.location.search : '') + window.location.hash);
           }
           document.title = `${country.name}: cost of poor sanitation | Sanitation Impact Modeler`;
       }
@@ -238,7 +270,8 @@ const App = () => {
           try {
               const rawData = await fetchCountryData(country.code, country.currency);
               const estimated = estimateInputs(rawData, country.code, country.currency);
-              setInputs(estimated.inputs);
+              setBaseline(estimated.inputs);
+              setInputs(scenarioSearch ? applyScenario(estimated.inputs, scenarioSearch).inputs : estimated.inputs);
               setSources(estimated.sources);
               setYearExplanation(rawData.yearExplanation);
               setDataYear(rawData.analysisYear);
@@ -248,6 +281,18 @@ const App = () => {
       }
       setIsLoading(false);
   };
+
+  // Write the user's changes into the link so a shared link reproduces the scenario.
+  useEffect(() => {
+      if (!baseline) return;
+      const timer = window.setTimeout(() => {
+          const query = scenarioQuery(inputs, baseline);
+          if (query !== window.location.search) {
+              window.history.replaceState(null, '', window.location.pathname + query + window.location.hash);
+          }
+      }, 400);
+      return () => window.clearTimeout(timer);
+  }, [inputs, baseline]);
 
   const outputs = useMemo(() => calculateModelOutputs(inputs), [inputs]);
   const selectedCountryMeta = useMemo(
@@ -384,13 +429,9 @@ const App = () => {
 
                         {/* Chart Section */}
                         <div className="bg-white p-6 rounded-xl border border-line mt-6">
-                             <div className="flex justify-between items-center mb-6">
+                             <div className="flex justify-between items-baseline gap-3 mb-6">
                                  <h3 className="font-bold text-brand-dark">Cost Breakdown by Category</h3>
-                                 <div className="flex gap-2">
-                                     {['Health', 'Productivity', ...(outputs.carbonIncluded ? ['Carbon'] : [])].map(l => (
-                                         <span key={l} className="text-[10px] px-2 py-1 bg-slate-100 text-slate-500 rounded-full">{l}</span>
-                                     ))}
-                                 </div>
+                                 <span className="text-[11px] text-slate-400">Compared with everyone having at least basic sanitation</span>
                              </div>
                              <Suspense fallback={<PanelFallback />}><CostChart outputs={outputs} /></Suspense>
                         </div>
@@ -408,9 +449,7 @@ const App = () => {
                                  <tbody className="divide-y divide-slate-100">
                                      {costEntries(outputs).map(([key, value]) => (
                                          <tr key={key} className="hover:bg-slate-50 transition-colors">
-                                             <td className="px-6 py-3 font-medium text-slate-700 capitalize">
-                                                 {key.replace(/([A-Z])/g, ' $1').trim().replace('Nutrition', 'Stunting').replace('Carbon', 'Carbon (GHG)')}
-                                             </td>
+                                             <td className="px-6 py-3 font-medium text-slate-700">{COST_LABELS[key] ?? key}</td>
                                              <td className="px-6 py-3 text-right font-mono text-slate-600">
                                                  {formatCurrency(value as number)}
                                              </td>
@@ -419,15 +458,27 @@ const App = () => {
                                              </td>
                                          </tr>
                                      ))}
-                                     {!outputs.carbonIncluded && (
-                                         <tr className="text-slate-500">
-                                             <td className="px-6 py-3 text-xs">Carbon (GHG), <span className="italic">not in total</span>: worldwide climate damage (see Inputs → Carbon)</td>
-                                             <td className="px-6 py-3 text-right font-mono text-xs">{formatCurrency(outputs.carbonCostUSD)}</td>
+                                     {excludedEntries(outputs).map(([key, value]) => (
+                                         <tr key={key} className="text-slate-500">
+                                             <td className="px-6 py-3 text-xs">{COST_LABELS[key] ?? key}, <span className="italic">not in total</span> (see Inputs)</td>
+                                             <td className="px-6 py-3 text-right font-mono text-xs">{formatCurrency(value)}</td>
                                              <td className="px-6 py-3 text-right text-xs">–</td>
                                          </tr>
-                                     )}
+                                     ))}
                                  </tbody>
                              </table>
+                             <p className="px-6 py-3 text-xs text-slate-500 border-t border-line bg-slate-50">
+                                 {Math.round(outputs.attributableDeaths).toLocaleString('en-US')} deaths a year from inadequate sanitation.
+                                 {' '}Deaths are valued by {inputs.macro.mortalityMethod === 'vsl' ? 'the value of a statistical life' : 'human capital (lost output by age at death)'};
+                                 {' '}valued by {inputs.macro.mortalityMethod === 'vsl'
+                                     ? <>human capital they would be {formatCurrency(outputs.mortalityHumanCapitalUSD)}</>
+                                     : <>the value of a statistical life ({formatCurrency(outputs.vslPerDeathUSD)} each, Robinson et al. 2019) they would be {formatCurrency(outputs.mortalityVslUSD)}</>}.
+                             </p>
+                        </div>
+
+                        {/* Sensitivity */}
+                        <div className="mt-6">
+                            <SensitivityPanel inputs={inputs} />
                         </div>
 
                         {/* Monte Carlo Analysis */}
