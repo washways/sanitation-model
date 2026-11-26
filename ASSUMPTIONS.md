@@ -101,18 +101,22 @@ Excluded because (1) basic pit latrines emit as much methane as unimproved ones 
 | Emission factor | 35 kg CO2e/person/year (IPCC); SCARE 52 kg | Cheng et al. 2022: 377 Mt CO2e a year (range 22–1,003) | Reasonable |
 | Social cost of carbon | US$100/t | Recent central estimates about US$185–190/t (Rennert et al. 2022; US EPA 2023) | Reasonable |
 
-## Benefit-cost: reaching basic sanitation for everyone (v1.7.0)
+## Benefit-cost: reaching basic sanitation for everyone (v1.7.0; sourced costs since v1.7.1)
 Yearly cost = (build cost × (1 + programme delivery)) × capital recovery factor at the discount rate over the toilet's life, + yearly upkeep. Yearly benefit = the headline total. Benefit-cost ratio = benefit ÷ cost. Payback = upfront cost ÷ (benefit − upkeep), undiscounted, flagged when longer than the people-weighted toilet life.
+
+Unit costs come from Hutton & Varughese (2016), *The Costs of Meeting the 2030 Sustainable Development Goal Targets on Drinking Water, Sanitation, and Hygiene*, World Bank WSP: table E.1 (capital cost per person served, US$ 2015, hardware + software, by country), table D.1 (technology mix) and table D.2 (life, maintenance, operating costs). Values for the 45 countries are in `data/sanitationUnitCosts.json`, inflated to the analysis year with the US GDP deflator.
+
 | Assumption | Default | Evidence | Rating |
 |---|---|---|---|
 | People without at least basic sanitation | World Bank (JMP) urban and rural | SH.STA.BASS.UR.ZS / .RU.ZS | Strong |
-| Build cost per person | **PLACEHOLDER** urban US$100, rural US$40 | Not from a source. The intended source, Hutton & Varughese (2016, World Bank), could not be read (the repository blocks automated downloads). Replace with national costs | Weak |
-| Programme delivery | **PLACEHOLDER** 20% of build cost | Not from a source | Weak |
-| Upkeep | **PLACEHOLDER** 5% of build cost a year | Not from a source | Weak |
-| Lifespan | **PLACEHOLDER** urban 20 years, rural 8 years | Not from a source | Weak |
+| Build cost per person, urban | 50% flush toilet to septic tank + 50% pit latrine (Malawi US$104 in 2023 prices) | Hutton & Varughese 2016, tables D.1 and E.1 | Reasonable |
+| Build cost per person, rural | 50% pour-flush pit + 50% dry pit (Malawi US$30) | Hutton & Varughese 2016, tables D.1 and E.1 | Reasonable |
+| Programme delivery | 0% extra | Already included: the unit costs include software at 10% (urban) and 20% (rural) of hardware (table D.2). The study says software costs are likely underestimated, especially for the last mile | Reasonable |
+| Upkeep | Pits: 5% of capital a year operating + 30% capital maintenance once per 8-year life (8.75% a year). Septic tanks: 30% per 20-year life (1.5% a year), no operating cost given. Weighted by capital (Malawi 6.4%) | Hutton & Varughese 2016, table D.2. Septic-tank emptying is left out | Reasonable |
+| Lifespan | Pits 8 years, septic tanks 20; urban = capital-weighted average (Malawi 17 years) | Hutton & Varughese 2016, table D.2 | Reasonable |
 | Benefits | All losses in the headline total avoided once everyone is reached | Overstates: health losses are measured against WHO's stricter reference; last-mile households cost more to reach | Reasonable |
 
-The app warns while the placeholders are unchanged, and the PDF leaves out the benefit-cost section until real costs are entered. With the placeholders the ratio is below 1 for most countries (Malawi about 0.5), because the headline total is conservative (sanitation only, human capital valuation, stunting excluded). Published sanitation ratios are higher mainly because they include more benefits and value deaths with VSL.
+Caveats: the study extrapolated unit costs from similar countries where it had no data, so treat them as order-of-magnitude. Some country values are odd: Ethiopia's pour-flush latrine is US$329 per person in 2015 (dry pit US$55), and Eritrea's appears to be extrapolated from it, so their ratios (about 0.1 and 0.25) mostly reflect this; DR Congo and Liberia have high urban septic-tank costs. The headline total is conservative (sanitation only, human capital valuation, stunting excluded), so ratios are lower than in published sanitation studies, which include more benefits and value deaths with VSL.
 
 ## Uncertainty
 - Each uncertain input has a low and high value (`inputs.ranges`): WHO's and WHO-CHOICE's 95% intervals where the country has them, otherwise the defaults in `constants.ts` (each with its basis).
@@ -142,6 +146,7 @@ v1.6.0 changes for Malawi: WHO's country share (44%) replaced the global 38%; WH
 - Radin M., Jeuland M., Wang H., Whittington D. (2020). Benefit–cost analysis of community-led total sanitation: incorporating results from recent evaluations. *Journal of Benefit-Cost Analysis* 11(3):380–417.
 - Hickling S., Hutton G. (2014). *Economic assessment of sanitation interventions.* Water and Sanitation Program, World Bank (as cited by Radin et al. 2020).
 - Hutton G. et al. (2008). *Economic impacts of sanitation in Southeast Asia.* Water and Sanitation Program, World Bank.
+- Hutton G., Varughese M. (2016). *The Costs of Meeting the 2030 Sustainable Development Goal Targets on Drinking Water, Sanitation, and Hygiene.* Water and Sanitation Program technical paper, World Bank. Copy used: https://www.fsmtoolbox.com/assets/pdf/The_costs_of_Meeting_the_2030_SDG_in_WASH.pdf
 - Danaei G. et al. (2016). Risk factors for childhood stunting in 137 developing countries. *PLOS Medicine* 13(11):e1002164.
 - Pickering A.J. et al. (2019). The WASH Benefits and SHINE trials: interpretation of WASH intervention effects on linear growth and diarrhoea. *Lancet Global Health* 7:e1139–46.
 - Haacker M., Hallett T.B., Atun R. (2020). On discount rates for economic evaluations in global health. *Health Policy and Planning*.

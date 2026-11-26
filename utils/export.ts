@@ -143,7 +143,7 @@ export const downloadAnalysisCsv = (
   out('Deaths attributable to inadequate sanitation', outputs.attributableDeaths, 'deaths/year');
 
   const bc = runBenefitCost(inputs);
-  const bcNote = bc.usesPlaceholderCosts ? 'Uses PLACEHOLDER unit costs, not from a source' : 'User-set unit costs';
+  const bcNote = 'Unit costs: World Bank country estimates (Hutton & Varughese 2016) unless changed';
   out('People without basic sanitation', bc.peopleUrban + bc.peopleRural, 'people', `${Math.round(bc.peopleUrban)} urban, ${Math.round(bc.peopleRural)} rural`);
   out('Upfront investment to reach basic sanitation', bc.upfrontUSD, 'USD', bcNote);
   out('Yearly cost (annualised capital + upkeep)', bc.annualCostUSD, 'USD/year', bcNote);

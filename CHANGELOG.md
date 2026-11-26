@@ -4,6 +4,12 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.7.1 — 2026-11-26
+- **The benefit-cost comparison now uses World Bank costs for each country** instead of placeholders: the cost per person of basic sanitation from Hutton & Varughese (2016), *The Costs of Meeting the 2030 SDG Targets on Drinking Water, Sanitation, and Hygiene*. Urban areas use half septic tanks and half pit latrines; rural areas use half pour-flush and half dry pit latrines, as in the study. Costs include promotion and supervision and are inflated from 2015 prices.
+- Toilet life, maintenance and running costs also follow the study: 8 years for pit latrines and 20 for septic tanks.
+- Results: Malawi US$0.60 back per dollar (was 0.50 with placeholders), Bangladesh 2.1, Niger 0.7. 27 of the 45 countries have a ratio above 1. Ethiopia and Eritrea are very low (0.1 and 0.25) because the study gives them unusually high latrine costs.
+- The placeholder warning is gone and the PDF always includes the benefit-cost section.
+
 ## v1.7.0 — 2026-11-26
 - **New benefit-cost comparison.** Under Inputs → 5. Benefit-Cost, set the cost per person of reaching basic sanitation (urban and rural), its life, programme delivery and upkeep. The results show the upfront investment, the yearly cost, the benefit-cost ratio and the payback period against the yearly losses.
 - **The default costs are placeholders, not from a source.** The intended source (Hutton & Varughese 2016, World Bank) couldn't be read automatically. The app warns until you change them, and the PDF only includes the benefit-cost section once real costs are entered.

@@ -62,6 +62,7 @@ export interface CountryApiData {
   };
   usGdpPerCapita: number | null; // same year, for transferring the value of a statistical life
   usDeflatorRatio: number | null; // US GDP deflator, analysis year ÷ 2010 (inflates WHO-CHOICE 2010 costs)
+  usDeflatorSince2015: number | null; // US GDP deflator, analysis year ÷ 2015 (inflates World Bank 2015 sanitation costs)
 }
 
 export interface MacroInputs {

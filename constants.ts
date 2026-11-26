@@ -34,15 +34,30 @@ export const DEFAULT_RANGES: UncertaintyRanges = {
 };
 
 /**
- * PLACEHOLDER unit costs for reaching basic sanitation. Round numbers, NOT from a source: the intended source,
- * Hutton & Varughese (2016, World Bank WSP), could not be read. Replace with national costs.
+ * Basic-sanitation cost assumptions from Hutton & Varughese (2016), The Costs of Meeting the 2030 SDG Targets on
+ * Drinking Water, Sanitation, and Hygiene, World Bank WSP. Country unit costs (table E.1, US$ 2015, hardware +
+ * software) are in data/sanitationUnitCosts.json. Technology mix: table D.1. Life, capital maintenance and
+ * operating costs: table D.2.
  */
-export const PLACEHOLDER_INVESTMENT_COSTS = {
-  capitalCostUrban: 100,
-  capitalCostRural: 40,
-  programmeShare: 0.2,
-  upkeepShare: 0.05,
-  lifespanUrban: 20,
+export const SANITATION_COSTING = {
+  source: 'Hutton & Varughese 2016 (World Bank)',
+  link: 'https://www.fsmtoolbox.com/assets/pdf/The_costs_of_Meeting_the_2030_SDG_in_WASH.pdf',
+  priceYear: 2015,
+  urbanSepticShare: 0.5, // urban: 50% flush to septic tank, 50% pit latrine
+  ruralPourFlushShare: 0.5, // rural: 50% pour-flush pit, 50% dry pit
+  lifespanSeptic: 20,
+  lifespanPit: 8,
+  capitalMaintenanceShare: 0.3, // 30% of initial capital, once per life (at half-life)
+  pitOperatingShare: 0.05, // 5% of initial capital a year for pit latrines; none given for septic tanks
+};
+
+/** Used only when a country has no World Bank unit costs (all 45 currently have them): Malawi's 2015 values. */
+export const FALLBACK_INVESTMENT_COSTS = {
+  capitalCostUrban: 82,
+  capitalCostRural: 24,
+  programmeShare: 0,
+  upkeepShare: 0.07,
+  lifespanUrban: 17,
   lifespanRural: 8,
 };
 
@@ -108,7 +123,7 @@ export const DEFAULT_INPUTS: ModelInputs = {
   investment: {
     withoutBasicUrban: 0.5,
     withoutBasicRural: 0.5,
-    ...PLACEHOLDER_INVESTMENT_COSTS,
+    ...FALLBACK_INVESTMENT_COSTS,
   },
   ranges: DEFAULT_RANGES,
 };

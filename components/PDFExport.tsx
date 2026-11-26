@@ -243,8 +243,7 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
             </View>
           )}
 
-          {!bc.usesPlaceholderCosts && (
-            <View style={s.section} wrap={false}>
+          <View style={s.section} wrap={false}>
               <Text style={s.h2}>Benefit-cost of basic sanitation for everyone</Text>
               <Text style={s.para}>
                 Reaching the {formatNumber((bc.peopleUrban + bc.peopleRural) / 1e6)} million people without at least basic sanitation would cost about {money(bc.upfrontUSD)} upfront,
@@ -252,10 +251,9 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
                 {bc.paybackWithinLife && bc.paybackYears !== null ? `, and the investment pays back in about ${formatNumber(bc.paybackYears)} years` : ', and the investment does not pay back within the toilets\' life'}.
               </Text>
               <Text style={s.small}>
-                Unit costs entered by the user: urban US${inputs.investment.capitalCostUrban} and rural US${inputs.investment.capitalCostRural} per person, {formatNumber(inputs.investment.lifespanUrban)}/{formatNumber(inputs.investment.lifespanRural)}-year life, programme delivery {pct(inputs.investment.programmeShare)}, upkeep {pct(inputs.investment.upkeepShare)} a year. Assumes everyone is reached and all losses in the total are avoided.
+                Cost per person: US${formatNumber(inputs.investment.capitalCostUrban)} urban and US${formatNumber(inputs.investment.capitalCostRural)} rural, {formatNumber(inputs.investment.lifespanUrban)}/{formatNumber(inputs.investment.lifespanRural)}-year life, extra programme delivery {pct(inputs.investment.programmeShare)}, upkeep {pct(inputs.investment.upkeepShare)} a year. Defaults are World Bank country estimates (Hutton &amp; Varughese 2016) for a mix of septic tanks and pit latrines, including promotion and supervision. Assumes everyone is reached and all losses in the total are avoided.
               </Text>
             </View>
-          )}
 
           <View style={s.section} wrap={false}>
             <Text style={s.h2}>Why it matters</Text>

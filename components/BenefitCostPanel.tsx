@@ -23,11 +23,9 @@ export const BenefitCostPanel: React.FC<{ inputs: ModelInputs }> = ({ inputs }) 
         {formatNumber(people / 1e6)} million people without at least basic sanitation ({formatNumber(r.peopleUrban / 1e6)}m urban, {formatNumber(r.peopleRural / 1e6)}m rural).
         Yearly cost = building cost spread over the toilet's life at the {formatNumber(inputs.macro.discountRate * 100)}% discount rate, plus upkeep. Yearly benefit = the losses in the total above, once everyone is reached.
       </p>
-      {r.usesPlaceholderCosts && (
-        <p className="text-xs border border-amber-300 text-amber-900 rounded p-2 mb-4">
-          Uses <strong>placeholder costs</strong>, not from a source. Set real costs under Inputs → 5. Benefit-Cost before quoting these figures.
-        </p>
-      )}
+      <p className="text-xs text-slate-500 mb-4">
+        Default costs: World Bank estimates for this country (Hutton &amp; Varughese 2016): US${formatNumber(inputs.investment.capitalCostUrban)} per person in towns and US${formatNumber(inputs.investment.capitalCostRural)} in rural areas, including promotion and supervision. Replace them under Inputs → 5. Benefit-Cost if you have national costs.
+      </p>
       <div className="grid grid-cols-2 gap-3">
         <Stat label="Benefit-cost ratio" value={`${r.ratio.toFixed(1)} : 1`} sub="yearly benefit ÷ yearly cost" />
         <Stat

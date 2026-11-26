@@ -1,0 +1,272 @@
+{
+ "AF": {
+  "urbanSepticTank": 29.7,
+  "urbanPitLatrine": 20.5,
+  "ruralPourFlushPit": 20.5,
+  "ruralDryPit": 8.6
+ },
+ "AO": {
+  "urbanSepticTank": 243.3,
+  "urbanPitLatrine": 40.6,
+  "ruralPourFlushPit": 40.6,
+  "ruralDryPit": 23.0
+ },
+ "BD": {
+  "urbanSepticTank": 132.0,
+  "urbanPitLatrine": 6.9,
+  "ruralPourFlushPit": 6.9,
+  "ruralDryPit": 5.7
+ },
+ "BJ": {
+  "urbanSepticTank": 57.8,
+  "urbanPitLatrine": 34.5,
+  "ruralPourFlushPit": 34.5,
+  "ruralDryPit": 11.2
+ },
+ "BF": {
+  "urbanSepticTank": 41.9,
+  "urbanPitLatrine": 31.5,
+  "ruralPourFlushPit": 31.5,
+  "ruralDryPit": 10.2
+ },
+ "BI": {
+  "urbanSepticTank": 62.0,
+  "urbanPitLatrine": 19.4,
+  "ruralPourFlushPit": 19.4,
+  "ruralDryPit": 10.5
+ },
+ "KH": {
+  "urbanSepticTank": 50.8,
+  "urbanPitLatrine": 22.6,
+  "ruralPourFlushPit": 22.6,
+  "ruralDryPit": 11.2
+ },
+ "CF": {
+  "urbanSepticTank": 102.4,
+  "urbanPitLatrine": 11.6,
+  "ruralPourFlushPit": 11.6,
+  "ruralDryPit": 10.6
+ },
+ "TD": {
+  "urbanSepticTank": 58.8,
+  "urbanPitLatrine": 40.1,
+  "ruralPourFlushPit": 40.1,
+  "ruralDryPit": 28.4
+ },
+ "KM": {
+  "urbanSepticTank": 50.3,
+  "urbanPitLatrine": 30.0,
+  "ruralPourFlushPit": 30.0,
+  "ruralDryPit": 16.8
+ },
+ "CD": {
+  "urbanSepticTank": 280.7,
+  "urbanPitLatrine": 71.0,
+  "ruralPourFlushPit": 71.0,
+  "ruralDryPit": 10.2
+ },
+ "DJ": {
+  "urbanSepticTank": 81.9,
+  "urbanPitLatrine": 57.8,
+  "ruralPourFlushPit": 57.8,
+  "ruralDryPit": 18.7
+ },
+ "ER": {
+  "urbanSepticTank": 449.4,
+  "urbanPitLatrine": 290.7,
+  "ruralPourFlushPit": 290.7,
+  "ruralDryPit": 48.5
+ },
+ "ET": {
+  "urbanSepticTank": 508.9,
+  "urbanPitLatrine": 329.2,
+  "ruralPourFlushPit": 329.2,
+  "ruralDryPit": 54.9
+ },
+ "GM": {
+  "urbanSepticTank": 95.3,
+  "urbanPitLatrine": 17.8,
+  "ruralPourFlushPit": 17.8,
+  "ruralDryPit": 8.1
+ },
+ "GN": {
+  "urbanSepticTank": 36.6,
+  "urbanPitLatrine": 38.2,
+  "ruralPourFlushPit": 38.2,
+  "ruralDryPit": 6.1
+ },
+ "GW": {
+  "urbanSepticTank": 36.2,
+  "urbanPitLatrine": 37.8,
+  "ruralPourFlushPit": 37.8,
+  "ruralDryPit": 6.0
+ },
+ "HT": {
+  "urbanSepticTank": 43.9,
+  "urbanPitLatrine": 32.8,
+  "ruralPourFlushPit": 32.8,
+  "ruralDryPit": 6.3
+ },
+ "KI": {
+  "urbanSepticTank": 40.9,
+  "urbanPitLatrine": 13.8,
+  "ruralPourFlushPit": 13.8,
+  "ruralDryPit": 5.6
+ },
+ "LA": {
+  "urbanSepticTank": 46.3,
+  "urbanPitLatrine": 23.4,
+  "ruralPourFlushPit": 23.4,
+  "ruralDryPit": 5.3
+ },
+ "LS": {
+  "urbanSepticTank": 83.5,
+  "urbanPitLatrine": 49.8,
+  "ruralPourFlushPit": 49.8,
+  "ruralDryPit": 10.3
+ },
+ "LR": {
+  "urbanSepticTank": 346.6,
+  "urbanPitLatrine": 26.7,
+  "ruralPourFlushPit": 26.7,
+  "ruralDryPit": 3.5
+ },
+ "MG": {
+  "urbanSepticTank": 70.9,
+  "urbanPitLatrine": 31.9,
+  "ruralPourFlushPit": 31.9,
+  "ruralDryPit": 15.0
+ },
+ "MW": {
+  "urbanSepticTank": 129.5,
+  "urbanPitLatrine": 35.1,
+  "ruralPourFlushPit": 35.1,
+  "ruralDryPit": 12.9
+ },
+ "ML": {
+  "urbanSepticTank": 80.3,
+  "urbanPitLatrine": 34.4,
+  "ruralPourFlushPit": 34.4,
+  "ruralDryPit": 9.2
+ },
+ "MR": {
+  "urbanSepticTank": 154.6,
+  "urbanPitLatrine": 51.5,
+  "ruralPourFlushPit": 51.5,
+  "ruralDryPit": 20.6
+ },
+ "MZ": {
+  "urbanSepticTank": 42.2,
+  "urbanPitLatrine": 86.0,
+  "ruralPourFlushPit": 86.0,
+  "ruralDryPit": 11.3
+ },
+ "MM": {
+  "urbanSepticTank": 110.2,
+  "urbanPitLatrine": 32.3,
+  "ruralPourFlushPit": 32.3,
+  "ruralDryPit": 16.0
+ },
+ "NP": {
+  "urbanSepticTank": 61.3,
+  "urbanPitLatrine": 42.6,
+  "ruralPourFlushPit": 42.6,
+  "ruralDryPit": 36.6
+ },
+ "NE": {
+  "urbanSepticTank": 25.8,
+  "urbanPitLatrine": 57.4,
+  "ruralPourFlushPit": 57.4,
+  "ruralDryPit": 28.7
+ },
+ "RW": {
+  "urbanSepticTank": 175.9,
+  "urbanPitLatrine": 62.1,
+  "ruralPourFlushPit": 62.1,
+  "ruralDryPit": 9.1
+ },
+ "SN": {
+  "urbanSepticTank": 66.1,
+  "urbanPitLatrine": 44.1,
+  "ruralPourFlushPit": 44.1,
+  "ruralDryPit": 11.0
+ },
+ "SL": {
+  "urbanSepticTank": 230.7,
+  "urbanPitLatrine": 58.6,
+  "ruralPourFlushPit": 58.6,
+  "ruralDryPit": 7.7
+ },
+ "SB": {
+  "urbanSepticTank": 45.5,
+  "urbanPitLatrine": 7.9,
+  "ruralPourFlushPit": 7.9,
+  "ruralDryPit": 3.5
+ },
+ "SO": {
+  "urbanSepticTank": 115.7,
+  "urbanPitLatrine": 17.4,
+  "ruralPourFlushPit": 17.4,
+  "ruralDryPit": 2.0
+ },
+ "SS": {
+  "urbanSepticTank": 65.9,
+  "urbanPitLatrine": 59.3,
+  "ruralPourFlushPit": 59.3,
+  "ruralDryPit": 6.7
+ },
+ "SD": {
+  "urbanSepticTank": 95.4,
+  "urbanPitLatrine": 85.8,
+  "ruralPourFlushPit": 85.8,
+  "ruralDryPit": 9.7
+ },
+ "TZ": {
+  "urbanSepticTank": 142.8,
+  "urbanPitLatrine": 54.0,
+  "ruralPourFlushPit": 54.0,
+  "ruralDryPit": 19.1
+ },
+ "TL": {
+  "urbanSepticTank": 61.2,
+  "urbanPitLatrine": 60.9,
+  "ruralPourFlushPit": 60.9,
+  "ruralDryPit": 3.8
+ },
+ "TG": {
+  "urbanSepticTank": 166.5,
+  "urbanPitLatrine": 42.3,
+  "ruralPourFlushPit": 42.3,
+  "ruralDryPit": 41.3
+ },
+ "TV": {
+  "urbanSepticTank": 80.1,
+  "urbanPitLatrine": 13.8,
+  "ruralPourFlushPit": 13.8,
+  "ruralDryPit": 6.1
+ },
+ "UG": {
+  "urbanSepticTank": 158.6,
+  "urbanPitLatrine": 42.9,
+  "ruralPourFlushPit": 42.9,
+  "ruralDryPit": 15.2
+ },
+ "YE": {
+  "urbanSepticTank": 108.1,
+  "urbanPitLatrine": 38.6,
+  "ruralPourFlushPit": 38.6,
+  "ruralDryPit": 6.7
+ },
+ "ZM": {
+  "urbanSepticTank": 102.7,
+  "urbanPitLatrine": 72.8,
+  "ruralPourFlushPit": 72.8,
+  "ruralDryPit": 15.0
+ },
+ "ZW": {
+  "urbanSepticTank": 68.8,
+  "urbanPitLatrine": 40.1,
+  "ruralPourFlushPit": 40.1,
+  "ruralDryPit": 6.8
+ }
+}

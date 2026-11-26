@@ -1,6 +1,7 @@
-import { DEFAULT_RANGES, EMISSION_PRESETS, PLACEHOLDER_INVESTMENT_COSTS } from '../constants';
+import { DEFAULT_RANGES, EMISSION_PRESETS, FALLBACK_INVESTMENT_COSTS, SANITATION_COSTING } from '../constants';
 import { CountryApiData, DataSourceInfo, DataSourceMap, ModelInputs, UncertaintyRanges } from '../types';
 import EVIDENCE from '../data/countryEvidence.json';
+import SANITATION_UNIT_COSTS from '../data/sanitationUnitCosts.json';
 
 type RawFieldKey = keyof CountryApiData['fields'];
 
@@ -112,6 +113,86 @@ const whoSource = (label: string, notes: string, link = 'https://www.who.int/dat
   notes,
   link,
 });
+
+interface UnitCosts { urbanSepticTank: number; urbanPitLatrine: number; ruralPourFlushPit: number; ruralDryPit: number }
+const UNIT_COSTS = SANITATION_UNIT_COSTS as Record<string, UnitCosts>;
+const INVESTMENT_KEYS = ['capitalCostUrban', 'capitalCostRural', 'programmeShare', 'upkeepShare', 'lifespanUrban', 'lifespanRural'] as const;
+
+/**
+ * Cost of reaching basic sanitation (benefit-cost comparison), from Hutton & Varughese (2016, World Bank):
+ * country capital costs per person (table E.1, US$ 2015, hardware + software), the baseline technology mix
+ * (table D.1) and life, capital maintenance and operating costs (table D.2).
+ */
+const estimateInvestment = (
+  isoCode: string,
+  inflator: number | null,
+  year: number,
+  urbanShare: number,
+  withoutBasicUrban: number,
+  withoutBasicRural: number,
+  sources: DataSourceMap
+) => {
+  const c = UNIT_COSTS[isoCode];
+  const K = SANITATION_COSTING;
+  if (!c) {
+    for (const key of INVESTMENT_KEYS) {
+      sources[key] = estimateSource('Fallback', `No World Bank unit costs for this country, so Malawi's values from ${K.source} are used. Replace with national costs.`);
+    }
+    return { ...FALLBACK_INVESTMENT_COSTS };
+  }
+
+  const f = inflator ?? 1;
+  const septic = c.urbanSepticTank * f;
+  const pitUrban = c.urbanPitLatrine * f;
+  const pourFlush = c.ruralPourFlushPit * f;
+  const dryPit = c.ruralDryPit * f;
+  const septicCapital = K.urbanSepticShare * septic;
+  const pitCapitalUrban = (1 - K.urbanSepticShare) * pitUrban;
+  const urban = septicCapital + pitCapitalUrban;
+  const rural = K.ruralPourFlushShare * pourFlush + (1 - K.ruralPourFlushShare) * dryPit;
+  const lifespanUrban = urban > 0 ? (septicCapital * K.lifespanSeptic + pitCapitalUrban * K.lifespanPit) / urban : K.lifespanPit;
+
+  // Yearly upkeep as a share of capital: capital maintenance (30% once per life) + operating costs (pits only).
+  const septicUpkeep = K.capitalMaintenanceShare / K.lifespanSeptic;
+  const pitUpkeep = K.pitOperatingShare + K.capitalMaintenanceShare / K.lifespanPit;
+  const wUrban = urbanShare * withoutBasicUrban;
+  const wRural = (1 - urbanShare) * withoutBasicRural;
+  const capital = wUrban * urban + wRural * rural;
+  const upkeep = capital > 0
+    ? (wUrban * (septicCapital * septicUpkeep + pitCapitalUrban * pitUpkeep) + wRural * rural * pitUpkeep) / capital
+    : pitUpkeep;
+
+  const usd = (x: number) => `US$${x.toFixed(0)}`;
+  const priceNote = inflator
+    ? `World Bank costs per person in ${K.priceYear} US$, including hardware and software (promotion, supervision), inflated to ${year} with the US GDP deflator (× ${f.toFixed(2)}).`
+    : `World Bank costs per person in ${K.priceYear} US$, including hardware and software. Not inflated: the US GDP deflator could not be loaded, so these are somewhat low.`;
+  const caveat = 'Where the study had no data for a country it extrapolated from a similar country, so treat these as order-of-magnitude costs and replace them with national costs where you have them.';
+  const tone: DataSourceInfo['tone'] = inflator ? 'success' : 'warning';
+  const wb = (label: string, notes: string): DataSourceInfo =>
+    ({ label, kind: 'derived', sourceName: K.source, tone, link: K.link, notes });
+  const pct = (x: number) => `${(x * 100).toFixed(x < 0.1 ? 2 : 1).replace(/\.?0+$/, '')}%`;
+
+  sources.capitalCostUrban = wb('World Bank (Hutton & Varughese 2016)',
+    `Half flush toilets to a septic tank (${usd(septic)}) and half pit latrines (${usd(pitUrban)}), the study's baseline mix for urban basic sanitation. Lower if everyone gets a pit latrine, higher with all septic tanks. ${priceNote} ${caveat}`);
+  sources.capitalCostRural = wb('World Bank (Hutton & Varughese 2016)',
+    `Half pour-flush pit latrines (${usd(pourFlush)}) and half dry pit latrines (${usd(dryPit)}), the study's baseline mix for rural basic sanitation. ${priceNote} ${caveat}`);
+  sources.programmeShare = wb('Included in build cost',
+    'Set to 0% because the World Bank unit costs already include software (programme management and behaviour change): 10% of hardware in towns and 20% in rural areas. Add more here only for costs beyond that, such as reaching the last, hardest-to-serve households.');
+  sources.upkeepShare = wb('World Bank (Hutton & Varughese 2016)',
+    `Pit latrines: operating costs of ${pct(K.pitOperatingShare)} of the build cost a year plus capital maintenance of ${pct(K.capitalMaintenanceShare)} once in an ${K.lifespanPit}-year life (${pct(pitUpkeep)} a year in all). Septic tanks: capital maintenance of ${pct(K.capitalMaintenanceShare)} over a ${K.lifespanSeptic}-year life (${pct(septicUpkeep)} a year); the study gives no operating cost, so pit emptying is left out. Weighted by the money spent on each.`);
+  sources.lifespanUrban = wb('World Bank (Hutton & Varughese 2016)',
+    `Average of septic tanks (${K.lifespanSeptic} years) and pit latrines (${K.lifespanPit} years), weighted by their build cost.`);
+  sources.lifespanRural = wb('World Bank (Hutton & Varughese 2016)', `${K.lifespanPit} years for pit latrines. Replacement after that is a new investment.`);
+
+  return {
+    capitalCostUrban: round(urban, 1),
+    capitalCostRural: round(rural, 1),
+    programmeShare: 0,
+    upkeepShare: round(upkeep, 3),
+    lifespanUrban: round(lifespanUrban, 1),
+    lifespanRural: K.lifespanPit,
+  };
+};
 
 /**
  * Estimates the model inputs for a country from World Bank data and the WHO evidence snapshot.
@@ -369,10 +450,7 @@ export const estimateInputs = (
   sources.withoutBasicRural = has(basicRuralField?.value)
     ? derivedFrom(basicRuralField!.source, 'World Bank (JMP)', `100% minus rural basic sanitation coverage (${basicRuralField!.value!.toFixed(1)}%).`)
     : estimateSource('National rate', 'No rural figure; the national share without basic sanitation is used.');
-  const placeholderNote = 'PLACEHOLDER, not from a source. A round number to show how the comparison works; replace it with costs from your national sanitation plan or a costing study (e.g. Hutton & Varughese 2016, World Bank).';
-  for (const key of ['capitalCostUrban', 'capitalCostRural', 'programmeShare', 'upkeepShare', 'lifespanUrban', 'lifespanRural']) {
-    sources[key] = { label: 'Placeholder', kind: 'estimate', sourceName: 'Placeholder', tone: 'danger', notes: placeholderNote };
-  }
+  const investment = estimateInvestment(isoCode, rawData?.usDeflatorSince2015 ?? null, analysisYear, urbanShare, withoutBasicUrban, withoutBasicRural, sources);
 
   // --- Carbon: people without at least basic sanitation ---
   let percentPoorSanitation = 0.6;
@@ -470,7 +548,7 @@ export const estimateInputs = (
     investment: {
       withoutBasicUrban: round(withoutBasicUrban),
       withoutBasicRural: round(withoutBasicRural),
-      ...PLACEHOLDER_INVESTMENT_COSTS,
+      ...investment,
     },
     ranges,
   };

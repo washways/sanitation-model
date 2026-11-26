@@ -1,5 +1,4 @@
 import { ModelInputs } from '../types';
-import { PLACEHOLDER_INVESTMENT_COSTS } from '../constants';
 import { calculateModelOutputs } from './calculations';
 
 /**
@@ -18,16 +17,11 @@ export interface BenefitCostResult {
   paybackYears: number | null; // upfront ÷ (benefit − upkeep); null if benefits never cover upkeep
   averageLifespan: number; // people-weighted
   paybackWithinLife: boolean;
-  usesPlaceholderCosts: boolean;
 }
 
 /** Capital recovery factor: turns an upfront cost into an equal yearly amount over its life. */
 const capitalRecovery = (rate: number, years: number) =>
   rate === 0 ? 1 / years : rate / (1 - Math.pow(1 + rate, -years));
-
-export const usesPlaceholderCosts = (inputs: ModelInputs) =>
-  (Object.keys(PLACEHOLDER_INVESTMENT_COSTS) as (keyof typeof PLACEHOLDER_INVESTMENT_COSTS)[])
-    .every((k) => inputs.investment[k] === PLACEHOLDER_INVESTMENT_COSTS[k]);
 
 export const runBenefitCost = (inputs: ModelInputs): BenefitCostResult => {
   const { investment: inv, health, access, macro } = inputs;
@@ -60,6 +54,5 @@ export const runBenefitCost = (inputs: ModelInputs): BenefitCostResult => {
     paybackYears,
     averageLifespan,
     paybackWithinLife: paybackYears !== null && paybackYears <= averageLifespan,
-    usesPlaceholderCosts: usesPlaceholderCosts(inputs),
   };
 };

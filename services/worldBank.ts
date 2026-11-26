@@ -470,6 +470,7 @@ export const fetchCountryData = async (isoCode: string, currencyCode: string = '
 
   const deflatorNow = valueAtOrBefore(us.deflator, analysisYear);
   const deflator2010 = us.deflator.find((p) => p.year === 2010)?.value ?? null;
+  const deflator2015 = us.deflator.find((p) => p.year === 2015)?.value ?? null;
 
   return {
     analysisYear,
@@ -479,6 +480,7 @@ export const fetchCountryData = async (isoCode: string, currencyCode: string = '
     fields,
     usGdpPerCapita: valueAtOrBefore(us.gdp, analysisYear),
     usDeflatorRatio: deflatorNow && deflator2010 ? deflatorNow / deflator2010 : null,
+    usDeflatorSince2015: deflatorNow && deflator2015 ? deflatorNow / deflator2015 : null,
   };
 };
 

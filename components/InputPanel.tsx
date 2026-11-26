@@ -348,9 +348,9 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
       </InputGroup>
 
       <InputGroup title="5. Benefit-Cost: Reaching Basic Sanitation" isOpen={openSection === 'investment'} onToggle={() => toggle('investment')}>
-        <div className="md:col-span-2 p-3 rounded border border-amber-300 text-xs text-amber-900 leading-relaxed">
-          The costs below are <strong>placeholders, not from a source</strong>. Replace them with costs from your national sanitation plan or a costing study before using the benefit-cost ratio. Costs are per person reached; programme delivery covers promotion and supervision.
-        </div>
+        <p className="md:col-span-2 text-xs text-slate-500 leading-relaxed">
+          Defaults are the World Bank's cost estimates for this country (Hutton &amp; Varughese 2016), per person reached, already including promotion and supervision. Replace them with costs from your national sanitation plan where you have them.
+        </p>
         <NumberField label="Without Basic, Urban" value={inputs.investment.withoutBasicUrban * 100} onChange={(v) => updateInvestment('withoutBasicUrban', v / 100)} step={0.1} unit="%" source={sources['withoutBasicUrban']} />
         <NumberField label="Without Basic, Rural" value={inputs.investment.withoutBasicRural * 100} onChange={(v) => updateInvestment('withoutBasicRural', v / 100)} step={0.1} unit="%" source={sources['withoutBasicRural']} />
         <NumberField label="Build Cost / Person, Urban" value={inputs.investment.capitalCostUrban} onChange={(v) => updateInvestment('capitalCostUrban', v)} unit="$" source={sources['capitalCostUrban']} />
