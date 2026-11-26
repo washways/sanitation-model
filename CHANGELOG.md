@@ -4,6 +4,12 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.7.0 — 2026-11-26
+- **New benefit-cost comparison.** Under Inputs → 5. Benefit-Cost, set the cost per person of reaching basic sanitation (urban and rural), its life, programme delivery and upkeep. The results show the upfront investment, the yearly cost, the benefit-cost ratio and the payback period against the yearly losses.
+- **The default costs are placeholders, not from a source.** The intended source (Hutton & Varughese 2016, World Bank) couldn't be read automatically. The app warns until you change them, and the PDF only includes the benefit-cost section once real costs are entered.
+- With the placeholder costs the ratio is below 1 for most countries, because the loss estimate is deliberately conservative. Treat it as a template to fill with national costs.
+- The CSV export includes the benefit-cost inputs and results; changed costs are kept in shared links.
+
 ## v1.6.0 — 2026-11-26
 A review of the methods from a sanitation economist's point of view. Full details and sources are in ASSUMPTIONS.md.
 - **One clear baseline:** the costs are what the country loses because people don't have at least basic sanitation.

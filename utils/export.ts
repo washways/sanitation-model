@@ -1,6 +1,7 @@
 import { ModelInputs, ModelOutputs, DataSourceMap, YearExplanation } from '../types';
 import { costEntries, excludedEntries, formatCurrency, formatNumber } from './calculations';
 import { runSensitivity } from './uncertainty';
+import { runBenefitCost } from './benefitCost';
 
 interface ExportField {
   section: string;
@@ -56,6 +57,14 @@ const INPUT_FIELDS: ExportField[] = [
   { section: 'Carbon', key: 'emissionFactorSource', label: 'Emission Factor Source', get: (i) => i.carbon.emissionFactorSource },
   { section: 'Carbon', key: 'emissionFactor', label: 'Emission Factor', unit: 'kg CO2e/person/year', get: (i) => i.carbon.emissionFactor },
   { section: 'Carbon', key: 'socialCostOfCarbon', label: 'Social Cost of Carbon', unit: 'USD/tCO2e', get: (i) => i.carbon.socialCostOfCarbon },
+  { section: 'Benefit-cost', key: 'withoutBasicUrban', label: 'Without Basic Sanitation, Urban', unit: '%', get: (i) => pct(i.investment.withoutBasicUrban) },
+  { section: 'Benefit-cost', key: 'withoutBasicRural', label: 'Without Basic Sanitation, Rural', unit: '%', get: (i) => pct(i.investment.withoutBasicRural) },
+  { section: 'Benefit-cost', key: 'capitalCostUrban', label: 'Build Cost per Person, Urban', unit: 'USD', get: (i) => i.investment.capitalCostUrban },
+  { section: 'Benefit-cost', key: 'capitalCostRural', label: 'Build Cost per Person, Rural', unit: 'USD', get: (i) => i.investment.capitalCostRural },
+  { section: 'Benefit-cost', key: 'lifespanUrban', label: 'Lifespan, Urban', unit: 'years', get: (i) => i.investment.lifespanUrban },
+  { section: 'Benefit-cost', key: 'lifespanRural', label: 'Lifespan, Rural', unit: 'years', get: (i) => i.investment.lifespanRural },
+  { section: 'Benefit-cost', key: 'programmeShare', label: 'Programme Delivery', unit: '% of build cost', get: (i) => pct(i.investment.programmeShare) },
+  { section: 'Benefit-cost', key: 'upkeepShare', label: 'Upkeep per Year', unit: '% of build cost', get: (i) => pct(i.investment.upkeepShare) },
 ];
 
 const csvEscape = (value: string | number | boolean | undefined) => {
@@ -132,6 +141,14 @@ export const downloadAnalysisCsv = (
   out('Deaths valued by human capital', outputs.mortalityHumanCapitalUSD, 'USD/year', 'Lost output over the remaining working life, by age at death');
   out('Deaths valued by VSL', outputs.mortalityVslUSD, 'USD/year', `Value of statistical life ${formatCurrency(outputs.vslPerDeathUSD)} per death (Robinson et al. 2019)`);
   out('Deaths attributable to inadequate sanitation', outputs.attributableDeaths, 'deaths/year');
+
+  const bc = runBenefitCost(inputs);
+  const bcNote = bc.usesPlaceholderCosts ? 'Uses PLACEHOLDER unit costs, not from a source' : 'User-set unit costs';
+  out('People without basic sanitation', bc.peopleUrban + bc.peopleRural, 'people', `${Math.round(bc.peopleUrban)} urban, ${Math.round(bc.peopleRural)} rural`);
+  out('Upfront investment to reach basic sanitation', bc.upfrontUSD, 'USD', bcNote);
+  out('Yearly cost (annualised capital + upkeep)', bc.annualCostUSD, 'USD/year', bcNote);
+  out('Benefit-cost ratio', bc.ratio, 'ratio', bcNote);
+  out('Payback period (undiscounted)', bc.paybackYears ?? 'never', 'years', `${bcNote}. ${bc.paybackWithinLife ? 'Within' : 'Not within'} the average ${bc.averageLifespan.toFixed(1)}-year life.`);
 
   const sens = runSensitivity(inputs);
   out('Conservative scenario total', sens.conservative, 'USD/year', 'Every uncertain input at the end of its range that lowers the total');

@@ -1,4 +1,4 @@
-import { DEFAULT_RANGES, EMISSION_PRESETS } from '../constants';
+import { DEFAULT_RANGES, EMISSION_PRESETS, PLACEHOLDER_INVESTMENT_COSTS } from '../constants';
 import { CountryApiData, DataSourceInfo, DataSourceMap, ModelInputs, UncertaintyRanges } from '../types';
 import EVIDENCE from '../data/countryEvidence.json';
 
@@ -359,6 +359,21 @@ export const estimateInputs = (
   sources.openDefecationUrban = has(odUrbanField?.value) ? withTone(odUrbanField!.source) : estimateSource('National rate', odFallbackNote);
   sources.openDefecationRural = has(odRuralField?.value) ? withTone(odRuralField!.source) : estimateSource('National rate', odFallbackNote);
 
+  // --- People without at least basic sanitation, urban and rural (carbon and benefit-cost) ---
+  const nationalNoBasic = sanitationField?.value ? 1 - sanitationField.value / 100 : 0.6;
+  const withoutBasicUrban = has(basicUrbanField?.value) ? 1 - basicUrbanField!.value! / 100 : nationalNoBasic;
+  const withoutBasicRural = has(basicRuralField?.value) ? 1 - basicRuralField!.value! / 100 : nationalNoBasic;
+  sources.withoutBasicUrban = has(basicUrbanField?.value)
+    ? derivedFrom(basicUrbanField!.source, 'World Bank (JMP)', `100% minus urban basic sanitation coverage (${basicUrbanField!.value!.toFixed(1)}%).`)
+    : estimateSource('National rate', 'No urban figure; the national share without basic sanitation is used.');
+  sources.withoutBasicRural = has(basicRuralField?.value)
+    ? derivedFrom(basicRuralField!.source, 'World Bank (JMP)', `100% minus rural basic sanitation coverage (${basicRuralField!.value!.toFixed(1)}%).`)
+    : estimateSource('National rate', 'No rural figure; the national share without basic sanitation is used.');
+  const placeholderNote = 'PLACEHOLDER, not from a source. A round number to show how the comparison works; replace it with costs from your national sanitation plan or a costing study (e.g. Hutton & Varughese 2016, World Bank).';
+  for (const key of ['capitalCostUrban', 'capitalCostRural', 'programmeShare', 'upkeepShare', 'lifespanUrban', 'lifespanRural']) {
+    sources[key] = { label: 'Placeholder', kind: 'estimate', sourceName: 'Placeholder', tone: 'danger', notes: placeholderNote };
+  }
+
   // --- Carbon: people without at least basic sanitation ---
   let percentPoorSanitation = 0.6;
   if (has(basicUrbanField?.value) && has(basicRuralField?.value)) {
@@ -451,6 +466,11 @@ export const estimateInputs = (
       tourismLossPercentage: 0.05,
       tourismReceipts,
       includeTourismInTotal: false,
+    },
+    investment: {
+      withoutBasicUrban: round(withoutBasicUrban),
+      withoutBasicRural: round(withoutBasicRural),
+      ...PLACEHOLDER_INVESTMENT_COSTS,
     },
     ranges,
   };

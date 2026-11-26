@@ -6,7 +6,7 @@ import { ModelInputs } from '../types';
  * Only values that differ from the country's estimated inputs are written. Uncertainty ranges are not.
  */
 type Section = Exclude<keyof ModelInputs, 'ranges'>;
-const SECTIONS: Section[] = ['macro', 'health', 'nutrition', 'access', 'carbon', 'other'];
+const SECTIONS: Section[] = ['macro', 'health', 'nutrition', 'access', 'carbon', 'other', 'investment'];
 
 const same = (a: unknown, b: unknown) =>
   typeof a === 'number' && typeof b === 'number' ? Math.abs(a - b) <= Math.abs(b) * 1e-9 : a === b;

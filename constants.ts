@@ -33,6 +33,19 @@ export const DEFAULT_RANGES: UncertaintyRanges = {
   socialCostOfCarbon: { low: 0.5, high: 1.9, basis: 'US$50–190 per tonne (Rennert et al. 2022)' },
 };
 
+/**
+ * PLACEHOLDER unit costs for reaching basic sanitation. Round numbers, NOT from a source: the intended source,
+ * Hutton & Varughese (2016, World Bank WSP), could not be read. Replace with national costs.
+ */
+export const PLACEHOLDER_INVESTMENT_COSTS = {
+  capitalCostUrban: 100,
+  capitalCostRural: 40,
+  programmeShare: 0.2,
+  upkeepShare: 0.05,
+  lifespanUrban: 20,
+  lifespanRural: 8,
+};
+
 // Approximate fallback baseline values used before country-specific data is loaded
 export const DEFAULT_INPUTS: ModelInputs = {
   macro: {
@@ -91,6 +104,11 @@ export const DEFAULT_INPUTS: ModelInputs = {
     tourismReceipts: 50000000,
     tourismLossPercentage: 0.05,
     includeTourismInTotal: false,
+  },
+  investment: {
+    withoutBasicUrban: 0.5,
+    withoutBasicRural: 0.5,
+    ...PLACEHOLDER_INVESTMENT_COSTS,
   },
   ranges: DEFAULT_RANGES,
 };

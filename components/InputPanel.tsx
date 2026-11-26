@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { ModelInputs, MacroInputs, HealthInputs, NutritionInputs, AccessTimeInputs, OtherCostsInputs, CarbonInputs, DataSourceInfo, DataSourceMap } from '../types';
+import { ModelInputs, MacroInputs, HealthInputs, NutritionInputs, AccessTimeInputs, OtherCostsInputs, CarbonInputs, InvestmentInputs, DataSourceInfo, DataSourceMap } from '../types';
 import { EMISSION_PRESETS } from '../constants';
 import { getSourceToneClasses, getSourceTooltip, getSourceYearLabel } from '../utils/dataSources';
 
@@ -201,6 +201,9 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
   const updateAccess = (key: keyof AccessTimeInputs, val: number) => {
     onUpdate({ ...inputs, access: { ...inputs.access, [key]: val } });
   };
+  const updateInvestment = (key: keyof InvestmentInputs, val: number) => {
+    onUpdate({ ...inputs, investment: { ...inputs.investment, [key]: val } });
+  };
   const minutes = (hours: number) => Math.round(hours * 60 * 10) / 10;
   const updateCarbon = (key: keyof CarbonInputs, val: number | string | boolean) => {
     // If source changes, update factor using presets
@@ -344,9 +347,23 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
         <NumberField label="Funeral Cost (Per Death)" value={inputs.other.funeralCostPerDeath} onChange={(v) => updateOther('funeralCostPerDeath', v)} unit="$" source={sources['funeralCostPerDeath']} />
       </InputGroup>
 
+      <InputGroup title="5. Benefit-Cost: Reaching Basic Sanitation" isOpen={openSection === 'investment'} onToggle={() => toggle('investment')}>
+        <div className="md:col-span-2 p-3 rounded border border-amber-300 text-xs text-amber-900 leading-relaxed">
+          The costs below are <strong>placeholders, not from a source</strong>. Replace them with costs from your national sanitation plan or a costing study before using the benefit-cost ratio. Costs are per person reached; programme delivery covers promotion and supervision.
+        </div>
+        <NumberField label="Without Basic, Urban" value={inputs.investment.withoutBasicUrban * 100} onChange={(v) => updateInvestment('withoutBasicUrban', v / 100)} step={0.1} unit="%" source={sources['withoutBasicUrban']} />
+        <NumberField label="Without Basic, Rural" value={inputs.investment.withoutBasicRural * 100} onChange={(v) => updateInvestment('withoutBasicRural', v / 100)} step={0.1} unit="%" source={sources['withoutBasicRural']} />
+        <NumberField label="Build Cost / Person, Urban" value={inputs.investment.capitalCostUrban} onChange={(v) => updateInvestment('capitalCostUrban', v)} unit="$" source={sources['capitalCostUrban']} />
+        <NumberField label="Build Cost / Person, Rural" value={inputs.investment.capitalCostRural} onChange={(v) => updateInvestment('capitalCostRural', v)} unit="$" source={sources['capitalCostRural']} />
+        <NumberField label="Lifespan, Urban" value={inputs.investment.lifespanUrban} onChange={(v) => updateInvestment('lifespanUrban', v)} unit="yrs" source={sources['lifespanUrban']} />
+        <NumberField label="Lifespan, Rural" value={inputs.investment.lifespanRural} onChange={(v) => updateInvestment('lifespanRural', v)} unit="yrs" source={sources['lifespanRural']} />
+        <NumberField label="Programme Delivery" value={inputs.investment.programmeShare * 100} onChange={(v) => updateInvestment('programmeShare', v / 100)} unit="% of build" source={sources['programmeShare']} />
+        <NumberField label="Upkeep / Year" value={inputs.investment.upkeepShare * 100} onChange={(v) => updateInvestment('upkeepShare', v / 100)} step={0.5} unit="% of build" source={sources['upkeepShare']} />
+      </InputGroup>
+
       <p className="text-xs font-bold text-slate-500 uppercase tracking-wide mt-6 mb-2">Shown separately (not in the total unless included)</p>
 
-      <InputGroup title="5. Stunting" isOpen={openSection === 'stunting'} onToggle={() => toggle('stunting')}>
+      <InputGroup title="6. Stunting"isOpen={openSection === 'stunting'} onToggle={() => toggle('stunting')}>
         <IncludeToggle checked={!!inputs.nutrition.includeInTotal} onChange={(v) => updateNutrition('includeInTotal', v)}>
           Lost future earnings of children stunted because of poor sanitation. <strong>Not in the total by default:</strong> large trials (WASH Benefits in Bangladesh and Kenya, SHINE in Zimbabwe) found household water, sanitation and hygiene did not improve child growth, so the 16% share is an upper bound.
         </IncludeToggle>
@@ -356,7 +373,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
         <NumberField label="Real Wage Growth / Year" value={inputs.nutrition.realWageGrowth * 100} onChange={(v) => updateNutrition('realWageGrowth', v/100)} step={0.1} unit="%" source={sources['realWageGrowth']} />
       </InputGroup>
 
-      <InputGroup title="6. Tourism" isOpen={openSection === 'tourism'} onToggle={() => toggle('tourism')}>
+      <InputGroup title="7. Tourism"isOpen={openSection === 'tourism'} onToggle={() => toggle('tourism')}>
         <IncludeToggle checked={!!inputs.other.includeTourismInTotal} onChange={(v) => updateOther('includeTourismInTotal', v)}>
           Tourism income lost because of poor sanitation. <strong>Not in the total by default:</strong> there is no published estimate of the share lost.
         </IncludeToggle>
@@ -364,7 +381,7 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
         <NumberField label="Tourism Loss Attributable" value={inputs.other.tourismLossPercentage * 100} onChange={(v) => updateOther('tourismLossPercentage', v/100)} unit="%" source={sources['tourismLossPercentage']} />
       </InputGroup>
 
-      <InputGroup title="7. Carbon (GHG) Emissions" isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>
+      <InputGroup title="8. Carbon (GHG) Emissions"isOpen={openSection === 'carbon'} onToggle={() => toggle('carbon')}>
          <IncludeToggle checked={!!inputs.carbon.includeInTotal} onChange={(v) => updateCarbon('includeInTotal', v)}>
             Methane from pit latrines and septic tanks, valued at the social cost of carbon. <strong>Not in the total by default</strong>, for three reasons:
             <ul className="list-disc pl-4 mt-1 space-y-0.5">

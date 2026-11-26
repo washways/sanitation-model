@@ -153,6 +153,18 @@ export type UncertaintyKey =
 
 export type UncertaintyRanges = Record<UncertaintyKey, UncertaintyRange>;
 
+/** Cost of getting everyone to at least basic sanitation, for the benefit-cost comparison. */
+export interface InvestmentInputs {
+  withoutBasicUrban: number; // 0.0 - 1.0 share of the urban population without at least basic sanitation
+  withoutBasicRural: number; // 0.0 - 1.0 share of the rural population
+  capitalCostUrban: number; // USD per person reached
+  capitalCostRural: number; // USD per person reached
+  programmeShare: number; // programme delivery (promotion, supervision) as a share of capital
+  upkeepShare: number; // yearly operation and maintenance as a share of capital
+  lifespanUrban: number; // years
+  lifespanRural: number; // years
+}
+
 export interface ModelInputs {
   macro: MacroInputs;
   health: HealthInputs;
@@ -160,6 +172,7 @@ export interface ModelInputs {
   access: AccessTimeInputs;
   carbon: CarbonInputs;
   other: OtherCostsInputs;
+  investment: InvestmentInputs;
   ranges: UncertaintyRanges;
 }
 

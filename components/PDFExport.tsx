@@ -5,6 +5,7 @@ import { costEntries, excludedEntries, formatNumber } from '../utils/calculation
 import { COST_LABELS } from '../utils/export';
 import { runSimulation } from '../utils/monteCarlo';
 import { runSensitivity } from '../utils/uncertainty';
+import { runBenefitCost } from '../utils/benefitCost';
 import { COLOR_PALETTE } from '../constants';
 
 interface SanitationReportProps {
@@ -130,6 +131,8 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
   const sens = runSensitivity(inputs);
   const drivers = sens.rows.slice(0, 5);
   const excluded = excludedEntries(outputs);
+  // Only shown once real unit costs are entered; the defaults are placeholders with no source.
+  const bc = runBenefitCost(inputs);
   const otherMortality = inputs.macro.mortalityMethod === 'vsl'
     ? { label: 'human capital (lost output)', value: outputs.mortalityHumanCapitalUSD }
     : { label: `the value of a statistical life (${money(outputs.vslPerDeathUSD)} per death)`, value: outputs.mortalityVslUSD };
@@ -237,6 +240,20 @@ export const SanitationReport: React.FC<SanitationReportProps> = ({ countryName,
                   <Text style={[s.cellText, { flex: 1, color: C.muted, fontSize: 8 }]}>{d.basis}</Text>
                 </View>
               ))}
+            </View>
+          )}
+
+          {!bc.usesPlaceholderCosts && (
+            <View style={s.section} wrap={false}>
+              <Text style={s.h2}>Benefit-cost of basic sanitation for everyone</Text>
+              <Text style={s.para}>
+                Reaching the {formatNumber((bc.peopleUrban + bc.peopleRural) / 1e6)} million people without at least basic sanitation would cost about {money(bc.upfrontUSD)} upfront,
+                or {money(bc.annualCostUSD)} a year including upkeep. Against yearly losses of {money(bc.annualBenefitUSD)}, every dollar returns about US${bc.ratio.toFixed(1)}
+                {bc.paybackWithinLife && bc.paybackYears !== null ? `, and the investment pays back in about ${formatNumber(bc.paybackYears)} years` : ', and the investment does not pay back within the toilets\' life'}.
+              </Text>
+              <Text style={s.small}>
+                Unit costs entered by the user: urban US${inputs.investment.capitalCostUrban} and rural US${inputs.investment.capitalCostRural} per person, {formatNumber(inputs.investment.lifespanUrban)}/{formatNumber(inputs.investment.lifespanRural)}-year life, programme delivery {pct(inputs.investment.programmeShare)}, upkeep {pct(inputs.investment.upkeepShare)} a year. Assumes everyone is reached and all losses in the total are avoided.
+              </Text>
             </View>
           )}
 

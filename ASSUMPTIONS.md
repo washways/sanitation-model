@@ -101,6 +101,19 @@ Excluded because (1) basic pit latrines emit as much methane as unimproved ones 
 | Emission factor | 35 kg CO2e/person/year (IPCC); SCARE 52 kg | Cheng et al. 2022: 377 Mt CO2e a year (range 22–1,003) | Reasonable |
 | Social cost of carbon | US$100/t | Recent central estimates about US$185–190/t (Rennert et al. 2022; US EPA 2023) | Reasonable |
 
+## Benefit-cost: reaching basic sanitation for everyone (v1.7.0)
+Yearly cost = (build cost × (1 + programme delivery)) × capital recovery factor at the discount rate over the toilet's life, + yearly upkeep. Yearly benefit = the headline total. Benefit-cost ratio = benefit ÷ cost. Payback = upfront cost ÷ (benefit − upkeep), undiscounted, flagged when longer than the people-weighted toilet life.
+| Assumption | Default | Evidence | Rating |
+|---|---|---|---|
+| People without at least basic sanitation | World Bank (JMP) urban and rural | SH.STA.BASS.UR.ZS / .RU.ZS | Strong |
+| Build cost per person | **PLACEHOLDER** urban US$100, rural US$40 | Not from a source. The intended source, Hutton & Varughese (2016, World Bank), could not be read (the repository blocks automated downloads). Replace with national costs | Weak |
+| Programme delivery | **PLACEHOLDER** 20% of build cost | Not from a source | Weak |
+| Upkeep | **PLACEHOLDER** 5% of build cost a year | Not from a source | Weak |
+| Lifespan | **PLACEHOLDER** urban 20 years, rural 8 years | Not from a source | Weak |
+| Benefits | All losses in the headline total avoided once everyone is reached | Overstates: health losses are measured against WHO's stricter reference; last-mile households cost more to reach | Reasonable |
+
+The app warns while the placeholders are unchanged, and the PDF leaves out the benefit-cost section until real costs are entered. With the placeholders the ratio is below 1 for most countries (Malawi about 0.5), because the headline total is conservative (sanitation only, human capital valuation, stunting excluded). Published sanitation ratios are higher mainly because they include more benefits and value deaths with VSL.
+
 ## Uncertainty
 - Each uncertain input has a low and high value (`inputs.ranges`): WHO's and WHO-CHOICE's 95% intervals where the country has them, otherwise the defaults in `constants.ts` (each with its basis).
 - **What drives the estimate** (tornado chart): the total with one input at a time at each end of its range.

@@ -26,6 +26,7 @@ import { useBottomOverlayInset } from './utils/useBottomOverlayInset';
 import { countryCodeFromPath, countryPath } from './utils/countryRoute';
 import { applyScenario, scenarioQuery } from './utils/scenarioUrl';
 import { SensitivityPanel } from './components/SensitivityPanel';
+import { BenefitCostPanel } from './components/BenefitCostPanel';
 import { estimateInputs } from './utils/estimators';
 
 const MobileStickyFooter = ({ outputs, currency }: { outputs: any, currency: string }) => (
@@ -479,6 +480,11 @@ const App = () => {
                         {/* Sensitivity */}
                         <div className="mt-6">
                             <SensitivityPanel inputs={inputs} />
+                        </div>
+
+                        {/* Benefit-cost */}
+                        <div className="mt-6">
+                            <BenefitCostPanel inputs={inputs} />
                         </div>
 
                         {/* Monte Carlo Analysis */}

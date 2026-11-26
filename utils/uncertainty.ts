@@ -93,6 +93,7 @@ export const copyInputs = (inputs: ModelInputs): ModelInputs => ({
   access: { ...inputs.access },
   carbon: { ...inputs.carbon },
   other: { ...inputs.other },
+  investment: { ...inputs.investment },
   ranges: inputs.ranges,
 });
 
