@@ -237,4 +237,8 @@ export interface CountryComparisonResult {
   inputs: ModelInputs;
   stats: SimulationStats;
   percentGDP_Mean: number;
+  bcr: number; // benefit-cost ratio of basic sanitation for everyone (headline total ÷ yearly cost)
+  bcrWider: number; // same with deaths at VSL and stunting included
+  bcAnnualCostUSD: number;
+  bcAnnualBenefitUSD: number;
 }

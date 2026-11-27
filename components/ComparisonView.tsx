@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { fetchAllLDCData } from '../services/worldBank';
 import { estimateInputs } from '../utils/estimators';
 import { runSimulation } from '../utils/monteCarlo';
+import { runBenefitCost } from '../utils/benefitCost';
+import { BenefitCostComparison } from './BenefitCostComparison';
 import { SUPPORTED_COUNTRIES, COLOR_PALETTE } from '../constants';
 import { CountryComparisonResult } from '../types';
 import { formatCurrency, formatNumber } from '../utils/calculations';
@@ -39,13 +41,23 @@ export const ComparisonView = () => {
         
         const totalNationalGDP = inputs.health.population * inputs.macro.gdpPerCapita;
         const percentGDP = totalNationalGDP > 0 ? (stats.mean / totalNationalGDP) * 100 : 0;
+        const bc = runBenefitCost(inputs);
+        const wider = runBenefitCost({
+          ...inputs,
+          macro: { ...inputs.macro, mortalityMethod: 'vsl' },
+          nutrition: { ...inputs.nutrition, includeInTotal: true },
+        });
 
         computedResults.push({
             code: country.code,
             name: country.name,
             inputs,
             stats,
-            percentGDP_Mean: percentGDP
+            percentGDP_Mean: percentGDP,
+            bcr: bc.ratio,
+            bcrWider: wider.ratio,
+            bcAnnualCostUSD: bc.annualCostUSD,
+            bcAnnualBenefitUSD: bc.annualBenefitUSD,
         });
 
         setProgress(50 + Math.round(((i + 1) / totalCountries) * 50));
@@ -228,6 +240,8 @@ export const ComparisonView = () => {
                         </ResponsiveContainer>
                     </div>
                 </div>
+
+                <BenefitCostComparison results={results} />
 
                 {/* Methodology Footer for Comparison Tab */}
                 <div className="bg-slate-900 text-slate-300 p-8 rounded-xl">

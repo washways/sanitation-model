@@ -4,6 +4,9 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.7.2 — 2026-11-26
+- **New benefit-cost chart on the Global Comparison page:** the benefit-cost ratio of basic sanitation for every country, ranked, with the break-even line at 1. Switch between core benefits and wider benefits (deaths at the value of a statistical life, plus stunting), and open a table with each country's yearly cost and benefit.
+
 ## v1.7.1 — 2026-11-26
 - **The benefit-cost comparison now uses World Bank costs for each country** instead of placeholders: the cost per person of basic sanitation from Hutton & Varughese (2016), *The Costs of Meeting the 2030 SDG Targets on Drinking Water, Sanitation, and Hygiene*. Urban areas use half septic tanks and half pit latrines; rural areas use half pour-flush and half dry pit latrines, as in the study. Costs include promotion and supervision and are inflated from 2015 prices.
 - Toilet life, maintenance and running costs also follow the study: 8 years for pit latrines and 20 for septic tanks.
