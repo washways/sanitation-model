@@ -4,6 +4,11 @@ The version shown in the app's top bar comes from `version` in `package.json`.
 When you ship a change: bump that version (patch for fixes, minor for features) and add an entry at the top.
 The app reads this file directly, so what is written here is what users see under "What changed".
 
+## v1.8.0 — 2026-11-27
+- **People who already have a latrine are no longer charged for a new one.** Many people without basic sanitation have an unimproved latrine (a pit without a slab). They now need only an upgrade, a concrete latrine slab at about US$2.30 per person (Peletz et al. 2017, rural Tanzania). People who share a latrine or defecate in the open still need a new one. The split comes from the WHO/UNICEF JMP 2025 estimates for each country, urban and rural.
+- New inputs under 5. Benefit-Cost: the share needing only an upgrade (urban, rural) and the upgrade cost.
+- Results: Malawi's benefit-cost ratio goes from 0.6 to 1.0, Tanzania from 0.6 to 1.25, Uganda from 0.5 to 1.3. 36 of 45 countries are now above 1 (was 26). The ratio still counts only the core, conservative benefits; the comparison chart also shows it with VSL and stunting.
+
 ## v1.7.2 — 2026-11-26
 - **New benefit-cost chart on the Global Comparison page:** the benefit-cost ratio of basic sanitation for every country, ranked, with the break-even line at 1. Switch between core benefits and wider benefits (deaths at the value of a statistical life, plus stunting), and open a table with each country's yearly cost and benefit.
 

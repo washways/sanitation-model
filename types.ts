@@ -160,6 +160,9 @@ export interface InvestmentInputs {
   withoutBasicRural: number; // 0.0 - 1.0 share of the rural population
   capitalCostUrban: number; // USD per person reached
   capitalCostRural: number; // USD per person reached
+  upgradeShareUrban: number; // 0.0 - 1.0 of the urban people without basic who have an unimproved latrine and need only an upgrade (JMP)
+  upgradeShareRural: number; // same, rural
+  upgradeCostPerPerson: number; // USD per person to upgrade an unimproved latrine (slab)
   programmeShare: number; // programme delivery (promotion, supervision) as a share of capital
   upkeepShare: number; // yearly operation and maintenance as a share of capital
   lifespanUrban: number; // years

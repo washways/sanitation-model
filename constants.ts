@@ -51,10 +51,29 @@ export const SANITATION_COSTING = {
   pitOperatingShare: 0.05, // 5% of initial capital a year for pit latrines; none given for septic tanks
 };
 
+/**
+ * Upgrading an unimproved latrine (a pit without a slab) to basic: a concrete sanitation platform (SanPlat).
+ * Peletz et al. (2017), Environmental Science & Technology: average cost of supplying a concrete SanPlat to a
+ * household in rural Tanzania US$7.51 (plastic platform US$23.28). Programme delivery added at the World Bank
+ * study's 20% for rural sanitation; household size of 5 is an assumption.
+ */
+export const LATRINE_UPGRADE = {
+  source: 'Peletz et al. 2017',
+  link: 'https://susana.org/knowledge-hub/resources?id=2883',
+  slabCostPerHousehold: 7.51,
+  plasticSlabCostPerHousehold: 23.28,
+  priceYear: 2015,
+  softwareShare: 0.2,
+  householdSize: 5,
+};
+
 /** Used only when a country has no World Bank unit costs (all 45 currently have them): Malawi's 2015 values. */
 export const FALLBACK_INVESTMENT_COSTS = {
   capitalCostUrban: 82,
   capitalCostRural: 24,
+  upgradeShareUrban: 0,
+  upgradeShareRural: 0,
+  upgradeCostPerPerson: 1.8,
   programmeShare: 0,
   upkeepShare: 0.07,
   lifespanUrban: 17,

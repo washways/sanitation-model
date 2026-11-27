@@ -28,9 +28,12 @@ export const runBenefitCost = (inputs: ModelInputs): BenefitCostResult => {
   const peopleUrban = health.population * access.urbanShare * inv.withoutBasicUrban;
   const peopleRural = health.population * (1 - access.urbanShare) * inv.withoutBasicRural;
 
-  const upfrontUrban = peopleUrban * inv.capitalCostUrban * (1 + inv.programmeShare);
-  const upfrontRural = peopleRural * inv.capitalCostRural * (1 + inv.programmeShare);
-  const annualUpkeepUSD = (peopleUrban * inv.capitalCostUrban + peopleRural * inv.capitalCostRural) * inv.upkeepShare;
+  // People with an unimproved latrine need only an upgrade (a slab); the rest need a new latrine.
+  const unitUrban = (1 - inv.upgradeShareUrban) * inv.capitalCostUrban + inv.upgradeShareUrban * inv.upgradeCostPerPerson;
+  const unitRural = (1 - inv.upgradeShareRural) * inv.capitalCostRural + inv.upgradeShareRural * inv.upgradeCostPerPerson;
+  const upfrontUrban = peopleUrban * unitUrban * (1 + inv.programmeShare);
+  const upfrontRural = peopleRural * unitRural * (1 + inv.programmeShare);
+  const annualUpkeepUSD = (peopleUrban * unitUrban + peopleRural * unitRural) * inv.upkeepShare;
   const annualCostUSD =
     upfrontUrban * capitalRecovery(macro.discountRate, Math.max(1, inv.lifespanUrban)) +
     upfrontRural * capitalRecovery(macro.discountRate, Math.max(1, inv.lifespanRural)) +

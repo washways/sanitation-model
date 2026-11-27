@@ -1,7 +1,8 @@
-import { DEFAULT_RANGES, EMISSION_PRESETS, FALLBACK_INVESTMENT_COSTS, SANITATION_COSTING } from '../constants';
+import { DEFAULT_RANGES, EMISSION_PRESETS, FALLBACK_INVESTMENT_COSTS, LATRINE_UPGRADE, SANITATION_COSTING } from '../constants';
 import { CountryApiData, DataSourceInfo, DataSourceMap, ModelInputs, UncertaintyRanges } from '../types';
 import EVIDENCE from '../data/countryEvidence.json';
 import SANITATION_UNIT_COSTS from '../data/sanitationUnitCosts.json';
+import SANITATION_LADDER from '../data/sanitationLadder.json';
 
 type RawFieldKey = keyof CountryApiData['fields'];
 
@@ -116,7 +117,9 @@ const whoSource = (label: string, notes: string, link = 'https://www.who.int/dat
 
 interface UnitCosts { urbanSepticTank: number; urbanPitLatrine: number; ruralPourFlushPit: number; ruralDryPit: number }
 const UNIT_COSTS = SANITATION_UNIT_COSTS as Record<string, UnitCosts>;
-const INVESTMENT_KEYS = ['capitalCostUrban', 'capitalCostRural', 'programmeShare', 'upkeepShare', 'lifespanUrban', 'lifespanRural'] as const;
+interface LadderArea { basic: number | null; limited: number | null; unimproved: number | null; openDefecation: number | null }
+const LADDER = (SANITATION_LADDER as { countries: Record<string, Record<string, { u: LadderArea; r: LadderArea }>> }).countries;
+const INVESTMENT_KEYS = ['capitalCostUrban', 'capitalCostRural', 'upgradeShareUrban', 'upgradeShareRural', 'upgradeCostPerPerson', 'programmeShare', 'upkeepShare', 'lifespanUrban', 'lifespanRural'] as const;
 
 /**
  * Cost of reaching basic sanitation (benefit-cost comparison), from Hutton & Varughese (2016, World Bank):
@@ -162,6 +165,19 @@ const estimateInvestment = (
     ? (wUrban * (septicCapital * septicUpkeep + pitCapitalUrban * pitUpkeep) + wRural * rural * pitUpkeep) / capital
     : pitUpkeep;
 
+  // People with an unimproved latrine (pit without a slab) only need an upgrade, not a new latrine (JMP ladder).
+  const ladderYears = Object.keys(LADDER[isoCode] ?? {}).map(Number).filter((y) => y <= year).sort((a, b) => b - a);
+  const ladderYear = ladderYears[0];
+  const ladder = ladderYear ? LADDER[isoCode][String(ladderYear)] : undefined;
+  const upgradeShare = (area?: LadderArea) => {
+    if (!area || !has(area.unimproved) || !has(area.basic) || area.basic >= 100) return 0;
+    return Math.min(1, Math.max(0, area.unimproved / (100 - area.basic)));
+  };
+  const upgradeShareUrban = upgradeShare(ladder?.u);
+  const upgradeShareRural = upgradeShare(ladder?.r);
+  const U = LATRINE_UPGRADE;
+  const upgradeCost = (U.slabCostPerHousehold * (1 + U.softwareShare) / U.householdSize) * f;
+
   const usd = (x: number) => `US$${x.toFixed(0)}`;
   const priceNote = inflator
     ? `World Bank costs per person in ${K.priceYear} US$, including hardware and software (promotion, supervision), inflated to ${year} with the US GDP deflator (× ${f.toFixed(2)}).`
@@ -184,9 +200,29 @@ const estimateInvestment = (
     `Average of septic tanks (${K.lifespanSeptic} years) and pit latrines (${K.lifespanPit} years), weighted by their build cost.`);
   sources.lifespanRural = wb('World Bank (Hutton & Varughese 2016)', `${K.lifespanPit} years for pit latrines. Replacement after that is a new investment.`);
 
+  const jmp = (area: 'u' | 'r', label: string): DataSourceInfo => {
+    const a = ladder?.[area];
+    return ladder && a
+      ? {
+          label: `JMP ${ladderYear}`, kind: 'derived', sourceName: 'WHO/UNICEF JMP', tone: 'success', link: 'https://washdata.org/data/household',
+          requestedYear: year, actualYear: ladderYear,
+          notes: `Of the ${label} population without at least basic sanitation, the share using an unimproved latrine (a pit without a slab or platform, hanging or bucket latrine): ${a.unimproved?.toFixed(1)}% of ${(100 - (a.basic ?? 0)).toFixed(1)}%. They need an upgrade rather than a new latrine. The rest share an improved latrine with other households (${a.limited?.toFixed(1)}%), who need their own, or defecate in the open (${a.openDefecation?.toFixed(1)}%), who need a new one.`,
+        }
+      : estimateSource('No JMP data', 'No JMP service-ladder data, so everyone without basic sanitation is costed for a new latrine.');
+  };
+  sources.upgradeShareUrban = jmp('u', 'urban');
+  sources.upgradeShareRural = jmp('r', 'rural');
+  sources.upgradeCostPerPerson = {
+    label: U.source, kind: 'derived', sourceName: `${U.source} (rural Tanzania)`, tone: 'neutral', link: U.link,
+    notes: `A concrete latrine platform (SanPlat) cost US$${U.slabCostPerHousehold} per household to supply in rural Tanzania (plastic platform US$${U.plasticSlabCostPerHousehold}). Plus ${U.softwareShare * 100}% for promotion and supervision (World Bank study), divided by ${U.householdSize} people per household (assumption) and inflated from ${U.priceYear} (× ${f.toFixed(2)}). Treat as a low estimate: some unimproved pits need rebuilding, not just a slab.`,
+  };
+
   return {
     capitalCostUrban: round(urban, 1),
     capitalCostRural: round(rural, 1),
+    upgradeShareUrban: round(upgradeShareUrban),
+    upgradeShareRural: round(upgradeShareRural),
+    upgradeCostPerPerson: round(upgradeCost, 2),
     programmeShare: 0,
     upkeepShare: round(upkeep, 3),
     lifespanUrban: round(lifespanUrban, 1),

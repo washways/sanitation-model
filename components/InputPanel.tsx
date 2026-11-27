@@ -349,12 +349,15 @@ export const InputPanel: React.FC<InputPanelProps> = ({ inputs, sources = {}, on
 
       <InputGroup title="5. Benefit-Cost: Reaching Basic Sanitation" isOpen={openSection === 'investment'} onToggle={() => toggle('investment')}>
         <p className="md:col-span-2 text-xs text-slate-500 leading-relaxed">
-          Defaults are the World Bank's cost estimates for this country (Hutton &amp; Varughese 2016), per person reached, already including promotion and supervision. Replace them with costs from your national sanitation plan where you have them.
+          Defaults are the World Bank's cost estimates for this country (Hutton &amp; Varughese 2016), per person reached, already including promotion and supervision. People who already have an unimproved latrine (JMP) are costed for an upgrade (a slab) instead of a new latrine. Replace these with costs from your national sanitation plan where you have them.
         </p>
         <NumberField label="Without Basic, Urban" value={inputs.investment.withoutBasicUrban * 100} onChange={(v) => updateInvestment('withoutBasicUrban', v / 100)} step={0.1} unit="%" source={sources['withoutBasicUrban']} />
         <NumberField label="Without Basic, Rural" value={inputs.investment.withoutBasicRural * 100} onChange={(v) => updateInvestment('withoutBasicRural', v / 100)} step={0.1} unit="%" source={sources['withoutBasicRural']} />
         <NumberField label="Build Cost / Person, Urban" value={inputs.investment.capitalCostUrban} onChange={(v) => updateInvestment('capitalCostUrban', v)} unit="$" source={sources['capitalCostUrban']} />
         <NumberField label="Build Cost / Person, Rural" value={inputs.investment.capitalCostRural} onChange={(v) => updateInvestment('capitalCostRural', v)} unit="$" source={sources['capitalCostRural']} />
+        <NumberField label="Need Only Upgrade, Urban" value={inputs.investment.upgradeShareUrban * 100} onChange={(v) => updateInvestment('upgradeShareUrban', v / 100)} step={0.1} unit="%" source={sources['upgradeShareUrban']} />
+        <NumberField label="Need Only Upgrade, Rural" value={inputs.investment.upgradeShareRural * 100} onChange={(v) => updateInvestment('upgradeShareRural', v / 100)} step={0.1} unit="%" source={sources['upgradeShareRural']} />
+        <NumberField label="Upgrade Cost / Person" value={inputs.investment.upgradeCostPerPerson} onChange={(v) => updateInvestment('upgradeCostPerPerson', v)} step={0.1} unit="$" source={sources['upgradeCostPerPerson']} />
         <NumberField label="Lifespan, Urban" value={inputs.investment.lifespanUrban} onChange={(v) => updateInvestment('lifespanUrban', v)} unit="yrs" source={sources['lifespanUrban']} />
         <NumberField label="Lifespan, Rural" value={inputs.investment.lifespanRural} onChange={(v) => updateInvestment('lifespanRural', v)} unit="yrs" source={sources['lifespanRural']} />
         <NumberField label="Programme Delivery" value={inputs.investment.programmeShare * 100} onChange={(v) => updateInvestment('programmeShare', v / 100)} unit="% of build" source={sources['programmeShare']} />

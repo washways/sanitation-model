@@ -24,7 +24,7 @@ export const BenefitCostPanel: React.FC<{ inputs: ModelInputs }> = ({ inputs }) 
         Yearly cost = building cost spread over the toilet's life at the {formatNumber(inputs.macro.discountRate * 100)}% discount rate, plus upkeep. Yearly benefit = the losses in the total above, once everyone is reached.
       </p>
       <p className="text-xs text-slate-500 mb-4">
-        Default costs: World Bank estimates for this country (Hutton &amp; Varughese 2016): US${formatNumber(inputs.investment.capitalCostUrban)} per person in towns and US${formatNumber(inputs.investment.capitalCostRural)} in rural areas, including promotion and supervision. Replace them under Inputs → 5. Benefit-Cost if you have national costs.
+        Default costs: World Bank estimates for this country (Hutton &amp; Varughese 2016): US${formatNumber(inputs.investment.capitalCostUrban)} per person in towns and US${formatNumber(inputs.investment.capitalCostRural)} in rural areas, including promotion and supervision. People who already have an unimproved latrine ({formatNumber(inputs.investment.upgradeShareRural * 100)}% of those without basic in rural areas) only need a slab, about US${inputs.investment.upgradeCostPerPerson.toFixed(2)} per person. Replace these under Inputs → 5. Benefit-Cost if you have national costs.
       </p>
       <div className="grid grid-cols-2 gap-3">
         <Stat label="Benefit-cost ratio" value={`${r.ratio.toFixed(1)} : 1`} sub="yearly benefit ÷ yearly cost" />
